@@ -4,7 +4,7 @@ const {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
   getVoteProposalButton,
-} = require("../shared/buttons");
+} = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model.js");
 const { VotingRound } = require("../models/votingRound.model.js");
 const { checkIfVerified } = require("./utils");
@@ -20,34 +20,35 @@ const {
   getPendingVerifiedCardanoWalletEmbed,
   getAlreadyVerifiedEthereumWalletEmbed,
   getPendingVerifiedEthereumWalletEmbed,
-} = require("../shared/embeds");
+  getHelpCommandEmbed,
+} = require("../sharedDiscordComponents/embeds");
 const {
   getVotingResult,
   getAllProposalsInfo,
 } = require("../api/quadraticVoting.js");
 
-const handleVerifyCardanoWalletCommand = async (message) => {
+const handleVerifyCardanoWalletCommand = async (interaction) => {
   const userVerified = await DiscordUser.findOne({
-    discordId: message.author.id,
-    serverId: message.guildId,
+    discordId: interaction.user.id,
+    serverId: interaction.guildId,
     cardanoIsVerified: true,
   });
   const alreadyVerifiedWalletEmbed = getAlreadyVerifiedCardanoWalletEmbed();
   if (userVerified) {
-    await message.reply({
+    await interaction.reply({
       embeds: [alreadyVerifiedWalletEmbed],
     });
     return;
   }
 
   const userPending = await DiscordUser.findOne({
-    discordId: message.author.id,
-    serverId: message.guildId,
+    discordId: interaction.user.id,
+    serverId: interaction.guildId,
     cardanoIsVerified: false,
   });
 
   if (userPending) {
-    await message.reply({
+    await interaction.reply({
       embeds: [getPendingVerifiedCardanoWalletEmbed()],
       components: [getVerifyCardanoWalletButton()],
     });
@@ -56,33 +57,33 @@ const handleVerifyCardanoWalletCommand = async (message) => {
 
   const verifyCardanoWalletButton = getVerifyCardanoWalletButton();
   const verifyCardanoWalletEmbed = getVerifyCardanoWalletEmbed();
-  message.reply({
+  interaction.reply({
     embeds: [verifyCardanoWalletEmbed],
     components: [verifyCardanoWalletButton],
   });
 };
 
-const handleVerifyEthereumWalletCommand = async (message) => {
+const handleVerifyEthereumWalletCommand = async (interaction) => {
   const userVerified = await DiscordUser.findOne({
-    discordId: message.author.id,
-    serverId: message.guildId,
+    discordId: interaction.user.id,
+    serverId: interaction.guildId,
     ethereumIsVerified: true,
   });
   if (userVerified) {
-    await message.reply({
+    await interaction.reply({
       embeds: [getAlreadyVerifiedEthereumWalletEmbed()],
     });
     return;
   }
 
   const userPending = await DiscordUser.findOne({
-    discordId: message.author.id,
-    serverId: message.guildId,
+    discordId: interaction.user.id,
+    serverId: interaction.guildId,
     ethereumIsVerified: false,
   });
 
   if (userPending) {
-    await message.reply({
+    await interaction.reply({
       embeds: [getPendingVerifiedEthereumWalletEmbed()],
       components: [getVerifyEthereumWalletButton()],
     });
@@ -91,22 +92,24 @@ const handleVerifyEthereumWalletCommand = async (message) => {
 
   const verifyEthereumWalletButton = getVerifyEthereumWalletButton();
   const verifyEthereumWalletEmbed = getVerifyEthereumWalletEmbed();
-  message.reply({
+  interaction.reply({
     embeds: [verifyEthereumWalletEmbed],
     components: [verifyEthereumWalletButton],
   });
 };
 
-const handleStartRoundCommand = async (message) => {
+const handleStartRoundCommand = async (interaction) => {
   const activeVotingRound = await VotingRound.findOne({
-    serverId: message.guildId,
+    serverId: interaction.guildId,
     status: "active",
   });
+  const serverOwner = await interaction.guild.fetchOwner();
+
   if (activeVotingRound) {
-    return message.reply("There is already an active voting round");
+    return interaction.reply("There is already an active voting round");
   }
-  if (message.guild.ownerId !== message.author.id) {
-    return message.reply(
+  if (serverOwner.user.id !== interaction.user.id) {
+    return interaction.reply(
       `You must be the owner of this server to start a voting round.`
     );
   }
@@ -115,23 +118,23 @@ const handleStartRoundCommand = async (message) => {
 
   const embed = getVotingSystemsEmbed();
 
-  await message.reply({
+  return interaction.reply({
     embeds: [embed],
     components: [startVotingRoundButton],
   });
 };
 
 // TODO: change this to find an active fund
-const handleRegisterProposalCommand = async (message) => {
+const handleRegisterProposalCommand = async (interaction) => {
   const votingRound = await VotingRound.findOne({
-    serverId: message.guildId,
+    serverId: interaction.guildId,
   });
   if (!votingRound) {
-    message.reply("No active voting round");
+    interaction.reply("No active voting round");
     return false;
   }
   const isVerifiedAndActiveVotingRound = await checkIfVerified(
-    message,
+    interaction,
     votingRound
   );
   if (!isVerifiedAndActiveVotingRound) {
@@ -142,41 +145,43 @@ const handleRegisterProposalCommand = async (message) => {
     "Register Proposal"
   );
   const registerProposalEmbed = getRegisterProposalEmbed();
-  await message.reply({
+  await interaction.reply({
     embeds: [registerProposalEmbed],
     components: [registerProposalButton],
   });
 };
 
-const handleVoteProposalCommand = async (message) => {
+const handleVoteProposalCommand = async (interaction) => {
   const votingRound = await VotingRound.findOne({
-    serverId: message.guildId,
+    serverId: interaction.guildId,
   });
   if (!votingRound) {
-    message.reply("No active voting round");
-    return false;
+    return interaction.reply("No active voting round");
   }
   const isVerifiedAndActiveVotingRound = await checkIfVerified(
-    message,
+    interaction,
     votingRound
   );
-  if (!isVerifiedAndActiveVotingRound) {
+  if (!isVerified) {
     return;
   }
   const voteProposalButton = getVoteProposalButton();
   const voteProposalEmbed = getVoteProposalEmbed();
-  await message.reply({
+  await interaction.reply({
     embeds: [voteProposalEmbed],
     components: [voteProposalButton],
   });
 };
 
-const handleDownVoteProposalCommand = async (message) => {
+const handleDownVoteProposalCommand = async (interaction) => {
   const votingRound = await VotingRound.findOne({
-    serverId: message.guildId,
+    serverId: interaction.guildId,
   });
-  const isVerifiedAndActiveVotingRound = await checkIfVerified(message);
-  if (!isVerifiedAndActiveVotingRound) {
+  if (!votingRound) {
+    return interaction.reply("No active voting round");
+  }
+  const isVerified = await checkIfVerified(message);
+  if (!isVerified) {
     return;
   }
   const voteProposalButton = getPrimaryButton(
@@ -184,29 +189,25 @@ const handleDownVoteProposalCommand = async (message) => {
     "Down Vote Proposal"
   );
   const downVoteProposalEmbed = getDownVoteProposalEmbed();
-  await message.reply({
+  await interaction.reply({
     embeds: [downVoteProposalEmbed],
     components: [voteProposalButton],
   });
 };
 
-const handleGetVotingRoundResultsCommand = async (message) => {
+const handleGetVotingRoundResultsCommand = async (interaction) => {
   const votingRoundInfo = await getVotingResult();
   const projectInfo = await getAllProposalsInfo();
   const embed = getQuadraticVotingResultsEmbed(votingRoundInfo, projectInfo);
-  message.reply({
+  interaction.reply({
     embeds: [embed],
   });
 };
 
-const handleHelpCommand = async (message) => {
-  await message.reply({
-    content: `**Commands**\n
-    **/verify** - Verify your wallet address\n
-    **/register-proposal** - Register your proposal\n
-    **/vote-proposal** - Vote for a proposal\n
-    **/down-vote-proposal** - Down vote a proposal\n
-    **/help** - Show this message\n`,
+const handleHelpCommand = async (interaction) => {
+  const helpCommandEmbed = getHelpCommandEmbed();
+  await interaction.reply({
+    embeds: [helpCommandEmbed],
   });
 };
 

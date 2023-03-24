@@ -7,12 +7,14 @@ const {
   getVerificationMethodModal,
   getSelectTokenModal,
   getEthereumWalletAddressModal,
-} = require("../shared/modals");
+} = require("../sharedDiscordComponents/modals");
 const {
   getConfirmVotingRoundInfoEmbed,
   getConfirmProposalEmbed,
   getConfirmVoteProposalEmbed,
-} = require("../shared/embeds");
+} = require("../sharedDiscordComponents/embeds");
+const { VotingRound } = require("../models/votingRound.model");
+const { initateFund } = require("../api/quadraticVoting");
 
 const handleStartRoundButton = async (interaction) => {
   if (interaction.guild.ownerId !== interaction.user.id)
@@ -61,8 +63,37 @@ const handleDownVoteProposalButton = async (interaction) => {
 };
 
 const handleConfirmVotingRoundInfoButton = async (interaction) => {
+  const activeVotingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "active",
+  });
+  if (activeVotingRound) {
+    return interaction.reply({
+      content: "There is already an active voting round",
+      ephemeral: true,
+    });
+  }
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "pending",
+  });
+  const response = await initateFund(
+    interaction.guildId,
+    votingRound.roundDurationInDays,
+    votingRound.assetIdentifierOnChain,
+    votingRound.blockchain
+  );
+  if (response.error) {
+    return interaction.reply({
+      content: response.message,
+      ephemeral: true,
+    });
+  }
+  votingRound.status = "active";
+  votingRound.votingRoundId = response.votingRoundId;
+  votingRound.save();
   const confirmVotingRoundInfoEmbed = getConfirmVotingRoundInfoEmbed();
-  await interaction.reply({
+  return interaction.reply({
     embeds: [confirmVotingRoundInfoEmbed],
   });
 };

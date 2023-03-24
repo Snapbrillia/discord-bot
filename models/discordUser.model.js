@@ -26,7 +26,7 @@ const DiscordUserSchema = new mongoose.Schema(
     discordUsername: {
       type: String,
     },
-    confirmAdaAmount: {
+    confirmLovelaceAmount: {
       type: Number,
     },
     confirmEthAmount: {

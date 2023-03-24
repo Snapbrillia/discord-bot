@@ -20,10 +20,10 @@ const verifyCardanoUsers = async () => {
     return;
   }
   users.forEach(async (user) => {
-    const { cardanoWalletAddress, confirmAdaAmount } = user;
+    const { cardanoWalletAddress, confirmLovelaceAmount } = user;
     const verified = await checkBalanceArrived(
       cardanoWalletAddress,
-      confirmAdaAmount
+      confirmLovelaceAmount
     );
     if (verified) {
       await DiscordUser.findOneAndUpdate(
@@ -34,10 +34,10 @@ const verifyCardanoUsers = async () => {
   });
 };
 
-const checkBalanceArrived = async (walletAddress, confirmAdaAmount) => {
+const checkBalanceArrived = async (walletAddress, confirmLovelaceAmount) => {
   const transactionHash = await getTxHashOfTransaction(
     walletAddress,
-    confirmAdaAmount
+    confirmLovelaceAmount
   );
   if (!transactionHash) {
     return false;
@@ -46,16 +46,15 @@ const checkBalanceArrived = async (walletAddress, confirmAdaAmount) => {
   return isVerified;
 };
 
-const getTxHashOfTransaction = async (walletAddress, confirmAdaAmount) => {
+const getTxHashOfTransaction = async (walletAddress, confirmLovelaceAmount) => {
   try {
-    const confimaAdaAmountLoveLace = confirmAdaAmount * 1000000;
+    const confimaAdaAmountLoveLace = confirmLovelaceAmount * 1000000;
     const transactions = await axios.get(
       `${blockfrostURL}/addresses/${walletAddress}/utxos`,
       {
         headers: blockfrostHeaders,
       }
     );
-    console.log(transactions.data);
     const { tx_hash } = transactions.data.find((transaction) => {
       if (
         transaction.amount[0].unit === "lovelace" &&
@@ -83,13 +82,28 @@ const verifyTxHash = async (walletAddress, txHash) => {
     );
     return isVerified;
   } catch (err) {
-    return false;
+    return null;
   }
 };
 
-const getTokenFromPolicyId = async (policyId) => {
-  if (policyId === "ADA") {
-    return "ADA";
+// Asset Idenitifer is the concatnation of the asset name and policy ID
+const getTokenFromPolicyId = async (assetIdentifier) => {
+  try {
+    if (assetIdentifier === "ADA") {
+      return "ADA";
+    }
+    const tokens = await axios.get(
+      `${blockfrostURL}/assets/${assetIdentifier}`,
+      {
+        headers: blockfrostHeaders,
+      }
+    );
+    const tokenName = Buffer.from(tokens.data.asset_name, "hex").toString(
+      "utf8"
+    );
+    return tokenName;
+  } catch (err) {
+    return null;
   }
 };
 

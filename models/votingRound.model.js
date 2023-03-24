@@ -29,6 +29,12 @@ const VotingRoundSchema = new mongoose.Schema(
     assetName: {
       type: String,
     },
+    blockchain: {
+      type: String,
+    },
+    projectInfo: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

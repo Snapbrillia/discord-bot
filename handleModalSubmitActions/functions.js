@@ -15,7 +15,7 @@ const {
   getVotingSystemsEmbed,
   getProposalInfoEmbed,
   getVoteProposalInfoEmbed,
-} = require("../shared/embeds");
+} = require("../sharedDiscordComponents/embeds");
 const { getTokenFromAddress } = require("../utils/ethereumUtils");
 const { getTokenFromPolicyId } = require("../utils/cardanoUtils");
 const {
@@ -24,9 +24,8 @@ const {
   getSelectQVTokenVerificationMethodButton,
   getSelectTokenButton,
   getConfirmVotingRoundInfoButton,
-  getConfirmProposalButton,
   getConfirmVoteButton,
-} = require("../shared/buttons");
+} = require("../sharedDiscordComponents/buttons");
 const { numberRegex } = require("../utils/shared");
 
 const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
@@ -34,22 +33,31 @@ const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
   const serverId = interaction.guildId;
   const discordUsername = interaction.user.username;
   const confirmLovelaceAmount = randomNumber(1500000, 5000000);
-  const confirmAdaAmount = confirmLovelaceAmount / 1000000;
   const cardanoWalletAddress = interaction.fields
     .getTextInputValue("walletAddressInput")
     .trim();
 
-  await DiscordUser.create({
-    cardanoWalletAddress,
-    cardanoIsVerified: false,
+  const user = await DiscordUser.findOne({
     discordId,
     serverId,
-    discordUsername,
-    confirmAdaAmount,
   });
-
+  if (user) {
+    user.cardanoWalletAddress = cardanoWalletAddress;
+    user.cardanoIsVerified = false;
+    user.confirmLovelaceAmount = confirmLovelaceAmount;
+    await user.save();
+  } else {
+    await DiscordUser.create({
+      cardanoWalletAddress,
+      cardanoIsVerified: false,
+      discordId,
+      serverId,
+      discordUsername,
+      confirmLovelaceAmount,
+    });
+  }
   interaction.reply(
-    `Please send ${sendAdaAmount} ADA to the provided wallet address within 5 minutes to verify your wallet`
+    `Please send ${confirmLovelaceAmount} ADA to the provided wallet address within 5 minutes to verify your wallet`
   );
 };
 
@@ -184,6 +192,7 @@ const handleVerificationMethodInputModal = async (interaction) => {
     }
     let embeded = "";
     let button = "";
+    // looks if it is a tokenized vote
     if (isTokenizedVote) {
       if (verificationMethod === "1") {
         embeded = getEthereumSelectTokenEmbed();
@@ -198,9 +207,11 @@ const handleVerificationMethodInputModal = async (interaction) => {
     switch (verificationMethod) {
       case "1":
         votingRound.verificationMethod = "Ethereum Wallet";
+        votingRound.blockchain = "Ethereum";
         break;
       case "2":
         votingRound.verificationMethod = "Cardano Wallet";
+        votingRound.blockchain = "Cardano";
         break;
       case "3":
         votingRound.verificationMethod = "Discord Account";
@@ -229,6 +240,25 @@ const handleTokenSelectInputModal = async (interaction) => {
   } else {
     tokenName = await getTokenFromPolicyId(token);
   }
+
+  if (!tokenName) {
+    if (votingRound.verificationMethod === "Ethereum Wallet") {
+      return interaction.reply({
+        content:
+          "Failed to find token with this contract address, please try again",
+        embeds: [getEthereumSelectTokenEmbed()],
+        components: [getSelectTokenButton()],
+      });
+    } else {
+      return interaction.reply({
+        content:
+          "Failed to find token with this policy and asset name, please try again. ",
+        embeds: [getCardanoSelectTokenEmbed()],
+        components: [getSelectTokenButton()],
+      });
+    }
+  }
+
   votingRound.assetIdentifierOnChain = token;
   votingRound.assetName = tokenName;
   await votingRound.save();
@@ -239,15 +269,20 @@ const handleTokenSelectInputModal = async (interaction) => {
 };
 
 const handleRegisterProposalInputModal = async (interaction) => {
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "active",
+  });
   const discordUser = await DiscordUser.findOne({
     discordId: interaction.user.id,
     serverId: interaction.guildId,
-    isVerified: true,
   });
-  const votingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    isActive: true,
-  });
+  let walletAddress = "";
+  if (votingRound.blockchain === "Ethereum") {
+    walletAddress = discordUser.ethereumWalletAddress;
+  } else {
+    walletAddress = discordUser.cardanoWalletAddress;
+  }
   const proposalName =
     interaction.fields.getTextInputValue("proposalNameInput");
   const proposalDescription = interaction.fields.getTextInputValue(
@@ -257,18 +292,17 @@ const handleRegisterProposalInputModal = async (interaction) => {
     proposalName,
     proposalDescription,
   };
-  // const registerProposalResponse = await registerProposal(
-  //   discordUser.walletAddress,
-  //   votingRound.votingRoundId,
-  //   projectInfo
-  // );
-  // if (registerProposalResponse.err) {
-  //   interaction.reply(registerProposalResponse.message);
-  //   return;
-  // }
+  const registerProposalResponse = await registerProposal(
+    walletAddress,
+    votingRound.votingRoundId,
+    projectInfo
+  );
+  if (registerProposalResponse.err) {
+    interaction.reply(registerProposalResponse.message);
+    return;
+  }
   interaction.reply({
     embeds: [getProposalInfoEmbed(projectInfo)],
-    components: [getConfirmProposalButton()],
   });
 };
 
@@ -276,11 +310,10 @@ const handleVoteProposalInputModal = async (interaction, action) => {
   const discordUser = await DiscordUser.findOne({
     discordId: interaction.user.id,
     serverId: interaction.guildId,
-    isVerified: true,
   });
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
-    isActive: true,
+    status: "active",
   });
   const voteToAddress = await interaction.fields.getTextInputValue(
     "proposalWalletAddressInput"
@@ -288,21 +321,25 @@ const handleVoteProposalInputModal = async (interaction, action) => {
   const percentageAllocated = await interaction.fields.getTextInputValue(
     "percentageAllocatedInput"
   );
-  // const voteProposalResponse = await voteToProposal(
-  //   discordUser.walletAddress,
-  //   votingRound.votingRoundId,
-  //   percentageAllocated,
-  //   voteToAddress,
-  //   action
-  // );
-  // if (voteProposalResponse.err) {
-  //   interaction.reply(voteProposalResponse.message);
-  //   return;
-  // }
-
+  let walletAddress = "";
+  if (votingRound.blockchain === "Ethereum") {
+    walletAddress = discordUser.ethereumWalletAddress;
+  } else {
+    walletAddress = discordUser.cardanoWalletAddress;
+  }
+  const voteProposalResponse = await voteToProposal(
+    walletAddress,
+    votingRound.votingRoundId,
+    percentageAllocated,
+    voteToAddress,
+    action
+  );
+  if (voteProposalResponse.err) {
+    interaction.reply(voteProposalResponse.message);
+    return;
+  }
   interaction.reply({
     embeds: [getVoteProposalInfoEmbed(voteToAddress, percentageAllocated)],
-    components: [getConfirmVoteButton()],
   });
 };
 

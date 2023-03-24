@@ -2,7 +2,10 @@ const { EmbedBuilder } = require("discord.js");
 const { formatDate } = require("../utils/shared");
 
 const createEmbed = (title, description) => {
-  const embed = new EmbedBuilder().setTitle(title).setDescription(description);
+  const embed = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor("#a900a6");
   return embed;
 };
 
@@ -67,7 +70,7 @@ const getEthereumSelectTokenEmbed = () => {
     "🌟 Select Voting Token 🌟",
     `You have selected to require voters to verify themselve using an Ethereum wallet. \n
     The last step is to select the token you want to use for voting. \n
-    If you want to use an ERC20 token, please enter the contract address of the token. \n
+    If you want to use an token, please enter the contract address of the token. \n
     If you want to use ETH, please enter "ETH". \n
     `
   );
@@ -79,8 +82,9 @@ const getCardanoSelectTokenEmbed = () => {
     "🌟 Select Voting Token 🌟 ",
     `You have selected to require voters to verify themselve using an Cardano wallet. \n
     The last step is to select the token you want to use for voting. \n
-    If you want to use an Cardano Asset, please enter the Policy ID of the asset. \n
+    If you want to use an Token, please enter the concatination of the hex encoding of the Asset Name and Policy ID of the Token. \n
     If you want to use ADA, please enter "ADA". \n
+    To see the tokens in your cardano wallet, please enter the command "/assets-in-cardano-wallet". \n
     `
   );
   return embed;
@@ -175,7 +179,7 @@ const getRegisterProposalEmbed = () => {
 const getProposalInfoEmbed = (proposalInfo) => {
   const embed = createEmbed(
     "📝 Proposal Info 📝 ",
-    `Please confirm the following information about the proposal \n
+    `You have successfully registered the following proposal \n
       Proposal Name: **${proposalInfo.proposalName}**\n
       Proposal Description: **${proposalInfo.proposalDescription}**\n
       `
@@ -215,7 +219,7 @@ const getVoteProposalEmbed = () => {
 const getVoteProposalInfoEmbed = (propsoalName, percentageAllocated) => {
   const embed = createEmbed(
     "🗳️ Vote Proposal Info 🗳️ ",
-    `Please confirm the following information about the proposal you want to vote for. \n
+    `You have voted for a proposal with the following information. \n
       Proposal Name: **${propsoalName}**\n
       Percentage of Voting Power Allocated: **${percentageAllocated}%**\n
     `
@@ -249,6 +253,43 @@ const getPendingVerifiedEthereumWalletEmbed = () => {
   return embed;
 };
 
+const getHelpCommandEmbed = () => {
+  const embed = createEmbed(
+    "Help",
+    `**For Admins** \n
+    /start-voting-round** - Start the voting round\n
+    **For Voters** \n
+    **/verify-cardano-wallet** - Verify your Cardano wallet address\n
+    **/verify-ethereum-wallet** - Verify your Ethereum wallet address\n
+    **/register-proposal** - Register your proposal\n
+    **/vote-proposal** - Vote for a proposal\n
+    **/down-vote-proposal** - Down vote a proposal\n
+    **/help** - Show this message\n`
+  );
+  return embed;
+};
+
+const getAdminIntroductionEmbed = () => {
+  const embed = createEmbed(
+    "👋 Snapbrillia Voting Bot 👋",
+    `Thank You for using Snapbrillia Voting Bot. To get started enter the command /help. \n
+    Please make sure only admins are allowed in this channel
+    `
+  );
+  return embed;
+};
+
+const getMemberIntrouductionEmbed = () => {
+  const embed = createEmbed(
+    "👋 Snapbrillia Voting Bot 👋",
+    `Welcome to the Snapbrillia Voting Bot! \n
+  Before you can participate in any of our voting rounds, we require all members to verify their wallet addresses. Don't worry, it's a quick and easy process! 🔒🛡️ \n
+  To get a list of all the commands you can use, please type **/help** \n  
+  `
+  );
+  return embed;
+};
+
 module.exports = {
   getListOfVerifiedEmbed,
   getVotingRoundInfoEmbed,
@@ -271,4 +312,7 @@ module.exports = {
   getPendingVerifiedCardanoWalletEmbed,
   getPendingVerifiedEthereumWalletEmbed,
   getAlreadyVerifiedEthereumWalletEmbed,
+  getHelpCommandEmbed,
+  getAdminIntroductionEmbed,
+  getMemberIntrouductionEmbed,
 };

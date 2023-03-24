@@ -1,18 +1,25 @@
 const axios = require("axios");
 const url = "http://localhost:8000";
 
-const initateFund = async (channelId, daysTillDeadline) => {
+const initateFund = async (
+  channelId,
+  roundDurationInDays,
+  assetIdentiferOnChain,
+  blockchain
+) => {
   try {
     const response = await axios.post(
       `${url}/snapbrillia/quadratic-voting/initiate-fund`,
       {
         fundOwnerId: channelId,
-        daysTillDeadline,
+        roundDurationInDays,
+        assetIdentiferOnChain,
+        blockchain,
       }
     );
     return response.data;
-  } catch (err) {
-    return { err: true, message: err.response.data.error };
+  } catch (error) {
+    return { error: true, message: error.response.data.error };
   }
 };
 
@@ -27,8 +34,8 @@ const registerProposal = async (walletAddress, votingRoundId, projectInfo) => {
       }
     );
     return response.data;
-  } catch (err) {
-    return { err: true, message: err.response.data.error };
+  } catch (error) {
+    return { error: true, message: error.response.data.error };
   }
 };
 
@@ -51,8 +58,8 @@ const voteToProposal = async (
       }
     );
     return response.data;
-  } catch (err) {
-    return { err: true, message: err.response.data.error };
+  } catch (error) {
+    return { error: true, message: error.response.data.error };
   }
 };
 

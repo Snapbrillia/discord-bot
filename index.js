@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, createChannel } = require("discord.js");
 const {
   handleVerifyCardanoWalletButton,
   handleRegisterProposalButton,
@@ -11,7 +11,7 @@ const {
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
-} = require("./buttonClickActions/functions");
+} = require("./handleButtonClickActions/functions");
 const {
   handleConfirmCardanoWalletAddressInputModal,
   handleVotingSystemInputModal,
@@ -20,7 +20,7 @@ const {
   handleVerificationMethodInputModal,
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
-} = require("./modalSubmitActions/functions");
+} = require("./handleModalSubmitActions/functions");
 const {
   handleVerifyCardanoWalletCommand,
   handleRegisterProposalCommand,
@@ -30,9 +30,14 @@ const {
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
   handleVerifyEthereumWalletCommand,
-} = require("./commandActions/functions");
+} = require("./handleCommandActions/functions");
 const { verifyCardanoUsers } = require("./utils/cardanoUtils");
 const { verifyEthereumUsers } = require("./utils/ethereumUtils");
+const { deployScripts } = require("./deployCommandScript");
+const {
+  createChannelWithOwner,
+  createChannelWithUsers,
+} = require("./handleGuildCreateActions/functions");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -51,38 +56,28 @@ client.on("ready", () => {
 });
 
 // TODO: ADD resend message if failed
-// Commands to handle
-client.on("messageCreate", async (message) => {
-  switch (message.content) {
-    case "/start-voting-round":
-      await handleStartRoundCommand(message);
-      break;
-    case "/verify-cardano-wallet":
-      await handleVerifyCardanoWalletCommand(message);
-      break;
-    case "/verify-ethereum-wallet":
-      await handleVerifyEthereumWalletCommand(message);
-      break;
-    case "/get-voting-round-results":
-      await handleGetVotingRoundResultsCommand(message);
-      break;
-    case "/register-proposal":
-      await handleRegisterProposalCommand(message);
-      break;
-    case "/vote-proposal":
-      await handleVoteProposalCommand(message);
-      break;
-    // TODO: Add verify information and confirm
-    case "/down-vote-proposal":
-      await handleDownVoteProposalCommand(message);
-      break;
-    case "/help":
-      await handleHelpCommand(message);
-      break;
-  }
+// TODO: DISABLE BUTTON ONCE CLICKED
+// Bot is added to server. Creates private channels with admins and users
+client.on("guildCreate", async (guild) => {
+  const members = await guild.members.fetch();
+  const owner = await guild.fetchOwner();
+  createChannelWithOwner(guild, owner, client.user.id);
+  members.forEach((member) => {
+    console.log(member);
+    if (member.user.bot) {
+      return;
+    }
+    createChannelWithUsers(guild, member, client.user.id);
+  });
+  await deployScripts(guild);
 });
 
-// handle button clicks
+// creare private channel with every user, private chaneel with the owner
+// TODO PRIVATE CHANNEL WITH ALL USERS
+// When new members join. Create a private channel with them
+client.on("guildMemberAdd", (member) => {});
+
+// Handle button clicks
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
 
@@ -100,7 +95,7 @@ client.on("interactionCreate", async (interaction) => {
       await handleSelectTokenButton(interaction);
       break;
     case "confirmVotingRoundInfoButton":
-      await handleConfirmVotingRoundInfoButton(interaction, true);
+      await handleConfirmVotingRoundInfoButton(interaction);
       break;
     case "verifyCardanoWalletButton":
       await handleVerifyCardanoWalletButton(interaction);
@@ -126,7 +121,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// handle modal submits
+// Handle modal submits
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
@@ -157,6 +152,40 @@ client.on("interactionCreate", async (interaction) => {
       break;
   }
 });
+
+// Handle commands
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+
+  switch (interaction.commandName) {
+    case "start-voting-round":
+      await handleStartRoundCommand(interaction);
+      break;
+    case "verify-cardano-wallet":
+      await handleVerifyCardanoWalletCommand(interaction);
+      break;
+    case "verify-ethereum-wallet":
+      await handleVerifyEthereumWalletCommand(interaction);
+      break;
+    case "register-proposal":
+      await handleRegisterProposalCommand(interaction);
+      break;
+    case "vote-proposal":
+      await handleVoteProposalCommand(interaction);
+      break;
+    case "down-vote-proposal":
+      await handleDownVoteProposalCommand(interaction);
+      break;
+    case "get-voting-round-results":
+      await handleGetVotingRoundResultsCommand(interaction);
+      break;
+    case "help":
+      await handleHelpCommand(interaction);
+      break;
+  }
+});
+
+//check if bot is mentioned in a message.
 
 client.login(process.env.TOKEN);
 
