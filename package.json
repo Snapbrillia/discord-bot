@@ -1,0 +1,22 @@
+{
+  "name": "discord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@brillout/import": "^0.2.2",
+    "alchemy-sdk": "^2.6.1",
+    "axios": "^1.3.4",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "langchain": "^0.0.35",
+    "mongoose": "^7.0.1",
+    "node-fetch": "^3.3.1",
+    "openai": "^3.2.1"
+  }
+}
