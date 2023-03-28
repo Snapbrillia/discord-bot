@@ -257,7 +257,7 @@ const getHelpCommandEmbed = () => {
   const embed = createEmbed(
     "Help",
     `**For Admins** \n
-    /start-voting-round** - Start the voting round\n
+    **/start-voting-round** - Start the voting round\n
     **For Voters** \n
     **/verify-cardano-wallet** - Verify your Cardano wallet address\n
     **/verify-ethereum-wallet** - Verify your Ethereum wallet address\n

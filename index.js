@@ -55,8 +55,6 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-// TODO: ADD resend message if failed
-// TODO: DISABLE BUTTON ONCE CLICKED
 // Bot is added to server. Creates private channels with admins and users
 client.on("guildCreate", async (guild) => {
   const members = await guild.members.fetch();
@@ -156,7 +154,6 @@ client.on("interactionCreate", async (interaction) => {
 // Handle commands
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
   switch (interaction.commandName) {
     case "start-voting-round":
       await handleStartRoundCommand(interaction);
@@ -184,8 +181,6 @@ client.on("interactionCreate", async (interaction) => {
       break;
   }
 });
-
-//check if bot is mentioned in a message.
 
 client.login(process.env.TOKEN);
 

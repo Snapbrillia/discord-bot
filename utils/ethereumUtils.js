@@ -19,7 +19,6 @@ const verifyEthereumUsers = async () => {
       ethereumWalletAddress,
       confirmEthAmount
     );
-    console.log(verified);
     if (verified) {
       await DiscordUser.findOneAndUpdate(
         { discordId: user.discordId, channelId: user.channelId },
