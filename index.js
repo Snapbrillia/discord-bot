@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, createChannel } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 const {
   handleVerifyCardanoWalletButton,
   handleRegisterProposalButton,
