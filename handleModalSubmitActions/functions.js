@@ -8,7 +8,6 @@ const { VotingRound } = require("../models/votingRound.model");
 const { DiscordUser } = require("../models/discordUser.model");
 const {
   getWalletVerificationEmbed,
-  getListOfVerifiedEmbed,
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getVotingRoundInfoEmbed,
@@ -95,72 +94,6 @@ const handleConfirmEthereumWalletAddressInputModal = async (interaction) => {
   );
 };
 
-const handleVotingSystemInputModal = async (interaction) => {
-  const roundDuration = interaction.fields
-    .getTextInputValue("deadlineInput")
-    .trim();
-  if (!numberRegex.test(roundDuration)) {
-    interaction.reply({
-      content:
-        "Please enter a valid number for days the voting round should last(e.g. 1)",
-      embeds: [getVotingSystemsEmbed()],
-      components: [getSelectVotingSystemButton()],
-    });
-    return;
-  }
-  const votingSystem = interaction.fields
-    .getTextInputValue("votingSystemInput")
-    .trim();
-  if (!numberRegex.test(votingSystem) || votingSystem < 1 || votingSystem > 4) {
-    interaction.reply({
-      content: "Please enter a valid number for voting system (e.g. 1)",
-      embeds: [getVotingSystemsEmbed()],
-      components: [getSelectVotingSystemButton()],
-    });
-    return;
-  }
-  let votingSystemToUse = "";
-  let embedContent = getListOfVerifiedEmbed();
-  let confirmVerificationButton = getSelectVerificationMethodButton();
-  switch (votingSystem) {
-    case "1":
-      embedContent = getWalletVerificationEmbed();
-      votingSystemToUse = "Quadratic Voting (Token In Wallet)";
-      confirmVerificationButton = getSelectQVTokenVerificationMethodButton();
-      break;
-    case "2":
-      votingSystemToUse = "Quadratic Voting (Same Voting Power)";
-      break;
-    case "3":
-      votingSystemToUse = "Basic Voting";
-      break;
-    case "4":
-      votingSystemToUse = "Single Choice Voting";
-      break;
-  }
-  const roundDurationInDays = parseInt(roundDuration);
-  const pendingVotingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "pending",
-  });
-  if (pendingVotingRound) {
-    pendingVotingRound.roundDurationInDays = roundDurationInDays;
-    pendingVotingRound.votingSystemToUse = votingSystemToUse;
-    await pendingVotingRound.save();
-  } else {
-    await VotingRound.create({
-      serverId: interaction.guildId,
-      roundDurationInDays,
-      votingSystemToUse,
-      status: "pending",
-    });
-  }
-  interaction.reply({
-    embeds: [embedContent],
-    components: [confirmVerificationButton],
-  });
-};
-
 const handleVerificationMethodInputModal = async (interaction) => {
   try {
     const votingRound = await VotingRound.findOne({
@@ -168,28 +101,11 @@ const handleVerificationMethodInputModal = async (interaction) => {
       status: "pending",
     });
     const isTokenizedVote =
-      votingRound.votingSystemToUse === "Quadratic Voting (Token In Wallet)";
+      votingRound.votingSystem === "Quadratic Voting (Tokens In Wallet)";
     const verificationMethod = interaction.fields
       .getTextInputValue("verificationMethodInput")
       .trim();
-    let verficationMethodLimit = "";
-    if (isTokenizedVote) {
-      verficationMethodLimit = 2;
-    } else {
-      verficationMethodLimit = 3;
-    }
-    if (
-      !numberRegex.test(verificationMethod) ||
-      verificationMethod < 1 ||
-      verificationMethod > verficationMethodLimit
-    ) {
-      interaction.reply({
-        content: "Please enter a valid verification method (e.g. 1)",
-        embeds: [getWalletVerificationEmbed()],
-        components: [getSelectVerificationMethodButton()],
-      });
-      return;
-    }
+
     let embeded = "";
     let button = "";
     // looks if it is a tokenized vote
@@ -345,7 +261,6 @@ const handleVoteProposalInputModal = async (interaction, action) => {
 
 module.exports = {
   handleConfirmCardanoWalletAddressInputModal,
-  handleVotingSystemInputModal,
   handleTokenSelectInputModal,
   handleRegisterProposalInputModal,
   handleVoteProposalInputModal,

@@ -14,7 +14,6 @@ const {
 } = require("./handleButtonClickActions/functions");
 const {
   handleConfirmCardanoWalletAddressInputModal,
-  handleVotingSystemInputModal,
   handleRegisterProposalInputModal,
   handleVoteProposalInputModal,
   handleVerificationMethodInputModal,
@@ -38,6 +37,12 @@ const {
   createChannelWithOwner,
   createChannelWithUsers,
 } = require("./handleGuildCreateActions/functions");
+const {
+  handleVotingSystemMenu,
+  handleRoundDurationMenu,
+  handleSelectVerificationMethodMenu,
+  handleSelectIfOnlyTokenHolderCanVoteMenu,
+} = require("./handleSelectMenuActions/functions");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -75,16 +80,56 @@ client.on("guildCreate", async (guild) => {
 // When new members join. Create a private channel with them
 client.on("guildMemberAdd", (member) => {});
 
-// Handle button clicks
+// Handle commands
 client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
+  if (!interaction.isChatInputCommand()) return;
+  switch (interaction.commandName) {
+    case "start-voting-round":
+      await handleStartRoundCommand(interaction);
+      break;
+    case "verify-cardano-wallet":
+      await handleVerifyCardanoWalletCommand(interaction);
+      break;
+    case "verify-ethereum-wallet":
+      await handleVerifyEthereumWalletCommand(interaction);
+      break;
+    case "register-proposal":
+      await handleRegisterProposalCommand(interaction);
+      break;
+    case "vote-proposal":
+      await handleVoteProposalCommand(interaction);
+      break;
+    case "down-vote-proposal":
+      await handleDownVoteProposalCommand(interaction);
+      break;
+    case "get-voting-round-results":
+      await handleGetVotingRoundResultsCommand(interaction);
+      break;
+    case "help":
+      await handleHelpCommand(interaction);
+      break;
+  }
+});
+
+// Handle Select Menu
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isStringSelectMenu()) return;
 
   switch (interaction.customId) {
-    case "selectVotingSystemButton":
-      await handleStartRoundButton(interaction);
+    case "selectVotingSystemMenu":
+      await handleVotingSystemMenu(interaction);
       break;
-    case "selectVerificationMethodButton":
-      await handleVerificationMethodButton(interaction);
+    case "selectIfOnlyTokenHolderCanVoteMenu":
+      await handleSelectIfOnlyTokenHolderCanVoteMenu(interaction);
+      break;
+    case "selectVerificationMethodMenu":
+      await handleSelectVerificationMethodMenu(interaction);
+      break;
+    case "selectRoundDurationMenu":
+      await handleRoundDurationMenu(interaction);
+      break;
+    case "selectIfOnlyTokenVoterCanVoteMenu":
+      await handleSelectIfOnlyTokenVoterCanVoteMenu(interaction);
       break;
     case "selectQVTokenVerificationMethodButton":
       await handleVerificationMethodButton(interaction, true);
@@ -147,37 +192,6 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "downVoteProposalInputModal":
       await handleVoteProposalInputModal(interaction, "down-vote");
-      break;
-  }
-});
-
-// Handle commands
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-  switch (interaction.commandName) {
-    case "start-voting-round":
-      await handleStartRoundCommand(interaction);
-      break;
-    case "verify-cardano-wallet":
-      await handleVerifyCardanoWalletCommand(interaction);
-      break;
-    case "verify-ethereum-wallet":
-      await handleVerifyEthereumWalletCommand(interaction);
-      break;
-    case "register-proposal":
-      await handleRegisterProposalCommand(interaction);
-      break;
-    case "vote-proposal":
-      await handleVoteProposalCommand(interaction);
-      break;
-    case "down-vote-proposal":
-      await handleDownVoteProposalCommand(interaction);
-      break;
-    case "get-voting-round-results":
-      await handleGetVotingRoundResultsCommand(interaction);
-      break;
-    case "help":
-      await handleHelpCommand(interaction);
       break;
   }
 });

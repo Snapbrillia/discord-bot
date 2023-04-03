@@ -21,11 +21,15 @@ const {
   getAlreadyVerifiedEthereumWalletEmbed,
   getPendingVerifiedEthereumWalletEmbed,
   getHelpCommandEmbed,
-} = require("../sharedDiscordComponents/embeds");
+} = require("../sharedDiscordComponents/embeds.js");
+const {
+  getSelectVotingSystemMenu,
+} = require("../sharedDiscordComponents/selectMenu.js");
 const {
   getVotingResult,
   getAllProposalsInfo,
 } = require("../api/quadraticVoting.js");
+const { getImage } = require("../sharedDiscordComponents/image");
 
 const handleVerifyCardanoWalletCommand = async (interaction) => {
   const userVerified = await DiscordUser.findOne({
@@ -64,18 +68,6 @@ const handleVerifyCardanoWalletCommand = async (interaction) => {
 };
 
 const handleVerifyEthereumWalletCommand = async (interaction) => {
-  const userVerified = await DiscordUser.findOne({
-    discordId: interaction.user.id,
-    serverId: interaction.guildId,
-    ethereumIsVerified: true,
-  });
-  if (userVerified) {
-    await interaction.reply({
-      embeds: [getAlreadyVerifiedEthereumWalletEmbed()],
-    });
-    return;
-  }
-
   const userPending = await DiscordUser.findOne({
     discordId: interaction.user.id,
     serverId: interaction.guildId,
@@ -104,7 +96,6 @@ const handleStartRoundCommand = async (interaction) => {
     status: "active",
   });
   const serverOwner = await interaction.guild.fetchOwner();
-
   if (activeVotingRound) {
     return interaction.reply("There is already an active voting round");
   }
@@ -113,14 +104,13 @@ const handleStartRoundCommand = async (interaction) => {
       `You must be the owner of this server to start a voting round.`
     );
   }
-
-  const startVotingRoundButton = getSelectVotingSystemButton();
-
+  const selectMenu = getSelectVotingSystemMenu();
   const embed = getVotingSystemsEmbed();
-
+  const image = getImage();
   return interaction.reply({
     embeds: [embed],
-    components: [startVotingRoundButton],
+    components: [selectMenu],
+    files: [image],
   });
 };
 

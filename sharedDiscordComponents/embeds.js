@@ -1,10 +1,19 @@
 const { EmbedBuilder } = require("discord.js");
-const { formatDate } = require("../utils/shared");
+const {
+  getStartAndEndDate,
+  getVotingRoundConfigurationText,
+} = require("../utils/shared");
 
 const createEmbed = (title, description) => {
   const embed = new EmbedBuilder()
     .setTitle(title)
     .setDescription(description)
+    .setAuthor({
+      name: "Snapbrillia",
+      url: "https://snapbrillia.com",
+      iconURL: `attachment://snapicon.png`,
+    })
+    .setThumbnail(`attachment://snapicon.png`)
     .setColor("#a900a6");
   return embed;
 };
@@ -12,13 +21,11 @@ const createEmbed = (title, description) => {
 const getVotingSystemsEmbed = () => {
   const embed = createEmbed(
     "Select Voting System",
-    `🗳️ Snapbrillia's Voting System! 🎉\n \n
-    🔥 We offer four dynamic voting methods to choose from, each with its own unique strengths and advantages. Whether you're running an election, gathering input from your team, or making a group decision, our system is designed to provide a simple, user-friendly experience that delivers reliable, accurate results.\n \n
-    1️⃣ Quadratic Voting (Token In Wallet) - The voting power of each voter will be decided by the amount of a specific asser the voter has in his wallet when the voting round ends. Users will specify the percentage of his voting power he will allocate to a proposal (down or up vote) when voting. Their votes will be squared rooted.\n
-    2️⃣ Quadratic Voting (Same Voting Power) - Each user will have the same voting power.Their votes will be square rooted.\n
-    3️⃣ Basic Voting - Voters can choose to vote either For or Against a proposal. \n
-    4️⃣ Single Choice Voting - Voters can choose to vote for one proposal only and all votes are counted equally. \n \n
-    🗳️ To start a voting round, please enter the number next to the voting system you would like to use. \n \n
+    `👋 Hi there! I'm the Snapbrillia Bot and I'm here to guide you through the process of setting up a voting round in your server. 🤖 To get started, please choose the voting system you'd like to use for this round. To ensure the security of your voting round, we recommend that only administrators are included in this channel, to prevent unauthorized access and editing. 🛡️ Thanks for choosing our bot to manage voting within your community! \n  \n    
+    1️⃣ Single Vote - Voters only have one vote. \n 
+    2️⃣ Yes/No Voting - Voters can choose to vote either For or Against a proposal. \n
+    3️⃣ Quadratic Voting (Tokens In Wallet) - The voting power of each voter will be decided by the amount of a specific asser the voter has in his wallet when the voting round ends. Users will specify the percentage of his voting power he will allocate to a proposal (down or up vote) when voting. Their votes will be calculated using the quadratic voting formula.\n
+    4️⃣ Quadratic Voting (Same Voting Power) - Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
     `
   );
   return embed;
@@ -42,32 +49,59 @@ const getAlreadyVerifiedEthereumWalletEmbed = () => {
   return embed;
 };
 
-const getListOfVerifiedEmbed = () => {
+const getSelectIfOnlyTokenHolderCanVoteEmbed = (votingSystem) => {
+  const embed = createEmbed(
+    "🔒🗳️️ Select Voting Permissions 🗳️🔒",
+    `Please select the the voting permissions for this voting round. \n \n
+  1️⃣ Only Token Holders: Only users who hold the token can vote. \n
+  2️⃣ Everyone Can Vote: Everyone can vote as long as they are verified. \n \n
+  ${getVotingRoundConfigurationText(votingSystem)} 
+  `
+  );
+  return embed;
+};
+
+const getVotingRoundDurationEmbed = (votingSystem) => {
+  const embed = createEmbed(
+    "🕒⏱️ Select Voting Round Duration ⏱️🕒",
+    `Please select how long you want the voting round to last. \n \n
+   ${getVotingRoundConfigurationText(
+     votingSystem,
+     votingSystem.onlyTokenHolderCanVote
+   )} 
+    `
+  );
+  return embed;
+};
+
+const getListOfVerifiedEmbed = (votingSystem, onlyTokenHolderCanVote) => {
   const embed = createEmbed(
     "Select Verification Method",
     `🔒🛡️ Verification Methods 🛡️🔒 \n \n
   1️⃣ Ethereum Wallet Address: Users will need to authenticate themselves by proving ownership of their Ethereum based wallet address. \n
   2️⃣ Cardano Wallet Address: Users will need to authenticate themselves by proving ownership of their Cardano based wallet address. \n
-  3️⃣ Discord Account: Users can vote simply by being a member of your discord community. \n
-`
+  3️⃣ Discord Account: Users can vote simply by being a member of your discord community. \n \n
+  ${getVotingRoundConfigurationText(votingSystem, onlyTokenHolderCanVote)}
+  `
   );
   return embed;
 };
 
-const getWalletVerificationEmbed = () => {
+const getWalletVerificationEmbed = (votingSystem, onlyTokenHolderCanVote) => {
   const embed = createEmbed(
     "🔒🛡️ Select Verification Method 🛡️🔒",
     `Since the voting power of the voter will be decided by the amount of a specific token they have in their wallet, the wallet you choose to verify must support the token you are using for voting.IE If you want only the holder of your communitie's ERC20 token to participate, select Ethereum wallet verification. \n 
   1️⃣ Ethereum-based wallet address: Users will need to authenticate themselves by proving ownership of their Ethereum based wallet address.  \n
   2️⃣ Cardano-based wallet address: Users will need to authenticate themselves by proving ownership of their Cardano based wallet address. \n
-`
+    ${getVotingRoundConfigurationText(votingSystem, onlyTokenHolderCanVote)}
+  `
   );
   return embed;
 };
 
 const getEthereumSelectTokenEmbed = () => {
   const embed = createEmbed(
-    "🌟 Select Voting Token 🌟",
+    "💰💸 Select Voting Token 💸💰",
     `You have selected to require voters to verify themselve using an Ethereum wallet. \n
     The last step is to select the token you want to use for voting. \n
     If you want to use an token, please enter the contract address of the token. \n
@@ -109,24 +143,20 @@ const getVerifyEthereumWalletEmbed = () => {
 };
 
 const getVotingRoundInfoEmbed = (votingRound) => {
-  const currentDate = new Date();
-  const currentDateFormated = formatDate(currentDate);
-  const endDate = new Date(
-    currentDate.getTime() +
-      votingRound.roundDurationInDays * 24 * 60 * 60 * 1000
+  const { endDate, startDate } = getStartAndEndDate(
+    votingRound.roundDurationInDays
   );
-  const endDateFormated = formatDate(endDate);
   let tokenUsed = "";
-  if (votingRound.votingSystemToUse === "Quadratic Voting (Token In Wallet)") {
+  if (votingRound.votingSystem === "Quadratic Voting (Tokens In Wallet)") {
     tokenUsed = `Voting Token: **${votingRound.assetName}**`;
   }
   const embed = createEmbed(
     "🗳️ Voting Round Info 🗳️ ",
     `Please confirm the following information about the voting round \n
-     Voting System: **${votingRound.votingSystemToUse}**\n
+     Voting System: **${votingRound.votingSystem}**\n
      Verification Method: **${votingRound.verificationMethod} **\n
-     Start Date: **${currentDateFormated}**\n
-     End Date: **${endDateFormated}**\n
+     Start Date: **${startDate}**\n
+     End Date: **${endDate}**\n
      ${tokenUsed} \n
     `
   );
@@ -293,6 +323,7 @@ const getMemberIntrouductionEmbed = () => {
 module.exports = {
   getListOfVerifiedEmbed,
   getVotingRoundInfoEmbed,
+  getSelectIfOnlyTokenHolderCanVoteEmbed,
   getWalletVerificationEmbed,
   getVerifyCardanoWalletEmbed,
   getEthereumSelectTokenEmbed,
@@ -315,4 +346,5 @@ module.exports = {
   getHelpCommandEmbed,
   getAdminIntroductionEmbed,
   getMemberIntrouductionEmbed,
+  getVotingRoundDurationEmbed,
 };

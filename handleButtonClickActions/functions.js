@@ -17,11 +17,7 @@ const { VotingRound } = require("../models/votingRound.model");
 const { initateFund } = require("../api/quadraticVoting");
 
 const handleStartRoundButton = async (interaction) => {
-  if (interaction.guild.ownerId !== interaction.user.id)
-    return interaction.reply("Only the server owner can start a voting round");
-
-  const modal = getStartRoundModal();
-  await interaction.showModal(modal);
+  console.log("handleStartRoundButton");
 };
 
 const handleVerificationMethodButton = async (
