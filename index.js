@@ -36,6 +36,7 @@ const { deployScripts } = require("./deployCommandScript");
 const {
   createChannelWithOwner,
   createChannelWithUsers,
+  createDiscordUser,
 } = require("./handleGuildCreateActions/functions");
 const {
   handleVotingSystemMenu,
@@ -71,6 +72,7 @@ client.on("guildCreate", async (guild) => {
       return;
     }
     createChannelWithUsers(guild, member, client.user.id);
+    createDiscordUser(guild, member);
   });
   await deployScripts(guild);
 });
@@ -137,26 +139,11 @@ client.on("interactionCreate", async (interaction) => {
     case "selectTokenButton":
       await handleSelectTokenButton(interaction);
       break;
-    case "confirmVotingRoundInfoButton":
-      await handleConfirmVotingRoundInfoButton(interaction);
-      break;
-    case "verifyCardanoWalletButton":
-      await handleVerifyCardanoWalletButton(interaction);
-      break;
-    case "verifyEthereumWalletButton":
-      await handleVerifyEthereumWalletButton(interaction);
-      break;
     case "registerProposal":
       await handleRegisterProposalButton(interaction);
       break;
-    case "confirmProposalButton":
-      await handleConfirmRegisterProposalButton(interaction);
-      break;
     case "voteProposalButton":
       await handleVoteProposalButton(interaction);
-      break;
-    case "confirmVoteProposalButton":
-      await handleConfirmVoteProposalButton(interaction);
       break;
     case "downVoteProposal":
       await handleDownVoteProposalButton(interaction);
@@ -169,9 +156,6 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
   switch (interaction.customId) {
-    case "selectVotingSystemInputModal":
-      await handleVotingSystemInputModal(interaction);
-      break;
     case "confirmVerificationMethodInputModal":
       await handleVerificationMethodInputModal(interaction);
       break;
@@ -196,9 +180,31 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  switch (interaction.customId) {
+    case "confirmVotingRoundInfoButton":
+      await handleConfirmVotingRoundInfoButton(interaction);
+      break;
+    case "verifyCardanoWalletButton":
+      await handleVerifyCardanoWalletButton(interaction);
+      break;
+    case "verifyEthereumWalletButton":
+      await handleVerifyEthereumWalletButton(interaction);
+      break;
+    case "confirmProposalButton":
+      await handleConfirmRegisterProposalButton(interaction);
+      break;
+    case "confirmVoteProposalButton":
+      await handleConfirmVoteProposalButton(interaction);
+      break;
+  }
+});
+
 client.login(process.env.TOKEN);
 
-setInterval(() => {
-  verifyCardanoUsers();
-  verifyEthereumUsers();
-}, 15000);
+// setInterval(() => {
+verifyCardanoUsers();
+verifyEthereumUsers();
+// }, 15000);

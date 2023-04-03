@@ -1,6 +1,8 @@
 // Setup: npm install alchemy-sdk
 const { Alchemy, Network } = require("alchemy-sdk");
 const { DiscordUser } = require("../models/discordUser.model");
+const { PendingVerification } = require("../models/pendingVerification.model");
+
 require("dotenv").config();
 
 const config = {
@@ -9,23 +11,38 @@ const config = {
 };
 
 const verifyEthereumUsers = async () => {
-  const users = await DiscordUser.find({ ethereumIsVerified: false });
-  if (users.length === 0) {
+  const pendingVerification = await PendingVerification.find({
+    blockchain: "Ethereum",
+  });
+  if (pendingVerification.length === 0) {
     return;
   }
-  users.forEach(async (user) => {
-    const { ethereumWalletAddress, confirmEthAmount } = user;
-    const verified = await checkIfEthSend(
-      ethereumWalletAddress,
-      confirmEthAmount
-    );
-    if (verified) {
-      await DiscordUser.findOneAndUpdate(
-        { discordId: user.discordId, channelId: user.channelId },
-        { ethereumIsVerified: true }
-      );
+  for (let i = 0; i < pendingVerification.length; i++) {
+    const { walletAddress, sendAmount, discordId } = pendingVerification[i];
+    const currentDate = new Date();
+    const verificationDate = new Date(pendingVerification[i].createdAt);
+    const difference = currentDate.getTime() - verificationDate.getTime();
+    const differenceInMinutes = Math.round(difference / 60000);
+    if (differenceInMinutes > 5) {
+      await PendingVerification.deleteOne({
+        walletAddress,
+        sendAmount,
+      });
+      return;
     }
-  });
+    const verified = await checkIfEthSend(walletAddress, sendAmount);
+    if (verified) {
+      const discordUser = await DiscordUser.findOne({
+        discordId,
+      });
+      discordUser.ethereumWallets.push(walletAddress);
+      await discordUser.save();
+      await PendingVerification.deleteOne({
+        walletAddress,
+        sendAmount,
+      });
+    }
+  }
 };
 
 const checkIfEthSend = async (address, amount) => {

@@ -4,21 +4,22 @@ const DiscordUserSchema = new mongoose.Schema(
   {
     cardanoWallets: [
       {
-        walletAddress: {
-          type: String,
-        },
+        type: String,
       },
     ],
     ethereumWallets: [
       {
-        walletAddress: {
-          type: String,
-        },
+        type: String,
       },
     ],
     discordId: {
       type: String,
     },
+    serverId: [
+      {
+        type: String,
+      },
+    ],
     discordUsername: {
       type: String,
     },

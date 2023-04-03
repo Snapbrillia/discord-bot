@@ -1,5 +1,8 @@
 const axios = require("axios");
 const { DiscordUser } = require("../models/discordUser.model.js");
+const {
+  PendingVerification,
+} = require("../models/pendingVerification.model.js");
 require("dotenv").config();
 
 const blockfrostHeaders = {
@@ -15,23 +18,38 @@ const randomNumber = (min, max) => {
 };
 
 const verifyCardanoUsers = async () => {
-  const users = await DiscordUser.find({ cardanoIsVerified: false });
-  if (users.length === 0) {
+  const pendingVerification = await PendingVerification.find({
+    blockchain: "Cardano",
+  });
+  if (pendingVerification.length === 0) {
     return;
   }
-  users.forEach(async (user) => {
-    const { cardanoWalletAddress, confirmLovelaceAmount } = user;
-    const verified = await checkBalanceArrived(
-      cardanoWalletAddress,
-      confirmLovelaceAmount
-    );
-    if (verified) {
-      await DiscordUser.findOneAndUpdate(
-        { discordId: user.discordId, channelId: user.channelId },
-        { cardanoIsVerified: true }
-      );
+  for (let i = 0; i < pendingVerification.length; i++) {
+    const { walletAddress, sendAmount, discordId } = pendingVerification[i];
+    const currentDate = new Date();
+    const verificationDate = new Date(pendingVerification[i].createdAt);
+    const difference = currentDate.getTime() - verificationDate.getTime();
+    const differenceInMinutes = Math.round(difference / 60000);
+    if (differenceInMinutes > 5) {
+      await PendingVerification.deleteOne({
+        walletAddress,
+        sendAmount,
+      });
+      return;
     }
-  });
+    const verified = await checkBalanceArrived(walletAddress, sendAmount);
+    if (verified) {
+      const discordUser = await DiscordUser.findOne({
+        discordId,
+      });
+      discordUser.cardanoWallets.push(walletAddress);
+      await discordUser.save();
+      await PendingVerification.deleteOne({
+        walletAddress,
+        sendAmount,
+      });
+    }
+  }
 };
 
 const checkBalanceArrived = async (walletAddress, confirmLovelaceAmount) => {

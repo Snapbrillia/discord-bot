@@ -4,10 +4,7 @@ const {
   getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const {
-  getVerifyCardanoWalletEmbed,
-  getVerifyEthereumWalletEmbed,
-  getPendingVerifiedCardanoWalletEmbed,
-  getPendingVerifiedEthereumWalletEmbed,
+  getVerifyWalletEmbed,
 } = require("../sharedDiscordComponents/embeds.js");
 
 const checkIfVerified = async (interaction, votingRound) => {
@@ -18,45 +15,25 @@ const checkIfVerified = async (interaction, votingRound) => {
 
   switch (votingRound.verificationMethod) {
     case "Cardano Wallet":
-      if (!discordUser) {
+      if (discordUser.cardanoWallets.length > 0) {
         interaction.reply({
-          embeds: [getVerifyCardanoWalletEmbed()],
-          components: [getVerifyCardanoWalletButton()],
-        });
-        return false;
-      }
-      if (!discordUser.cardanoIsVerified) {
-        interaction.reply({
-          embeds: [getPendingVerifiedCardanoWalletEmbed()],
+          embeds: [getVerifyWalletEmbed("ADA")],
           components: [getVerifyCardanoWalletButton()],
         });
         return false;
       }
       break;
     case "Ethereum Wallet":
-      if (!discordUser) {
+      if (discordUser.ethereumWallets.length > 0) {
         interaction.reply({
-          embeds: [getVerifyEthereumWalletEmbed()],
-          components: [getVerifyEthereumWalletButton()],
-        });
-        return false;
-      }
-      if (!discordUser.ethereumIsVerified) {
-        interaction.reply({
-          embeds: [getPendingVerifiedEthereumWalletEmbed()],
+          embeds: [getVerifyWalletEmbed("ETH")],
           components: [getVerifyEthereumWalletButton()],
         });
         return false;
       }
       break;
   }
-  if (!discordUser) {
-    interaction.reply({
-      embeds: [verifyWalletEmbed],
-      components: [verifyWalletButton],
-    });
-    return false;
-  }
+
   return true;
 };
 

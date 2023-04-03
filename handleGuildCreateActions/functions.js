@@ -1,4 +1,5 @@
 const { ChannelType, PermissionsBitField } = require("discord.js");
+const { DiscordUser } = require("../models/discordUser.model");
 const {
   getMemberIntrouductionEmbed,
   getAdminIntroductionEmbed,
@@ -66,7 +67,34 @@ const createChannelWithOwner = (guild, user, botId) => {
   }
 };
 
+//create discord user in database
+const createDiscordUser = async (guild, member) => {
+  try {
+    const discordUserExists = await DiscordUser.findOne({
+      discordId: member.id,
+    });
+    if (discordUserExists) {
+      const serverIdExists = discordUserExists.serverId.includes(
+        member.guild.id
+      );
+      if (!serverIdExists) {
+        discordUserExists.serverId.push(member.guild.id);
+        await discordUserExists.save();
+      }
+      return;
+    }
+    await DiscordUser.create({
+      discordId: member.id,
+      discordUsername: member.user.username,
+      serverId: [guild.id],
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   createChannelWithUsers,
   createChannelWithOwner,
+  createDiscordUser,
 };

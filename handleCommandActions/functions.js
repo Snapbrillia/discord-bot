@@ -11,7 +11,7 @@ const { checkIfVerified } = require("./utils");
 const {
   getVotingSystemsEmbed,
   getQuadraticVotingResultsEmbed,
-  getVerifyCardanoWalletEmbed,
+  getVerifyWalletEmbed,
   getRegisterProposalEmbed,
   getVerifyEthereumWalletEmbed,
   getVoteProposalEmbed,
@@ -32,61 +32,26 @@ const {
 const { getImage } = require("../sharedDiscordComponents/image");
 
 const handleVerifyCardanoWalletCommand = async (interaction) => {
-  const userVerified = await DiscordUser.findOne({
-    discordId: interaction.user.id,
-    serverId: interaction.guildId,
-    cardanoIsVerified: true,
-  });
-  const alreadyVerifiedWalletEmbed = getAlreadyVerifiedCardanoWalletEmbed();
-  if (userVerified) {
-    await interaction.reply({
-      embeds: [alreadyVerifiedWalletEmbed],
-    });
-    return;
-  }
-
-  const userPending = await DiscordUser.findOne({
-    discordId: interaction.user.id,
-    serverId: interaction.guildId,
-    cardanoIsVerified: false,
-  });
-
-  if (userPending) {
-    await interaction.reply({
-      embeds: [getPendingVerifiedCardanoWalletEmbed()],
-      components: [getVerifyCardanoWalletButton()],
-    });
-    return;
-  }
-
+  const verifyCardanoWalletEmbed = getVerifyWalletEmbed("ADA");
   const verifyCardanoWalletButton = getVerifyCardanoWalletButton();
-  const verifyCardanoWalletEmbed = getVerifyCardanoWalletEmbed();
+  const image = getImage();
+
   interaction.reply({
     embeds: [verifyCardanoWalletEmbed],
     components: [verifyCardanoWalletButton],
+    files: [image],
   });
 };
 
 const handleVerifyEthereumWalletCommand = async (interaction) => {
-  const userPending = await DiscordUser.findOne({
-    discordId: interaction.user.id,
-    serverId: interaction.guildId,
-    ethereumIsVerified: false,
-  });
-
-  if (userPending) {
-    await interaction.reply({
-      embeds: [getPendingVerifiedEthereumWalletEmbed()],
-      components: [getVerifyEthereumWalletButton()],
-    });
-    return;
-  }
-
+  const verifyEthereumWalletEmbed = getVerifyWalletEmbed("ETH");
   const verifyEthereumWalletButton = getVerifyEthereumWalletButton();
-  const verifyEthereumWalletEmbed = getVerifyEthereumWalletEmbed();
+  const image = getImage();
+
   interaction.reply({
     embeds: [verifyEthereumWalletEmbed],
     components: [verifyEthereumWalletButton],
+    files: [image],
   });
 };
 

@@ -31,10 +31,21 @@ const getVotingSystemsEmbed = () => {
   return embed;
 };
 
-const getAlreadyVerifiedCardanoWalletEmbed = () => {
+const getSendFundToWalletEmbed = (sendAmount, walletAddress) => {
   const embed = createEmbed(
-    "🔒🛡️ Verification 🛡️🔒",
-    `You have already verified your Cardano wallet. \n
+    "✅👝 Wallet Address Submitted For Verification 👝✅",
+    `You have submitted a wallet address for verification. \n
+    Please send ** ${sendAmount} **to this ** ${walletAddress}** wallet address within 5 minutes for it to be verified. \n
+    Please remember to use the same wallet to send the funds. \n
+    `
+  );
+  return embed;
+};
+
+const getAlreadyVerifiedWalletEmbed = () => {
+  const embed = createEmbed(
+    "🔒🛡️ Wallet Already Verified 🛡️🔒",
+    `This wallet address has already been verified and link to you. Please enter a different wallet address to verify. \n
     `
   );
   return embed;
@@ -124,21 +135,14 @@ const getCardanoSelectTokenEmbed = () => {
   return embed;
 };
 
-const getVerifyCardanoWalletEmbed = () => {
-  const embed = new EmbedBuilder().setTitle("🔒🛡️ Verify Wallet 🛡️🔒")
-    .setDescription(`To ensure the security of our community, we require all members to verify their wallet addresses before participating in voting rounds.\n
-        💰 To verify your wallet, please send a sum of ADA to the wallet address you provide. Once the transaction is confirmed, you will be able to participate in the upcoming voting round.\n
-        👉 Please ensure that you send the sum of ADA from the same address that you are using to verify. This will help us confirm the ownership of the wallet and prevent any potential fraudulent activity. Thank you!.\n
-    `);
-  return embed;
-};
-
-const getVerifyEthereumWalletEmbed = () => {
-  const embed = new EmbedBuilder().setTitle("🔒🛡️ Verify Wallet 🛡️🔒")
-    .setDescription(`To ensure the security of our community, we require all members to verify their wallet addresses before participating in voting rounds.\n
-        💰 To verify your wallet, please send a sum of ETH to the wallet address you provide. Once the transaction is confirmed, you will be able to participate in the upcoming voting round.\n
-        👉 Please ensure that you send the sum of ETH from the same address that you are using to verify. This will help us confirm the ownership of the wallet and prevent any potential fraudulent activity. Thank you!.\n
-    `);
+const getVerifyWalletEmbed = (token) => {
+  const embed = createEmbed(
+    "🔒🛡️ Verify Wallet 🛡️🔒",
+    `To ensure the security of our community, we require all members to verify their wallet addresses before participating in voting rounds.\n
+        💰 To verify your wallet, please send a sum of ${token} to the wallet address you provide. Once the transaction is confirmed, you will be able to participate in the upcoming voting round.\n
+        👉 Please ensure that you send the sum of ${token} using the wallet that you are want to verify. This will help us confirm the ownership of the wallet and prevent any potential fraudulent activity. Thank you!.\n
+    `
+  );
   return embed;
 };
 
@@ -265,10 +269,10 @@ const getDownVoteProposalEmbed = () => {
   return embed;
 };
 
-const getPendingVerifiedCardanoWalletEmbed = () => {
+const getPendingVerifiedWalletEmbed = () => {
   const embed = createEmbed(
-    "🔒🛡️ Verify Wallet 🛡️🔒",
-    `Your wallet is currently being verified. Please wait for the verification to complete. You can also verify a different wallet \n
+    "🔒🛡️ Wallet Pending Verification 🛡️🔒",
+    `Your wallet is currently being verified. Please wait for the verification to complete. You can also verify another wallet. \n
     `
   );
   return embed;
@@ -323,24 +327,24 @@ const getMemberIntrouductionEmbed = () => {
 module.exports = {
   getListOfVerifiedEmbed,
   getVotingRoundInfoEmbed,
+  getSendFundToWalletEmbed,
   getSelectIfOnlyTokenHolderCanVoteEmbed,
   getWalletVerificationEmbed,
-  getVerifyCardanoWalletEmbed,
+  getVerifyWalletEmbed,
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getVotingSystemsEmbed,
   getQuadraticVotingResultsEmbed,
   getConfirmVotingRoundInfoEmbed,
   getRegisterProposalEmbed,
-  getVerifyEthereumWalletEmbed,
   getProposalInfoEmbed,
   getConfirmProposalEmbed,
   getVoteProposalEmbed,
   getDownVoteProposalEmbed,
   getVoteProposalInfoEmbed,
   getConfirmVoteProposalEmbed,
-  getAlreadyVerifiedCardanoWalletEmbed,
-  getPendingVerifiedCardanoWalletEmbed,
+  getAlreadyVerifiedWalletEmbed,
+  getPendingVerifiedWalletEmbed,
   getPendingVerifiedEthereumWalletEmbed,
   getAlreadyVerifiedEthereumWalletEmbed,
   getHelpCommandEmbed,

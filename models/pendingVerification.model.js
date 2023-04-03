@@ -5,11 +5,11 @@ const PendingVerificationSchema = new mongoose.Schema(
     discordId: {
       type: String,
     },
-    serverId: {
+    // Ethereum, Cardano
+    blockchain: {
       type: String,
     },
-    // Ethereum Wallet, Cardano Wallet, Discord Verification, SSI
-    verificationMethod: {
+    walletAddress: {
       type: String,
     },
     // pending, active, ended

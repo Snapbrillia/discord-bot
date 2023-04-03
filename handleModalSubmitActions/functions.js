@@ -11,9 +11,12 @@ const {
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getVotingRoundInfoEmbed,
+  getSendFundToWalletEmbed,
   getVotingSystemsEmbed,
   getProposalInfoEmbed,
   getVoteProposalInfoEmbed,
+  getAlreadyVerifiedWalletEmbed,
+  getPendingVerifiedWalletEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getTokenFromAddress } = require("../utils/ethereumUtils");
 const { getTokenFromPolicyId } = require("../utils/cardanoUtils");
@@ -24,74 +27,91 @@ const {
   getSelectTokenButton,
   getConfirmVotingRoundInfoButton,
   getConfirmVoteButton,
+  getVerifyCardanoWalletButton,
+  getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const { numberRegex } = require("../utils/shared");
+const { PendingVerification } = require("../models/pendingVerification.model");
+const { getImage } = require("../sharedDiscordComponents/image");
 
 const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
+  const image = getImage();
   const discordId = interaction.user.id;
-  const serverId = interaction.guildId;
-  const discordUsername = interaction.user.username;
-  const confirmLovelaceAmount = randomNumber(1500000, 5000000);
-  const cardanoWalletAddress = interaction.fields
+  const sendAmount = randomNumber(1500000, 5000000);
+  const walletAddress = interaction.fields
     .getTextInputValue("walletAddressInput")
     .trim();
-
   const user = await DiscordUser.findOne({
     discordId,
-    serverId,
   });
-  if (user) {
-    user.cardanoWalletAddress = cardanoWalletAddress;
-    user.cardanoIsVerified = false;
-    user.confirmLovelaceAmount = confirmLovelaceAmount;
-    await user.save();
-  } else {
-    await DiscordUser.create({
-      cardanoWalletAddress,
-      cardanoIsVerified: false,
-      discordId,
-      serverId,
-      discordUsername,
-      confirmLovelaceAmount,
+  if (user.cardanoWallets.includes(walletAddress)) {
+    return interaction.reply({
+      embeds: [getAlreadyVerifiedWalletEmbed()],
+      components: [getVerifyCardanoWalletButton()],
+      files: [image],
     });
   }
-  interaction.reply(
-    `Please send ${confirmLovelaceAmount} ADA to the provided wallet address within 5 minutes to verify your wallet`
-  );
+  const pendingVerification = await PendingVerification.findOne({
+    discordId,
+    walletAddress,
+  });
+  if (pendingVerification) {
+    return interaction.reply({
+      embeds: [getPendingVerifiedWalletEmbed()],
+      components: [getVerifyCardanoWalletButton()],
+      files: [image],
+    });
+  }
+  await PendingVerification.create({
+    discordId,
+    walletAddress,
+    sendAmount,
+    blockchain: "Cardano",
+  });
+  interaction.reply({
+    embeds: [getSendFundToWalletEmbed(`${sendAmount} ADA`, walletAddress)],
+    files: [image],
+  });
 };
 
 const handleConfirmEthereumWalletAddressInputModal = async (interaction) => {
+  const image = getImage();
   const discordId = interaction.user.id;
-  const serverId = interaction.guildId;
-  const discordUsername = interaction.user.username;
-  const confirmEthAmount = randomNumber(10000, 20000);
-  const ethereumWalletAddress = interaction.fields
+  const sendAmount = randomNumber(10000, 20000);
+  const walletAddress = interaction.fields
     .getTextInputValue("walletAddressInput")
     .trim();
-
   const user = await DiscordUser.findOne({
     discordId,
-    serverId,
   });
-  if (user) {
-    user.ethereumWalletAddress = ethereumWalletAddress;
-    user.ethereumIsVerified = false;
-    user.confirmEthAmount = confirmEthAmount;
-    await user.save();
-  } else {
-    await DiscordUser.create({
-      ethereumWalletAddress,
-      ethereumIsVerified: false,
-      discordId,
-      serverId,
-      discordUsername,
-      confirmEthAmount,
+  if (user.cardanoWallets.includes(walletAddress)) {
+    return interaction.reply({
+      embeds: [getAlreadyVerifiedWalletEmbed()],
+      components: [getVerifyEthereumWalletButton()],
+      files: [image],
     });
   }
-
-  interaction.reply(
-    `Please send ${confirmEthAmount} ETH to the provided wallet address within 5 minutes to verify your wallet`
-  );
+  const pendingVerification = await PendingVerification.findOne({
+    discordId,
+    walletAddress,
+  });
+  if (pendingVerification) {
+    return interaction.reply({
+      embeds: [getPendingVerifiedWalletEmbed()],
+      components: [getVerifyEthereumWalletButton()],
+      files: [image],
+    });
+  }
+  await PendingVerification.create({
+    discordId,
+    walletAddress,
+    sendAmount,
+    blockchain: "Ethereum",
+  });
+  interaction.reply({
+    embeds: [getSendFundToWalletEmbed(`${sendAmount} ETH`, walletAddress)],
+    files: [image],
+  });
 };
 
 const handleVerificationMethodInputModal = async (interaction) => {
