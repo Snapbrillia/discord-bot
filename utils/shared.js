@@ -19,29 +19,33 @@ const getStartAndEndDate = (days) => {
 // append them if they exist and if they are undefined, then don't append them
 const getVotingRoundConfigurationText = (
   votingSystem,
-  votingPermissions,
-  roundDuration,
+  onlyTokenHolderCanVote,
   verificationMethod,
-  tokenUsed
+  tokenName,
+  roundDuration,
+  votingRoundName
 ) => {
   let text = `🔧** Current configuration of voting round **🔧\n
   Voting System:** ${votingSystem} **\n `;
-  if (typeof votingPermissions === "boolean") {
-    if (votingPermissions) {
+  if (typeof onlyTokenHolderCanVote === "boolean") {
+    if (onlyTokenHolderCanVote) {
       text += `Voting Permissions:** Only holders of a specific Token can Vote **\n`;
     } else {
       text += `Voting Permissions:** Anybody can vote as long as they are verified **\n`;
     }
   }
+  if (verificationMethod) {
+    text += `Verification Method:** ${verificationMethod} **\n`;
+  }
+  if (tokenName) {
+    text += `Token Used:** ${tokenName} **\n`;
+  }
   if (roundDuration) {
     const { startDate, endDate } = getStartAndEndDate(roundDuration);
     text += `Voting Round Start:** ${startDate} **\n Voting Round End:** ${endDate} **\n`;
   }
-  if (verificationMethod) {
-    text += `Verification Method:** ${verificationMethod} **\n`;
-  }
-  if (tokenUsed) {
-    text += `Token Used:** ${tokenUsed} **\n`;
+  if (votingRoundName) {
+    text += `Voting Round Name:** ${votingRoundName} **\n`;
   }
   return text;
 };

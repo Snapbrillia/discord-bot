@@ -195,8 +195,8 @@ const handleTokenSelectInputModal = async (interaction) => {
     }
   }
 
-  votingRound.assetIdentifierOnChain = token;
-  votingRound.assetName = tokenName;
+  votingRound.tokenIdentiferOnBlockchain = token;
+  votingRound.tokenName = tokenName;
   await votingRound.save();
   interaction.reply({
     embeds: [getVotingRoundInfoEmbed(votingRound)],
@@ -279,6 +279,33 @@ const handleVoteProposalInputModal = async (interaction, action) => {
   });
 };
 
+const handleNameOfVotingRoundInputModal = async (interaction) => {
+  const votingRoundName = interaction.fields.getTextInputValue(
+    "nameOfVotingRoundInput"
+  );
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "pending",
+  });
+  votingRound.votingRoundName = votingRoundName;
+  await votingRound.save();
+  const image = getImage();
+  const votingRoundInfoEmbed = getVotingRoundInfoEmbed(
+    votingRound.votingSystem,
+    votingRound.onlyTokenHolderCanVote,
+    votingRound.verificationMethod,
+    votingRound.tokenName,
+    votingRound.roundDurationInDays,
+    votingRound.votingRoundName
+  );
+  const confirmVotingRoundInfoButton = getConfirmVotingRoundInfoButton();
+  interaction.reply({
+    embeds: [votingRoundInfoEmbed],
+    components: [confirmVotingRoundInfoButton],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleConfirmCardanoWalletAddressInputModal,
   handleTokenSelectInputModal,
@@ -286,4 +313,5 @@ module.exports = {
   handleVoteProposalInputModal,
   handleVerificationMethodInputModal,
   handleConfirmEthereumWalletAddressInputModal,
+  handleNameOfVotingRoundInputModal,
 };

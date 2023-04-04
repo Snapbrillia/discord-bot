@@ -26,16 +26,16 @@ const VotingRoundSchema = new mongoose.Schema(
     status: {
       type: String,
     },
-    assetIdentifierOnChain: {
+    tokenIdentiferOnBlockchain: {
       type: String,
     },
-    assetName: {
+    tokenName: {
       type: String,
     },
     blockchain: {
       type: String,
     },
-    projectInfo: {
+    votingRoundName: {
       type: String,
     },
   },

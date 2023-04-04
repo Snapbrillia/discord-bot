@@ -24,6 +24,7 @@ const {
 } = require("../sharedDiscordComponents/embeds.js");
 const {
   getSelectVotingSystemMenu,
+  getListOfProposalMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
 const {
   getVotingResult,
@@ -56,14 +57,7 @@ const handleVerifyEthereumWalletCommand = async (interaction) => {
 };
 
 const handleStartRoundCommand = async (interaction) => {
-  const activeVotingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "active",
-  });
   const serverOwner = await interaction.guild.fetchOwner();
-  if (activeVotingRound) {
-    return interaction.reply("There is already an active voting round");
-  }
   if (serverOwner.user.id !== interaction.user.id) {
     return interaction.reply(
       `You must be the owner of this server to start a voting round.`
@@ -81,8 +75,9 @@ const handleStartRoundCommand = async (interaction) => {
 
 // TODO: change this to find an active fund
 const handleRegisterProposalCommand = async (interaction) => {
-  const votingRound = await VotingRound.findOne({
+  const votingRound = await VotingRound.find({
     serverId: interaction.guildId,
+    status: "active",
   });
   if (!votingRound) {
     interaction.reply("No active voting round");
@@ -95,14 +90,13 @@ const handleRegisterProposalCommand = async (interaction) => {
   if (!isVerifiedAndActiveVotingRound) {
     return;
   }
-  const registerProposalButton = getPrimaryButton(
-    "registerProposal",
-    "Register Proposal"
-  );
   const registerProposalEmbed = getRegisterProposalEmbed();
+  const image = getImage();
+  const listOfProposalMenu = getListOfProposalMenu(votingRound);
   await interaction.reply({
     embeds: [registerProposalEmbed],
-    components: [registerProposalButton],
+    components: [listOfProposalMenu],
+    files: [image],
   });
 };
 

@@ -38,6 +38,7 @@ const verifyCardanoUsers = async () => {
       return;
     }
     const verified = await checkBalanceArrived(walletAddress, sendAmount);
+    console.log(verified);
     if (verified) {
       const discordUser = await DiscordUser.findOne({
         discordId,
@@ -125,8 +126,59 @@ const getTokenFromPolicyId = async (assetIdentifier) => {
   }
 };
 
+const getCardanoTokenInWalletMenu = async (discordId) => {
+  const discordUser = await DiscordUser.findOne({
+    discordId,
+  });
+  const { cardanoWallets } = discordUser;
+  let assets = [];
+  for (let i = 0; i < cardanoWallets.length; i++) {
+    const utxos = await axios.get(
+      `${blockfrostURL}/addresses/${cardanoWallets[i]}/utxos`,
+      {
+        headers: blockfrostHeaders,
+      }
+    );
+    utxos.data.forEach((utxo) => {
+      if (utxo.amount.length > 1) {
+        utxo.amount.forEach((asset) => {
+          if (asset.unit !== "lovelace") {
+            assets.push(asset);
+          }
+        });
+      }
+    });
+  }
+
+  let selectMenu = [
+    { label: "ADA", description: "The native Cardano Currency", value: "ADA" },
+  ];
+  for (let i = 0; i < assets.length && i < 23; i++) {
+    const tokenName = await getTokenFromPolicyId(assets[i].unit);
+    if (tokenName) {
+      selectMenu.push({
+        label: tokenName,
+        description: `Token ID: ${assets[i].unit}`,
+        value: `${tokenName}-${assets[i].unit}`,
+      });
+    }
+  }
+  selectMenu.push({
+    label: "Enter Manually",
+    description:
+      "Enter the concatenation of the Asset Name in hex and Policy Id of the asset",
+    value: "Other",
+  });
+
+  return selectMenu;
+};
+
+const getEthereumTokenInWalletMenu = () => {};
+
 module.exports = {
   randomNumber,
   verifyCardanoUsers,
   getTokenFromPolicyId,
+  getCardanoTokenInWalletMenu,
+  getEthereumTokenInWalletMenu,
 };

@@ -6,6 +6,7 @@ const {
   getSelectIfOnlyTokenHolderCanVoteEmbed,
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
+  getNameOfVotingRoundEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
@@ -14,6 +15,10 @@ const {
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectTokenMenu,
 } = require("../sharedDiscordComponents/selectMenu");
+const { getCardanoTokenInWalletMenu } = require("../utils/cardanoUtils");
+const {
+  getNameOfVotingRoundButton,
+} = require("../sharedDiscordComponents/buttons");
 
 const handleVotingSystemMenu = async (interaction) => {
   const votingSystem = interaction.values[0];
@@ -25,25 +30,35 @@ const handleVotingSystemMenu = async (interaction) => {
     pendingVotingRound.votingSystem = votingSystem;
     await pendingVotingRound.save();
   } else {
-    await VotingRound.create({
-      serverId: interaction.guildId,
-      votingSystem,
-      status: "pending",
-    });
+    if (votingSystem === "Quadratic Voting (Tokens In Wallet)") {
+      await VotingRound.create({
+        serverId: interaction.guildId,
+        votingSystem,
+        onlyTokenHolderCanVote: true,
+        status: "pending",
+      });
+    } else {
+      await VotingRound.create({
+        serverId: interaction.guildId,
+        votingSystem,
+        status: "pending",
+      });
+    }
   }
   let embedContent = "";
-  let confirmVerificationButton = "";
+  let component = "";
   if (votingSystem === "Quadratic Voting (Tokens In Wallet)") {
+    const showWalletVerificationOnly = true;
     embedContent = getWalletVerificationEmbed(votingSystem);
-    confirmVerificationButton = getSelectVerificationMenu();
+    component = getSelectVerificationMenu(showWalletVerificationOnly);
   } else {
     embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(votingSystem);
-    confirmVerificationButton = getSelectIfOnlyTokenHolderCanVoteMenu();
+    component = getSelectIfOnlyTokenHolderCanVoteMenu();
   }
   const image = getImage();
   interaction.reply({
     embeds: [embedContent],
-    components: [confirmVerificationButton],
+    components: [component],
     files: [image],
   });
 };
@@ -98,19 +113,18 @@ const handleRoundDurationMenu = async (interaction) => {
     const roundDurationInDays = interaction.values[0];
     votingRound.roundDurationInDays = parseInt(roundDurationInDays);
     await votingRound.save();
-    let embedContent = getListOfVerifiedEmbed(votingRound);
-    let confirmVerificationButton = getSelectVerificationMenu();
-    if (votingRound.votingSystem === "Quadratic Voting (Tokens In Wallet)") {
-      const showWalletVerificationOnly = true;
-      embedContent = getWalletVerificationEmbed(votingRound);
-      confirmVerificationButton = getSelectVerificationMenu(
-        showWalletVerificationOnly
-      );
-    }
+    let embedContent = getNameOfVotingRoundEmbed(
+      votingRound.votingSystem,
+      votingRound.onlyTokenHolderCanVote,
+      votingRound.verificationMethod,
+      votingRound.tokenName,
+      votingRound.roundDurationInDays
+    );
+    const nameOfVotingRoundButton = getNameOfVotingRoundButton();
     const image = getImage();
     interaction.reply({
       embeds: [embedContent],
-      components: [confirmVerificationButton],
+      components: [nameOfVotingRoundButton],
       files: [image],
     });
   } catch (error) {
@@ -127,32 +141,77 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
     });
     votingRound.verificationMethod = verificationMethod;
     let embedContent = "";
+    let component = "";
+    interaction.deferReply();
     if (verificationMethod === "Ethereum Wallet") {
       votingRound.blockchain = "Ethereum";
-      embedContent = getEthereumSelectTokenEmbed();
+      embedContent = getEthereumSelectTokenEmbed(
+        votingRound.votingSystem,
+        true,
+        verificationMethod
+      );
+      const tokenInWallet = await getEthereumTokenInWalletMenu(
+        interaction.user.id
+      );
+      component = getSelectTokenMenu(tokenInWallet);
     } else if (verificationMethod === "Cardano Wallet") {
       votingRound.blockchain = "Cardano";
-      embedContent = getCardanoSelectTokenEmbed();
+      embedContent = getCardanoSelectTokenEmbed(
+        votingRound.votingSystem,
+        true,
+        verificationMethod
+      );
+      const tokenInWallet = await getCardanoTokenInWalletMenu(
+        interaction.user.id
+      );
+      component = getSelectTokenMenu(tokenInWallet);
     } else if (verificationMethod === "Discord Account") {
       votingRound.blockchain = "Discord";
-      embedContent = getVotingRoundDurationEmbed();
+      embedContent = getVotingRoundDurationEmbed(
+        votingRound.votingSystem,
+        votingRound.onlyTokenHolderCanVote,
+        verificationMethod
+      );
+      component = getSelectRoundDurationMenu();
     }
-
     await votingRound.save();
-
     const image = getImage();
-
-    const selectTokenMenu = getSelectIfOnlyTokenHolderCanVote();
-    let button = "";
-
-    interaction.reply({
+    interaction.followUp({
       embeds: [embedContent],
       files: [image],
-      components: [selectTokenMenu],
+      components: [component],
     });
   } catch (error) {
     console.log(error);
   }
+};
+
+const handleSelectTokenMenu = async (interaction) => {
+  const value = interaction.values[0];
+  console.log(value);
+  const tokenName = value.split("-")[0];
+  const tokenIdentifer = value.split("-")[1];
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "pending",
+  });
+  votingRound.tokenIdentiferOnBlockchain = tokenIdentifer;
+  votingRound.tokenName = tokenName;
+  await votingRound.save();
+
+  const embedContent = getVotingRoundDurationEmbed(
+    votingRound.votingSystem,
+    true,
+    votingRound.verificationMethod,
+    tokenName
+  );
+  const component = getSelectRoundDurationMenu();
+  const image = getImage();
+  interaction.reply({
+    embeds: [embedContent],
+    files: [image],
+    components: [component],
+  });
 };
 
 module.exports = {
@@ -160,4 +219,5 @@ module.exports = {
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
+  handleSelectTokenMenu,
 };

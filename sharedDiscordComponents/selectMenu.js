@@ -107,18 +107,28 @@ const getSelectVerificationMenu = (showWalletVerificationOnly) => {
   return actionRow;
 };
 
-const selectTokenMenu = (tokensInWallet) => {
-  const selectMenu = [];
-  tokensInWallet.forEach((token) => {
-    selectMenu.push({
-      label: token.tokenName,
-      value: token.tokenIdentifierOnChain,
-    });
-  });
+const getSelectTokenMenu = (selectMenu) => {
   const actionRow = buildActionRow(
     selectMenu,
     "Select Token",
     "selectTokenMenu"
+  );
+  return actionRow;
+};
+
+const getListOfProposalMenu = (votingRound) => {
+  const selectMenu = [];
+  for (let i = 0; i < votingRound.length; i++) {
+    selectMenu.push({
+      label: votingRound[i].votingRoundName,
+      description: `Voting System: ${votingRound[i].votingSystem}`,
+      value: votingRound[i].votingRoundName,
+    });
+  }
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Voting Round",
+    "listOfProposalMenu"
   );
   return actionRow;
 };
@@ -128,5 +138,6 @@ module.exports = {
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectRoundDurationMenu,
   getSelectVerificationMenu,
-  selectTokenMenu,
+  getSelectTokenMenu,
+  getListOfProposalMenu,
 };

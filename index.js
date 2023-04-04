@@ -11,6 +11,7 @@ const {
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
+  handleNameOfVotingRoundButton,
 } = require("./handleButtonClickActions/functions");
 const {
   handleConfirmCardanoWalletAddressInputModal,
@@ -19,6 +20,7 @@ const {
   handleVerificationMethodInputModal,
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
+  handleNameOfVotingRoundInputModal,
 } = require("./handleModalSubmitActions/functions");
 const {
   handleVerifyCardanoWalletCommand,
@@ -43,6 +45,7 @@ const {
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
+  handleSelectTokenMenu,
 } = require("./handleSelectMenuActions/functions");
 
 require("dotenv").config();
@@ -127,11 +130,11 @@ client.on("interactionCreate", async (interaction) => {
     case "selectVerificationMethodMenu":
       await handleSelectVerificationMethodMenu(interaction);
       break;
+    case "selectTokenMenu":
+      await handleSelectTokenMenu(interaction);
+      break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
-      break;
-    case "selectIfOnlyTokenVoterCanVoteMenu":
-      await handleSelectIfOnlyTokenVoterCanVoteMenu(interaction);
       break;
     case "selectQVTokenVerificationMethodButton":
       await handleVerificationMethodButton(interaction, true);
@@ -156,6 +159,9 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
   switch (interaction.customId) {
+    case "confirmNameOfVotingRoundInputModal":
+      await handleNameOfVotingRoundInputModal(interaction);
+      break;
     case "confirmVerificationMethodInputModal":
       await handleVerificationMethodInputModal(interaction);
       break;
@@ -184,6 +190,9 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
 
   switch (interaction.customId) {
+    case "nameOfVotingRoundButton":
+      await handleNameOfVotingRoundButton(interaction);
+      break;
     case "confirmVotingRoundInfoButton":
       await handleConfirmVotingRoundInfoButton(interaction);
       break;
@@ -204,7 +213,7 @@ client.on("interactionCreate", async (interaction) => {
 
 client.login(process.env.TOKEN);
 
-// setInterval(() => {
-verifyCardanoUsers();
-verifyEthereumUsers();
-// }, 15000);
+setInterval(() => {
+  verifyCardanoUsers();
+  verifyEthereumUsers();
+}, 15000);

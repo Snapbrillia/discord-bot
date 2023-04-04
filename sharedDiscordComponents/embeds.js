@@ -72,13 +72,20 @@ const getSelectIfOnlyTokenHolderCanVoteEmbed = (votingSystem) => {
   return embed;
 };
 
-const getVotingRoundDurationEmbed = (votingSystem) => {
+const getVotingRoundDurationEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenName
+) => {
   const embed = createEmbed(
     "🕒⏱️ Select Voting Round Duration ⏱️🕒",
     `Please select how long you want the voting round to last. \n \n
    ${getVotingRoundConfigurationText(
      votingSystem,
-     votingSystem.onlyTokenHolderCanVote
+     onlyTokenHolderCanVote,
+     verificationMethod,
+     tokenName
    )} 
     `
   );
@@ -110,26 +117,43 @@ const getWalletVerificationEmbed = (votingSystem, onlyTokenHolderCanVote) => {
   return embed;
 };
 
-const getEthereumSelectTokenEmbed = () => {
+const getEthereumSelectTokenEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod
+) => {
   const embed = createEmbed(
     "💰💸 Select Voting Token 💸💰",
     `You have selected to require voters to verify themselve using an Ethereum wallet. \n
     The last step is to select the token you want to use for voting. \n
     If you want to use an token, please enter the contract address of the token. \n
     If you want to use ETH, please enter "ETH". \n
+    ${getVotingRoundConfigurationText(
+      votingSystem,
+      onlyTokenHolderCanVote,
+      verificationMethod
+    )}
     `
   );
   return embed;
 };
 
-const getCardanoSelectTokenEmbed = () => {
+const getCardanoSelectTokenEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod
+) => {
   const embed = createEmbed(
     "🌟 Select Voting Token 🌟 ",
     `You have selected to require voters to verify themselve using an Cardano wallet. \n
-    The last step is to select the token you want to use for voting. \n
-    If you want to use an Token, please enter the concatination of the hex encoding of the Asset Name and Policy ID of the Token. \n
-    If you want to use ADA, please enter "ADA". \n
-    To see the tokens in your cardano wallet, please enter the command "/assets-in-cardano-wallet". \n
+    Please select the token that you want to use for voting. \n
+    We have selected the first 24 tokens in your wallets. You can also enter their unique identifer onchain (concatenation of the Asset Name in hex and Policy Id) \n
+    If you don't see the token you want to use you can enter the command ** /assets-in-cardano-wallet **.This will return you all tokens you have in your all of your wallet. You simply need to copy and paste their unique identifer \n
+    ${getVotingRoundConfigurationText(
+      votingSystem,
+      onlyTokenHolderCanVote,
+      verificationMethod
+    )}
     `
   );
   return embed;
@@ -146,22 +170,26 @@ const getVerifyWalletEmbed = (token) => {
   return embed;
 };
 
-const getVotingRoundInfoEmbed = (votingRound) => {
-  const { endDate, startDate } = getStartAndEndDate(
-    votingRound.roundDurationInDays
-  );
-  let tokenUsed = "";
-  if (votingRound.votingSystem === "Quadratic Voting (Tokens In Wallet)") {
-    tokenUsed = `Voting Token: **${votingRound.assetName}**`;
-  }
+const getVotingRoundInfoEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenUsed,
+  roundDuration,
+  votingRoundName
+) => {
   const embed = createEmbed(
     "🗳️ Voting Round Info 🗳️ ",
-    `Please confirm the following information about the voting round \n
-     Voting System: **${votingRound.votingSystem}**\n
-     Verification Method: **${votingRound.verificationMethod} **\n
-     Start Date: **${startDate}**\n
-     End Date: **${endDate}**\n
-     ${tokenUsed} \n
+    `You have completed all the nessesary steps to create a voting round. \n
+    Please confirm the following information about the voting round \n
+    ${getVotingRoundConfigurationText(
+      votingSystem,
+      onlyTokenHolderCanVote,
+      verificationMethod,
+      tokenUsed,
+      roundDuration,
+      votingRoundName
+    )}
     `
   );
   return embed;
@@ -204,7 +232,7 @@ const getConfirmVotingRoundInfoEmbed = () => {
 const getRegisterProposalEmbed = () => {
   const embed = createEmbed(
     "📝 Register Proposal 📝 ",
-    `To register a proposal please enter the name of your proposal along with a quick description. \n
+    `To register a proposal please first select the voting round you want to participate in. \n
     `
   );
   return embed;
@@ -324,6 +352,28 @@ const getMemberIntrouductionEmbed = () => {
   return embed;
 };
 
+const getNameOfVotingRoundEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenUsed,
+  roundDuration
+) => {
+  const embed = createEmbed(
+    "🗳️ Voting Round Name 🗳️ ",
+    `This is the final step of creating a voting round.Please click the button below to enter a name for this voting round. \n
+    ${getVotingRoundConfigurationText(
+      votingSystem,
+      onlyTokenHolderCanVote,
+      verificationMethod,
+      tokenUsed,
+      roundDuration
+    )}
+    `
+  );
+  return embed;
+};
+
 module.exports = {
   getListOfVerifiedEmbed,
   getVotingRoundInfoEmbed,
@@ -351,4 +401,5 @@ module.exports = {
   getAdminIntroductionEmbed,
   getMemberIntrouductionEmbed,
   getVotingRoundDurationEmbed,
+  getNameOfVotingRoundEmbed,
 };

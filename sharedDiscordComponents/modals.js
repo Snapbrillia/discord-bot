@@ -5,6 +5,24 @@ const {
   TextInputStyle,
 } = require("discord.js");
 
+const getNameOfVotingRoundModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("confirmNameOfVotingRoundInputModal")
+    .setTitle("Confirm Name Of Voting Round");
+
+  const nameOfVotingRoundInput = new TextInputBuilder()
+    .setCustomId("nameOfVotingRoundInput")
+    .setLabel("Please enter the name of the voting round")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(
+    nameOfVotingRoundInput
+  );
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
 const getCardanoWalletAddressModal = () => {
   const modal = new ModalBuilder()
     .setCustomId("confirmCardanoWalletAddressInputModal")
@@ -181,6 +199,7 @@ const getDownVoteProposalModal = () => {
 };
 
 module.exports = {
+  getNameOfVotingRoundModal,
   getCardanoWalletAddressModal,
   getEthereumWalletAddressModal,
   getStartRoundModal,
