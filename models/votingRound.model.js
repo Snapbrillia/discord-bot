@@ -38,6 +38,9 @@ const VotingRoundSchema = new mongoose.Schema(
     votingRoundName: {
       type: String,
     },
+    votingRoundDescription: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

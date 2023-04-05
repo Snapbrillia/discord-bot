@@ -87,6 +87,18 @@ const createDiscordUser = async (guild, member) => {
       discordId: member.id,
       discordUsername: member.user.username,
       serverId: [guild.id],
+      ethereumTokenInWallet: [
+        {
+          tokenName: "ETH",
+          tokenIdentifier: "ETH",
+        },
+      ],
+      cardanoTokenInWallet: [
+        {
+          tokenName: "ADA",
+          tokenIdentifier: "ADA",
+        },
+      ],
     });
   } catch (err) {
     console.log(err);

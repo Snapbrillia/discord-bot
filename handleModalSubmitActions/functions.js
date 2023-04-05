@@ -37,7 +37,7 @@ const { getImage } = require("../sharedDiscordComponents/image");
 const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
   const image = getImage();
   const discordId = interaction.user.id;
-  const sendAmount = randomNumber(1500000, 5000000);
+  const sendAmount = randomNumber(1500000, 2000000);
   const walletAddress = interaction.fields
     .getTextInputValue("walletAddressInput")
     .trim();
@@ -77,7 +77,7 @@ const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
 const handleConfirmEthereumWalletAddressInputModal = async (interaction) => {
   const image = getImage();
   const discordId = interaction.user.id;
-  const sendAmount = randomNumber(10000, 20000);
+  const sendAmount = randomNumber(1000, 1100);
   const walletAddress = interaction.fields
     .getTextInputValue("walletAddressInput")
     .trim();
@@ -114,56 +114,6 @@ const handleConfirmEthereumWalletAddressInputModal = async (interaction) => {
   });
 };
 
-const handleVerificationMethodInputModal = async (interaction) => {
-  try {
-    const votingRound = await VotingRound.findOne({
-      serverId: interaction.guildId,
-      status: "pending",
-    });
-    const isTokenizedVote =
-      votingRound.votingSystem === "Quadratic Voting (Tokens In Wallet)";
-    const verificationMethod = interaction.fields
-      .getTextInputValue("verificationMethodInput")
-      .trim();
-
-    let embeded = "";
-    let button = "";
-    // looks if it is a tokenized vote
-    if (isTokenizedVote) {
-      if (verificationMethod === "1") {
-        embeded = getEthereumSelectTokenEmbed();
-      } else if (verificationMethod === "2") {
-        embeded = getCardanoSelectTokenEmbed();
-      }
-      button = getSelectTokenButton();
-    } else {
-      embeded = getVotingRoundInfoEmbed(votingRound);
-      button = getConfirmVotingRoundInfoButton();
-    }
-    switch (verificationMethod) {
-      case "1":
-        votingRound.verificationMethod = "Ethereum Wallet";
-        votingRound.blockchain = "Ethereum";
-        break;
-      case "2":
-        votingRound.verificationMethod = "Cardano Wallet";
-        votingRound.blockchain = "Cardano";
-        break;
-      case "3":
-        votingRound.verificationMethod = "Discord Account";
-        break;
-    }
-    await votingRound.save();
-    interaction.reply({ embeds: [embeded], components: [button] });
-  } catch (error) {
-    interaction.reply({
-      content: "An error occured, please try again",
-      embeds: [getWalletVerificationEmbed()],
-      components: [getSelectVerificationMethodButton()],
-    });
-  }
-};
-
 const handleTokenSelectInputModal = async (interaction) => {
   const token = interaction.fields.getTextInputValue("tokenInput").trim();
   const votingRound = await VotingRound.findOne({
@@ -182,16 +132,33 @@ const handleTokenSelectInputModal = async (interaction) => {
       return interaction.reply({
         content:
           "Failed to find token with this contract address, please try again",
-        embeds: [getEthereumSelectTokenEmbed()],
+        embeds: [
+          getEthereumSelectTokenEmbed(
+            votingRound.votingSystem,
+            true,
+            votingRound.verificationMethod
+          ),
+        ],
         components: [getSelectTokenButton()],
       });
     } else {
       return interaction.reply({
         content:
           "Failed to find token with this policy and asset name, please try again. ",
-        embeds: [getCardanoSelectTokenEmbed()],
+        embeds: [
+          getCardanoSelectTokenEmbed(
+            votingRound.votingSystem,
+            true,
+            votingRound.verificationMethod
+          ),
+        ],
         components: [getSelectTokenButton()],
       });
+    }
+  } else {
+    if (votingRound.verificationMethod === "Ethereum Wallet") {
+      interaction.reply({});
+    } else {
     }
   }
 
@@ -283,11 +250,15 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   const votingRoundName = interaction.fields.getTextInputValue(
     "nameOfVotingRoundInput"
   );
+  const votingRoundDescription = interaction.fields.getTextInputValue(
+    "votingRoundDescriptionInput"
+  );
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
     status: "pending",
   });
   votingRound.votingRoundName = votingRoundName;
+  votingRound.votingRoundDescription = votingRoundDescription;
   await votingRound.save();
   const image = getImage();
   const votingRoundInfoEmbed = getVotingRoundInfoEmbed(
@@ -311,7 +282,6 @@ module.exports = {
   handleTokenSelectInputModal,
   handleRegisterProposalInputModal,
   handleVoteProposalInputModal,
-  handleVerificationMethodInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
 };

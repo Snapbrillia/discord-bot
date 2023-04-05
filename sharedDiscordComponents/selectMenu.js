@@ -96,6 +96,8 @@ const getSelectVerificationMenu = (showWalletVerificationOnly) => {
   if (!showWalletVerificationOnly) {
     selectMenu.push({
       label: "Discord Verification",
+      description:
+        "Users can participate as long as they are a member of the server",
       value: "Discord Verification",
     });
   }
@@ -107,7 +109,27 @@ const getSelectVerificationMenu = (showWalletVerificationOnly) => {
   return actionRow;
 };
 
-const getSelectTokenMenu = (selectMenu) => {
+const getSelectTokenMenu = (tokens) => {
+  let selectMenu = [];
+  for (let i = 0; i < tokens.length && i < 23; i++) {
+    selectMenu.push({
+      label: tokens[i].tokenName,
+      description: tokens[i].tokenIdentifier,
+      value: tokens[i].tokenIdentifier,
+    });
+    if (i === 22)
+      selectMenu.push({
+        label: "More Tokens",
+        description: "See more tokens in your wallet",
+        value: "More Tokens",
+      });
+  }
+  selectMenu.push({
+    label: "Enter Manually",
+    description: "Enter the token identifier manually",
+    value: "Enter Manually",
+  });
+
   const actionRow = buildActionRow(
     selectMenu,
     "Select Token",

@@ -12,14 +12,23 @@ const getNameOfVotingRoundModal = () => {
 
   const nameOfVotingRoundInput = new TextInputBuilder()
     .setCustomId("nameOfVotingRoundInput")
-    .setLabel("Please enter the name of the voting round")
+    .setLabel("Name of the voting round")
     .setStyle(TextInputStyle.Short);
+
+  const descriptionOfVotingRound = new TextInputBuilder()
+    .setCustomId("descriptionOfVotingRound")
+    .setLabel("Description of the voting round")
+    .setStyle(TextInputStyle.Paragraph);
 
   const firstActionRow = new ActionRowBuilder().addComponents(
     nameOfVotingRoundInput
   );
+  const secondActionRow = new ActionRowBuilder().addComponents(
+    descriptionOfVotingRound
+  );
 
-  modal.addComponents(firstActionRow);
+  modal.addComponents(firstActionRow, secondActionRow);
+
   return modal;
 };
 

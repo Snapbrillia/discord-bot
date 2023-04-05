@@ -2,11 +2,8 @@ const { Client, GatewayIntentBits } = require("discord.js");
 const {
   handleVerifyCardanoWalletButton,
   handleRegisterProposalButton,
-  handleStartRoundButton,
   handleVoteProposalButton,
   handleDownVoteProposalButton,
-  handleVerificationMethodButton,
-  handleSelectTokenButton,
   handleConfirmVotingRoundInfoButton,
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
@@ -17,7 +14,6 @@ const {
   handleConfirmCardanoWalletAddressInputModal,
   handleRegisterProposalInputModal,
   handleVoteProposalInputModal,
-  handleVerificationMethodInputModal,
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
@@ -70,7 +66,6 @@ client.on("guildCreate", async (guild) => {
   const owner = await guild.fetchOwner();
   createChannelWithOwner(guild, owner, client.user.id);
   members.forEach((member) => {
-    console.log(member);
     if (member.user.bot) {
       return;
     }
@@ -136,21 +131,6 @@ client.on("interactionCreate", async (interaction) => {
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
       break;
-    case "selectQVTokenVerificationMethodButton":
-      await handleVerificationMethodButton(interaction, true);
-      break;
-    case "selectTokenButton":
-      await handleSelectTokenButton(interaction);
-      break;
-    case "registerProposal":
-      await handleRegisterProposalButton(interaction);
-      break;
-    case "voteProposalButton":
-      await handleVoteProposalButton(interaction);
-      break;
-    case "downVoteProposal":
-      await handleDownVoteProposalButton(interaction);
-      break;
   }
 });
 
@@ -159,14 +139,11 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
   switch (interaction.customId) {
-    case "confirmNameOfVotingRoundInputModal":
-      await handleNameOfVotingRoundInputModal(interaction);
-      break;
-    case "confirmVerificationMethodInputModal":
-      await handleVerificationMethodInputModal(interaction);
-      break;
     case "confirmTokenInputModal":
       await handleTokenSelectInputModal(interaction);
+      break;
+    case "confirmNameOfVotingRoundInputModal":
+      await handleNameOfVotingRoundInputModal(interaction);
       break;
     case "confirmCardanoWalletAddressInputModal":
       await handleConfirmCardanoWalletAddressInputModal(interaction);
@@ -202,6 +179,15 @@ client.on("interactionCreate", async (interaction) => {
     case "verifyEthereumWalletButton":
       await handleVerifyEthereumWalletButton(interaction);
       break;
+    case "registerProposal":
+      await handleRegisterProposalButton(interaction);
+      break;
+    case "voteProposalButton":
+      await handleVoteProposalButton(interaction);
+      break;
+    case "downVoteProposal":
+      await handleDownVoteProposalButton(interaction);
+      break;
     case "confirmProposalButton":
       await handleConfirmRegisterProposalButton(interaction);
       break;
@@ -213,7 +199,7 @@ client.on("interactionCreate", async (interaction) => {
 
 client.login(process.env.TOKEN);
 
-setInterval(() => {
-  verifyCardanoUsers();
-  verifyEthereumUsers();
-}, 15000);
+// setInterval(() => {
+verifyCardanoUsers();
+//   verifyEthereumUsers();
+// }, 15000);

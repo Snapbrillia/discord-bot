@@ -18,53 +18,66 @@ const randomNumber = (min, max) => {
 };
 
 const verifyCardanoUsers = async () => {
-  const pendingVerification = await PendingVerification.find({
-    blockchain: "Cardano",
-  });
-  if (pendingVerification.length === 0) {
-    return;
-  }
-  for (let i = 0; i < pendingVerification.length; i++) {
-    const { walletAddress, sendAmount, discordId } = pendingVerification[i];
-    const currentDate = new Date();
-    const verificationDate = new Date(pendingVerification[i].createdAt);
-    const difference = currentDate.getTime() - verificationDate.getTime();
-    const differenceInMinutes = Math.round(difference / 60000);
-    if (differenceInMinutes > 5) {
-      await PendingVerification.deleteOne({
-        walletAddress,
-        sendAmount,
-      });
+  try {
+    const pendingVerification = await PendingVerification.find({
+      blockchain: "Cardano",
+    });
+    if (pendingVerification.length === 0) {
       return;
     }
-    const verified = await checkBalanceArrived(walletAddress, sendAmount);
-    console.log(verified);
-    if (verified) {
-      const discordUser = await DiscordUser.findOne({
-        discordId,
-      });
-      discordUser.cardanoWallets.push(walletAddress);
-      await discordUser.save();
-      await PendingVerification.deleteOne({
+    for (let i = 0; i < pendingVerification.length; i++) {
+      const { walletAddress, sendAmount, discordId } = pendingVerification[i];
+      const currentDate = new Date();
+      const verificationDate = new Date(pendingVerification[i].createdAt);
+      const difference = currentDate.getTime() - verificationDate.getTime();
+      const differenceInMinutes = Math.round(difference / 60000);
+      if (differenceInMinutes > 5) {
+        await PendingVerification.deleteOne({
+          walletAddress,
+          sendAmount,
+        });
+        return;
+      }
+      const transactionHash = await getTxHashOfTransaction(
         walletAddress,
-        sendAmount,
-      });
+        sendAmount
+      );
+      const verified = await verifyTxHash(walletAddress, transactionHash);
+      if (verified) {
+        const discordUser = await DiscordUser.findOne({
+          discordId,
+        });
+        discordUser.cardanoWallets.push(walletAddress);
+        const tokensInWallet = await getCardanoTokenInWallet(walletAddress);
+        const currentCardanoTokenInWallet = discordUser.cardanoTokenInWallet;
+        const allCardanoTokens = [
+          ...currentCardanoTokenInWallet,
+          ...tokensInWallet,
+        ];
+        let uniqueCardanoTokenInWallet = [];
+        allCardanoTokens.forEach((token) => {
+          if (
+            !uniqueCardanoTokenInWallet.some(
+              (uniqueToken) => uniqueToken === token
+            )
+          ) {
+            uniqueCardanoTokenInWallet.push(token);
+          }
+        });
+        discordUser.cardanoTokenInWallet = uniqueCardanoTokenInWallet;
+        await discordUser.save();
+        await PendingVerification.deleteOne({
+          walletAddress,
+          sendAmount,
+        });
+      }
     }
+  } catch (err) {
+    console.log(err);
   }
 };
 
-const checkBalanceArrived = async (walletAddress, confirmLovelaceAmount) => {
-  const transactionHash = await getTxHashOfTransaction(
-    walletAddress,
-    confirmLovelaceAmount
-  );
-  if (!transactionHash) {
-    return false;
-  }
-  const isVerified = await verifyTxHash(walletAddress, transactionHash);
-  return isVerified;
-};
-
+// Get the transaction hash of the transaction that sent the confirm amount
 const getTxHashOfTransaction = async (walletAddress, confirmLovelaceAmount) => {
   try {
     const confimaAdaAmountLoveLace = confirmLovelaceAmount * 1000000;
@@ -88,6 +101,7 @@ const getTxHashOfTransaction = async (walletAddress, confirmLovelaceAmount) => {
   }
 };
 
+// Verify that the transaction input came from the wallet address
 const verifyTxHash = async (walletAddress, txHash) => {
   try {
     const transactions = await axios.get(
@@ -126,51 +140,35 @@ const getTokenFromPolicyId = async (assetIdentifier) => {
   }
 };
 
-const getCardanoTokenInWalletMenu = async (discordId) => {
-  const discordUser = await DiscordUser.findOne({
-    discordId,
-  });
-  const { cardanoWallets } = discordUser;
+const getCardanoTokenInWallet = async (walletAddress) => {
   let assets = [];
-  for (let i = 0; i < cardanoWallets.length; i++) {
-    const utxos = await axios.get(
-      `${blockfrostURL}/addresses/${cardanoWallets[i]}/utxos`,
-      {
-        headers: blockfrostHeaders,
-      }
-    );
-    utxos.data.forEach((utxo) => {
-      if (utxo.amount.length > 1) {
-        utxo.amount.forEach((asset) => {
-          if (asset.unit !== "lovelace") {
-            assets.push(asset);
-          }
-        });
-      }
-    });
-  }
+  const utxos = await axios.get(
+    `${blockfrostURL}/addresses/${walletAddress}/utxos`,
+    {
+      headers: blockfrostHeaders,
+    }
+  );
 
-  let selectMenu = [
-    { label: "ADA", description: "The native Cardano Currency", value: "ADA" },
-  ];
+  utxos.data.forEach((utxo) => {
+    if (utxo.amount.length > 1) {
+      utxo.amount.forEach((asset) => {
+        if (asset.unit !== "lovelace") {
+          assets.push(asset);
+        }
+      });
+    }
+  });
+  let tokenWithTokenName = [];
   for (let i = 0; i < assets.length && i < 23; i++) {
     const tokenName = await getTokenFromPolicyId(assets[i].unit);
     if (tokenName) {
-      selectMenu.push({
-        label: tokenName,
-        description: `Token ID: ${assets[i].unit}`,
-        value: `${tokenName}-${assets[i].unit}`,
+      tokenWithTokenName.push({
+        tokenName,
+        tokenIdentifier: assets[i].unit,
       });
     }
   }
-  selectMenu.push({
-    label: "Enter Manually",
-    description:
-      "Enter the concatenation of the Asset Name in hex and Policy Id of the asset",
-    value: "Other",
-  });
-
-  return selectMenu;
+  return tokenWithTokenName;
 };
 
 const getEthereumTokenInWalletMenu = () => {};
@@ -179,6 +177,6 @@ module.exports = {
   randomNumber,
   verifyCardanoUsers,
   getTokenFromPolicyId,
-  getCardanoTokenInWalletMenu,
+  getCardanoTokenInWallet,
   getEthereumTokenInWalletMenu,
 };

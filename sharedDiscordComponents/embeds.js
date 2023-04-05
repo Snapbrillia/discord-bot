@@ -145,10 +145,9 @@ const getCardanoSelectTokenEmbed = (
 ) => {
   const embed = createEmbed(
     "🌟 Select Voting Token 🌟 ",
-    `You have selected to require voters to verify themselve using an Cardano wallet. \n
-    Please select the token that you want to use for voting. \n
-    We have selected the first 24 tokens in your wallets. You can also enter their unique identifer onchain (concatenation of the Asset Name in hex and Policy Id) \n
-    If you don't see the token you want to use you can enter the command ** /assets-in-cardano-wallet **.This will return you all tokens you have in your all of your wallet. You simply need to copy and paste their unique identifer \n
+    `You have selected to require voters to verify themselve using an Cardano wallet. Please select the token that you want to use for voting. \n
+    We have selected the first 24 tokens in your wallets. If you don't see the token you want to use you can enter the command ** /refresh-assets-in-cardano-wallet **.This will fetch the latest assets you have in your wallet. \n
+    You can also enter the token manually. You would need to provide the token's unique identifer on the blockchain (concatenation of the Asset Name in hex and Policy Id). \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onlyTokenHolderCanVote,
@@ -361,7 +360,7 @@ const getNameOfVotingRoundEmbed = (
 ) => {
   const embed = createEmbed(
     "🗳️ Voting Round Name 🗳️ ",
-    `This is the final step of creating a voting round.Please click the button below to enter a name for this voting round. \n
+    `This is the final step of creating a voting round.Please click the button below to enter a name and a description for this voting round. \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onlyTokenHolderCanVote,
