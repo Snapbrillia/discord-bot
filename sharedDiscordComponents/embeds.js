@@ -1,8 +1,42 @@
 const { EmbedBuilder } = require("discord.js");
-const {
-  getStartAndEndDate,
-  getVotingRoundConfigurationText,
-} = require("../utils/shared");
+
+// append them if they exist and if they are undefined, then don't append them
+const getVotingRoundConfigurationText = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenName,
+  roundDuration,
+  votingRoundName,
+  votingRoundDescription
+) => {
+  let text = `🔧** Current configuration of voting round **🔧\n
+  ** Voting System **: ${votingSystem} \n `;
+  if (typeof onlyTokenHolderCanVote === "boolean") {
+    if (onlyTokenHolderCanVote) {
+      text += `** Voting Permissions **: Only holders of a specific Token can Vote\n`;
+    } else {
+      text += `** Voting Permissions **: Anybody can vote as long as they are verified \n`;
+    }
+  }
+  if (verificationMethod) {
+    text += `** Verification Method **: ${verificationMethod} \n`;
+  }
+  if (tokenName) {
+    text += `** Token Used **: ${tokenName} \n`;
+  }
+  if (roundDuration) {
+    const { startDate, endDate } = getStartAndEndDate(roundDuration);
+    text += `** Voting Round Start**: ${startDate} \n ** Voting Round End **: ${endDate}\n`;
+  }
+  if (votingRoundName) {
+    text += `** Voting Round Name **: ${votingRoundName}\n`;
+  }
+  if (votingRoundDescription) {
+    text += `** Voting Round Description **: ${votingRoundDescription}\n`;
+  }
+  return text;
+};
 
 const createEmbed = (title, description) => {
   const embed = new EmbedBuilder()
@@ -24,7 +58,7 @@ const getVotingSystemsEmbed = () => {
     `👋 Hi there! I'm the Snapbrillia Bot and I'm here to guide you through the process of setting up a voting round in your server. 🤖 To get started, please choose the voting system you'd like to use for this round. To ensure the security of your voting round, we recommend that only administrators are included in this channel, to prevent unauthorized access and editing. 🛡️ Thanks for choosing our bot to manage voting within your community! \n  \n    
     1️⃣ Single Vote - Voters only have one vote. \n 
     2️⃣ Yes/No Voting - Voters can choose to vote either For or Against a proposal. \n
-    3️⃣ Quadratic Voting (Tokens In Wallet) - The voting power of each voter will be decided by the amount of a specific asser the voter has in his wallet when the voting round ends. Users will specify the percentage of his voting power he will allocate to a proposal (down or up vote) when voting. Their votes will be calculated using the quadratic voting formula.\n
+    3️⃣ Quadratic Voting (Tokens In Wallet) - The voting power of each voter will be decided by the amount of a specific asset the voter has in his wallet when the voting round ends. Users will specify the percentage of his voting power he will allocate to a proposal (down or up vote) when voting. Their votes will be calculated using the quadratic voting formula.\n
     4️⃣ Quadratic Voting (Same Voting Power) - Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
     `
   );
@@ -175,7 +209,8 @@ const getVotingRoundInfoEmbed = (
   verificationMethod,
   tokenUsed,
   roundDuration,
-  votingRoundName
+  votingRoundName,
+  votingRoundDescription
 ) => {
   const embed = createEmbed(
     "🗳️ Voting Round Info 🗳️ ",
@@ -187,7 +222,8 @@ const getVotingRoundInfoEmbed = (
       verificationMethod,
       tokenUsed,
       roundDuration,
-      votingRoundName
+      votingRoundName,
+      votingRoundDescription
     )}
     `
   );
@@ -237,10 +273,11 @@ const getRegisterProposalEmbed = () => {
   return embed;
 };
 
-const getProposalInfoEmbed = (proposalInfo) => {
+const getProposalInfoEmbed = (proposalInfo, votingRound) => {
   const embed = createEmbed(
     "📝 Proposal Info 📝 ",
-    `You have successfully registered the following proposal \n
+    `Please confirm the following information about your proposal \n
+      Voting Round: **${votingRound}** \n
       Proposal Name: **${proposalInfo.proposalName}**\n
       Proposal Description: **${proposalInfo.proposalDescription}**\n
       `
@@ -272,6 +309,15 @@ const getVoteProposalEmbed = () => {
     "🗳️ Vote Proposal 🗳️ ",
     `To vote for a proposal please enter the name of the proposal you want to vote for. You will specify a percentage of your voting power(amount of voting asset you have in your wallet) to give to the proposal. \n
      Please note the maximum percentage of voting power you can allocate across all proposal is 100%. \n
+    `
+  );
+  return embed;
+};
+
+const getVoteProposalEmbed1 = () => {
+  const embed = createEmbed(
+    "🗳️ Vote Proposal 🗳️ ",
+    `To vote for a proposal please first select the voting round you want to participate in \n 
     `
   );
   return embed;
@@ -373,6 +419,15 @@ const getNameOfVotingRoundEmbed = (
   return embed;
 };
 
+const getEnterProposalInformationEmbed = () => {
+  const embed = createEmbed(
+    "🗳️ Proposal Info 🗳️ ",
+    `Please enter the name and a description of your proposal. \n
+    `
+  );
+  return embed;
+};
+
 module.exports = {
   getListOfVerifiedEmbed,
   getVotingRoundInfoEmbed,
@@ -401,4 +456,6 @@ module.exports = {
   getMemberIntrouductionEmbed,
   getVotingRoundDurationEmbed,
   getNameOfVotingRoundEmbed,
+  getEnterProposalInformationEmbed,
+  getVoteProposalEmbed1,
 };

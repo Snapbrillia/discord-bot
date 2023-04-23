@@ -1,3 +1,11 @@
+const { DiscordUser } = require("../models/discordUser.model");
+const { Proposal } = require("../models/projectProposal.model");
+const {
+  getVerifyCardanoWalletButton,
+  getVerifyEthereumWalletButton,
+} = require("../sharedDiscordComponents/buttons");
+const { getVerifyWalletEmbed } = require("../sharedDiscordComponents/embeds");
+
 const numberRegex = /^[0-9]+$/;
 
 const formatDate = (date) => {
@@ -16,43 +24,56 @@ const getStartAndEndDate = (days) => {
   return { startDate: formatedStartDate, endDate: formatedEndDate };
 };
 
-// append them if they exist and if they are undefined, then don't append them
-const getVotingRoundConfigurationText = (
-  votingSystem,
-  onlyTokenHolderCanVote,
-  verificationMethod,
-  tokenName,
-  roundDuration,
-  votingRoundName
-) => {
-  let text = `🔧** Current configuration of voting round **🔧\n
-  Voting System:** ${votingSystem} **\n `;
-  if (typeof onlyTokenHolderCanVote === "boolean") {
-    if (onlyTokenHolderCanVote) {
-      text += `Voting Permissions:** Only holders of a specific Token can Vote **\n`;
-    } else {
-      text += `Voting Permissions:** Anybody can vote as long as they are verified **\n`;
-    }
+const checkIfVerified = async (interaction, votingRound) => {
+  const discordUser = await DiscordUser.findOne({
+    discordId: interaction.user.id,
+    serverId: interaction.guildId,
+  });
+
+  switch (votingRound.verificationMethod) {
+    case "Cardano Wallet":
+      if (discordUser.cardanoWallets.length <= 0) {
+        interaction.reply({
+          embeds: [getVerifyWalletEmbed("ADA")],
+          components: [getVerifyCardanoWalletButton()],
+        });
+        return false;
+      }
+      break;
+    case "Ethereum Wallet":
+      if (discordUser.ethereumWallets.length <= 0) {
+        interaction.reply({
+          embeds: [getVerifyWalletEmbed("ETH")],
+          components: [getVerifyEthereumWalletButton()],
+        });
+        return false;
+      }
+      break;
   }
-  if (verificationMethod) {
-    text += `Verification Method:** ${verificationMethod} **\n`;
+
+  return true;
+};
+
+const checkIfUserHasParticipatedInRound = async (discordUser, votingRound) => {
+  const proposal = await Proposal.find({
+    votingRoundId: votingRound._id,
+    discordId: discordUser.discordId,
+  });
+  const votes = await Votes.find({
+    votingRoundId: votingRound._id,
+    discordId: discordUser.discordId,
+  });
+  if (proposal.length > 0 || votes.length > 0) {
+    return true;
+  } else {
+    return false;
   }
-  if (tokenName) {
-    text += `Token Used:** ${tokenName} **\n`;
-  }
-  if (roundDuration) {
-    const { startDate, endDate } = getStartAndEndDate(roundDuration);
-    text += `Voting Round Start:** ${startDate} **\n Voting Round End:** ${endDate} **\n`;
-  }
-  if (votingRoundName) {
-    text += `Voting Round Name:** ${votingRoundName} **\n`;
-  }
-  return text;
 };
 
 module.exports = {
   numberRegex,
   formatDate,
   getStartAndEndDate,
-  getVotingRoundConfigurationText,
+  checkIfVerified,
+  checkIfUserHasParticipatedInRound,
 };

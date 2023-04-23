@@ -7,6 +7,8 @@ const {
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getNameOfVotingRoundEmbed,
+  getEnterProposalInformationEmbed,
+  getVerifyWalletEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
@@ -18,9 +20,14 @@ const {
 const { getCardanoTokenInWalletMenu } = require("../utils/cardanoUtils");
 const {
   getNameOfVotingRoundButton,
+  getRegisterProposalButton,
+  getVerifyEthereumWalletButton,
+  getVerifyCardanoWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
 const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
+const { Proposal } = require("../models/projectProposal.model");
+const { checkIfVerified } = require("../utils/shared");
 
 const handleVotingSystemMenu = async (interaction) => {
   const votingSystem = interaction.values[0];
@@ -229,10 +236,56 @@ const handleSelectTokenMenu = async (interaction) => {
   });
 };
 
+// Since there is no way of perserving state of interaction,
+// we will create a pending proposal for the user to store the states between
+// interactions. If the user already has a pending proposal, we will update the voting round id
+// they also need to select the wallet they want to use to represent themselves.
+const handleListOfProposalsMenu = async (interaction) => {
+  const votingRoundId = interaction.values[0];
+  const votingRound = await VotingRound.findOne({
+    votingRoundId: votingRoundId,
+  });
+  const existingProposal = await Proposal.findOne({
+    serverId: interaction.guildId,
+    votingRoundId: votingRoundId,
+    discordId: interaction.user.id,
+    status: "pending",
+  });
+  if (existingProposal) {
+    existingProposal.votingRoundId = votingRoundId;
+    await existingProposal.save();
+  } else {
+    await Proposal.create({
+      serverId: interaction.guildId,
+      votingRoundId: votingRoundId,
+      discordId: interaction.user.id,
+      status: "pending",
+    });
+  }
+
+  const isVerified = await checkIfVerified(interaction, votingRound);
+  if (!isVerified) {
+    return;
+  }
+
+  const hasParticipatedInRound = await checkIfUserHasParticipatedInRound();
+
+  const image = getImage();
+  let embedContent = getEnterProposalInformationEmbed();
+  let button = getRegisterProposalButton();
+
+  interaction.reply({
+    embeds: [embedContent],
+    files: [image],
+    components: [button],
+  });
+};
+
 module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
   handleSelectTokenMenu,
+  handleListOfProposalsMenu,
 };

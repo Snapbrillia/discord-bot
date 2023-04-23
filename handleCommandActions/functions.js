@@ -4,10 +4,11 @@ const {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
   getVoteProposalButton,
+  getRegisterProposalButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model.js");
 const { VotingRound } = require("../models/votingRound.model.js");
-const { checkIfVerified } = require("./utils");
+const { checkIfVerified } = require("../utils/shared");
 const {
   getVotingSystemsEmbed,
   getQuadraticVotingResultsEmbed,
@@ -31,6 +32,8 @@ const {
   getAllProposalsInfo,
 } = require("../api/quadraticVoting.js");
 const { getImage } = require("../sharedDiscordComponents/image");
+const { ActionRow } = require("discord.js");
+const { ActionRowBuilder } = require("@discordjs/builders");
 
 const handleVerifyCardanoWalletCommand = async (interaction) => {
   const verifyCardanoWalletEmbed = getVerifyWalletEmbed("ADA");
@@ -83,13 +86,6 @@ const handleRegisterProposalCommand = async (interaction) => {
     interaction.reply("No active voting round");
     return false;
   }
-  const isVerifiedAndActiveVotingRound = await checkIfVerified(
-    interaction,
-    votingRound
-  );
-  if (!isVerifiedAndActiveVotingRound) {
-    return;
-  }
   const registerProposalEmbed = getRegisterProposalEmbed();
   const image = getImage();
   const listOfProposalMenu = getListOfProposalMenu(votingRound);
@@ -101,21 +97,16 @@ const handleRegisterProposalCommand = async (interaction) => {
 };
 
 const handleVoteProposalCommand = async (interaction) => {
-  const votingRound = await VotingRound.findOne({
+  const votingRound = await VotingRound.find({
     serverId: interaction.guildId,
+    status: "active",
   });
   if (!votingRound) {
-    return interaction.reply("No active voting round");
+    interaction.reply("No active voting round");
+    return false;
   }
-  const isVerifiedAndActiveVotingRound = await checkIfVerified(
-    interaction,
-    votingRound
-  );
-  if (!isVerified) {
-    return;
-  }
-  const voteProposalButton = getVoteProposalButton();
   const voteProposalEmbed = getVoteProposalEmbed();
+  const listOfProposalMenu = getListOfProposalMenu(votingRound);
   await interaction.reply({
     embeds: [voteProposalEmbed],
     components: [voteProposalButton],

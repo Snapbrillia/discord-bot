@@ -42,6 +42,7 @@ const {
   handleSelectVerificationMethodMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
+  handleListOfProposalsMenu,
 } = require("./handleSelectMenuActions/functions");
 
 require("dotenv").config();
@@ -111,7 +112,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// Handle Select Menu
+// Handle select menu
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isStringSelectMenu()) return;
 
@@ -130,6 +131,9 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
+      break;
+    case "selectRegisterProposalVotingRoundMenu":
+      handleListOfProposalsMenu(interaction);
       break;
   }
 });
@@ -163,6 +167,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+// Handle button clicks
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
 
@@ -199,7 +204,7 @@ client.on("interactionCreate", async (interaction) => {
 
 client.login(process.env.TOKEN);
 
-// setInterval(() => {
-verifyCardanoUsers();
-//   verifyEthereumUsers();
-// }, 15000);
+setInterval(() => {
+  verifyCardanoUsers();
+  verifyEthereumUsers();
+}, 15000);

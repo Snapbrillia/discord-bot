@@ -144,13 +144,13 @@ const getListOfProposalMenu = (votingRound) => {
     selectMenu.push({
       label: votingRound[i].votingRoundName,
       description: `Voting System: ${votingRound[i].votingSystem}`,
-      value: votingRound[i].votingRoundName,
+      value: votingRound[i].votingRoundId,
     });
   }
   const actionRow = buildActionRow(
     selectMenu,
     "Select Voting Round",
-    "listOfProposalMenu"
+    "selectRegisterProposalVotingRoundMenu"
   );
   return actionRow;
 };

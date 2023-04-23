@@ -70,20 +70,20 @@ const handleConfirmVotingRoundInfoButton = async (interaction) => {
     serverId: interaction.guildId,
     status: "pending",
   });
-  // const response = await initateFund(
-  //   interaction.guildId,
-  //   votingRound.roundDurationInDays,
-  //   votingRound.tokenIdentiferOnBlockchain,
-  //   votingRound.blockchain
-  // );
-  // if (response.error) {
-  //   return interaction.reply({
-  //     content: response.message,
-  //     ephemeral: true,
-  //   });
-  // }
+  const response = await initateFund(
+    interaction.guildId,
+    votingRound.roundDurationInDays,
+    votingRound.tokenIdentiferOnBlockchain,
+    votingRound.blockchain
+  );
+  if (response.error) {
+    return interaction.reply({
+      content: response.message,
+      ephemeral: true,
+    });
+  }
   votingRound.status = "active";
-  // votingRound.votingRoundId = response.votingRoundId;
+  votingRound.votingRoundId = response.votingRoundId;
   votingRound.save();
   const confirmVotingRoundInfoEmbed = getConfirmVotingRoundInfoEmbed();
   const image = getImage();

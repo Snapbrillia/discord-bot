@@ -180,12 +180,12 @@ const handleRegisterProposalInputModal = async (interaction) => {
     discordId: interaction.user.id,
     serverId: interaction.guildId,
   });
-  let walletAddress = "";
-  if (votingRound.blockchain === "Ethereum") {
-    walletAddress = discordUser.ethereumWalletAddress;
-  } else {
-    walletAddress = discordUser.cardanoWalletAddress;
-  }
+  // let walletAddress = "";
+  // if (votingRound.blockchain === "Ethereum") {
+  //   walletAddress = discordUser.ethereumWalletAddress;
+  // } else {
+  //   walletAddress = discordUser.cardanoWalletAddress;
+  // }
   const proposalName =
     interaction.fields.getTextInputValue("proposalNameInput");
   const proposalDescription = interaction.fields.getTextInputValue(
@@ -195,17 +195,19 @@ const handleRegisterProposalInputModal = async (interaction) => {
     proposalName,
     proposalDescription,
   };
-  const registerProposalResponse = await registerProposal(
-    walletAddress,
-    votingRound.votingRoundId,
-    projectInfo
-  );
-  if (registerProposalResponse.err) {
-    interaction.reply(registerProposalResponse.message);
-    return;
-  }
+  // const registerProposalResponse = await registerProposal(
+  //   walletAddress,
+  //   votingRound.votingRoundId,
+  //   projectInfo
+  // );
+  // if (registerProposalResponse.err) {
+  //   interaction.reply(registerProposalResponse.message);
+  //   return;
+  // }
+  const image = getImage();
   interaction.reply({
     embeds: [getProposalInfoEmbed(projectInfo)],
+    files: [image],
   });
 };
 
@@ -251,7 +253,7 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
     "nameOfVotingRoundInput"
   );
   const votingRoundDescription = interaction.fields.getTextInputValue(
-    "votingRoundDescriptionInput"
+    "descriptionOfVotingRound"
   );
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
@@ -267,7 +269,8 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
     votingRound.verificationMethod,
     votingRound.tokenName,
     votingRound.roundDurationInDays,
-    votingRound.votingRoundName
+    votingRound.votingRoundName,
+    votingRound.votingRoundDescription
   );
   const confirmVotingRoundInfoButton = getConfirmVotingRoundInfoButton();
   interaction.reply({
