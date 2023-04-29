@@ -269,6 +269,7 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
     votingRound.verificationMethod,
     votingRound.tokenName,
     votingRound.roundDurationInDays,
+    votingRound.storeVotesOnChain,
     votingRound.votingRoundName,
     votingRound.votingRoundDescription
   );

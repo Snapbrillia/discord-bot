@@ -88,6 +88,7 @@ const handleRegisterProposalCommand = async (interaction) => {
   }
   const registerProposalEmbed = getRegisterProposalEmbed();
   const image = getImage();
+
   const listOfProposalMenu = getListOfProposalMenu(votingRound);
   await interaction.reply({
     embeds: [registerProposalEmbed],

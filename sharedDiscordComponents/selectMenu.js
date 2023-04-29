@@ -111,6 +111,7 @@ const getSelectVerificationMenu = (showWalletVerificationOnly) => {
 
 const getSelectTokenMenu = (tokens) => {
   let selectMenu = [];
+
   for (let i = 0; i < tokens.length && i < 23; i++) {
     selectMenu.push({
       label: tokens[i].tokenName,
@@ -155,11 +156,55 @@ const getListOfProposalMenu = (votingRound) => {
   return actionRow;
 };
 
+const getSelectVotingOnChainMenu = () => {
+  const selectMenu = [
+    {
+      label: "On-chain",
+      description: "Store the votes on chain",
+      value: "On-chain",
+    },
+    {
+      label: "Off-chain",
+      description: "Do not store the votes on chain",
+      value: "Off-chain",
+    },
+  ];
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select On-chain or Off-chain Voting",
+    "selectOnChainOrOffChainVotingMenu"
+  );
+  return actionRow;
+};
+
+const getEnableKYCMenu = () => {
+  const selectMenu = [
+    {
+      label: "Yes",
+      description: "SSI and KYC enabled authentication",
+      value: "Yes",
+    },
+    {
+      label: "No",
+      description: "No SSI and KYC enabled authentication",
+      value: "No",
+    },
+  ];
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Enable SSI and KYC",
+    "selectSSIAndKYCMenu"
+  );
+  return actionRow;
+};
+
 module.exports = {
   getSelectVotingSystemMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectRoundDurationMenu,
   getSelectVerificationMenu,
   getSelectTokenMenu,
+  getSelectVotingOnChainMenu,
   getListOfProposalMenu,
+  getEnableKYCMenu,
 };

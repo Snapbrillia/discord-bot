@@ -1,12 +1,31 @@
 const { EmbedBuilder } = require("discord.js");
 
+// helper functions
+const formatDate = (date) => {
+  const d = new Date(date);
+  const day = `0${d.getDate()}`.slice(-2);
+  const year = d.getFullYear();
+  const month = `0${d.getMonth() + 1}`.slice(-2);
+  return [year, month, day].join("-");
+};
+
+const getStartAndEndDate = (days) => {
+  const startDate = new Date();
+  const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+  const formatedStartDate = formatDate(startDate);
+  const formatedEndDate = formatDate(endDate);
+  return { startDate: formatedStartDate, endDate: formatedEndDate };
+};
+
 // append them if they exist and if they are undefined, then don't append them
 const getVotingRoundConfigurationText = (
   votingSystem,
   onlyTokenHolderCanVote,
   verificationMethod,
   tokenName,
+  enabledKYC,
   roundDuration,
+  onChainVotes,
   votingRoundName,
   votingRoundDescription
 ) => {
@@ -25,9 +44,15 @@ const getVotingRoundConfigurationText = (
   if (tokenName) {
     text += `** Token Used **: ${tokenName} \n`;
   }
+  if (enabledKYC) {
+    text += `** SSI and KYC Enabled **: ${enabledKYC} \n`;
+  }
   if (roundDuration) {
     const { startDate, endDate } = getStartAndEndDate(roundDuration);
     text += `** Voting Round Start**: ${startDate} \n ** Voting Round End **: ${endDate}\n`;
+  }
+  if (onChainVotes) {
+    text += `** On-Chain Votes**: ${onChainVotes} \n`;
   }
   if (votingRoundName) {
     text += `** Voting Round Name **: ${votingRoundName}\n`;
@@ -38,6 +63,7 @@ const getVotingRoundConfigurationText = (
   return text;
 };
 
+// embeds
 const createEmbed = (title, description) => {
   const embed = new EmbedBuilder()
     .setTitle(title)
@@ -106,20 +132,42 @@ const getSelectIfOnlyTokenHolderCanVoteEmbed = (votingSystem) => {
   return embed;
 };
 
-const getVotingRoundDurationEmbed = (
+const getEnableKYCEmbed = (
   votingSystem,
   onlyTokenHolderCanVote,
   verificationMethod,
   tokenName
 ) => {
   const embed = createEmbed(
-    "🕒⏱️ Select Voting Round Duration ⏱️🕒",
-    `Please select how long you want the voting round to last. \n \n
+    "🕒⏱️ Enable KYC ⏱️🕒",
+    `Would you like to secure your voting round with KYC and SSI enabled authentication. \n \n
    ${getVotingRoundConfigurationText(
      votingSystem,
      onlyTokenHolderCanVote,
      verificationMethod,
      tokenName
+   )} 
+    `
+  );
+  return embed;
+};
+
+const getVotingRoundDurationEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenName,
+  enableKYC
+) => {
+  const embed = createEmbed(
+    "🔍👤 Select Voting Round Duration 👤🔍",
+    `Please select how long you want the voting round to last. \n \n
+   ${getVotingRoundConfigurationText(
+     votingSystem,
+     onlyTokenHolderCanVote,
+     verificationMethod,
+     tokenName,
+     enableKYC
    )} 
     `
   );
@@ -203,12 +251,35 @@ const getVerifyWalletEmbed = (token) => {
   return embed;
 };
 
+const getSelectOnchainOrOffchainEmbed = (
+  votingSystem,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenUsed,
+  roundDuration
+) => {
+  const embed = createEmbed(
+    "🗳️ On-chain or Off-chain voting 🗳️ ",
+    `Please select if you want to use on-chain voting or off-chain voting. \n
+    ${getVotingRoundConfigurationText(
+      votingSystem,
+      onlyTokenHolderCanVote,
+      verificationMethod,
+      tokenUsed,
+      roundDuration
+    )}
+    `
+  );
+  return embed;
+};
+
 const getVotingRoundInfoEmbed = (
   votingSystem,
   onlyTokenHolderCanVote,
   verificationMethod,
   tokenUsed,
   roundDuration,
+  storeVotesOnChain,
   votingRoundName,
   votingRoundDescription
 ) => {
@@ -222,6 +293,7 @@ const getVotingRoundInfoEmbed = (
       verificationMethod,
       tokenUsed,
       roundDuration,
+      storeVotesOnChain,
       votingRoundName,
       votingRoundDescription
     )}
@@ -402,7 +474,8 @@ const getNameOfVotingRoundEmbed = (
   onlyTokenHolderCanVote,
   verificationMethod,
   tokenUsed,
-  roundDuration
+  roundDuration,
+  onChainVotes
 ) => {
   const embed = createEmbed(
     "🗳️ Voting Round Name 🗳️ ",
@@ -412,7 +485,8 @@ const getNameOfVotingRoundEmbed = (
       onlyTokenHolderCanVote,
       verificationMethod,
       tokenUsed,
-      roundDuration
+      roundDuration,
+      onChainVotes
     )}
     `
   );
@@ -422,7 +496,7 @@ const getNameOfVotingRoundEmbed = (
 const getEnterProposalInformationEmbed = () => {
   const embed = createEmbed(
     "🗳️ Proposal Info 🗳️ ",
-    `Please enter the name and a description of your proposal. \n
+    `Please click the following link to register a proposal. http://localhost:3000 \n
     `
   );
   return embed;
@@ -435,6 +509,7 @@ module.exports = {
   getSelectIfOnlyTokenHolderCanVoteEmbed,
   getWalletVerificationEmbed,
   getVerifyWalletEmbed,
+  getEnableKYCEmbed,
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getVotingSystemsEmbed,
@@ -458,4 +533,5 @@ module.exports = {
   getNameOfVotingRoundEmbed,
   getEnterProposalInformationEmbed,
   getVoteProposalEmbed1,
+  getSelectOnchainOrOffchainEmbed,
 };

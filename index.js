@@ -42,6 +42,8 @@ const {
   handleSelectVerificationMethodMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
+  handleSelectSSIAndKYCMenu,
+  handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
 } = require("./handleSelectMenuActions/functions");
 
@@ -129,11 +131,17 @@ client.on("interactionCreate", async (interaction) => {
     case "selectTokenMenu":
       await handleSelectTokenMenu(interaction);
       break;
+    case "selectSSIAndKYCMenu":
+      await handleSelectSSIAndKYCMenu(interaction);
+      break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
       break;
+    case "selectOnChainOrOffChainVotingMenu":
+      await handleOnChainOrOffChainVotingMenu(interaction);
+      break;
     case "selectRegisterProposalVotingRoundMenu":
-      handleListOfProposalsMenu(interaction);
+      await handleListOfProposalsMenu(interaction);
       break;
   }
 });

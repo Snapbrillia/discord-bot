@@ -41,6 +41,12 @@ const VotingRoundSchema = new mongoose.Schema(
     votingRoundDescription: {
       type: String,
     },
+    storeVotesOnChain: {
+      type: Boolean,
+    },
+    knowYourCustomerSSIEnabled: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );

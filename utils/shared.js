@@ -8,22 +8,6 @@ const { getVerifyWalletEmbed } = require("../sharedDiscordComponents/embeds");
 
 const numberRegex = /^[0-9]+$/;
 
-const formatDate = (date) => {
-  const d = new Date(date);
-  const day = `0${d.getDate()}`.slice(-2);
-  const year = d.getFullYear();
-  const month = `0${d.getMonth() + 1}`.slice(-2);
-  return [year, month, day].join("-");
-};
-
-const getStartAndEndDate = (days) => {
-  const startDate = new Date();
-  const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-  const formatedStartDate = formatDate(startDate);
-  const formatedEndDate = formatDate(endDate);
-  return { startDate: formatedStartDate, endDate: formatedEndDate };
-};
-
 const checkIfVerified = async (interaction, votingRound) => {
   const discordUser = await DiscordUser.findOne({
     discordId: interaction.user.id,
@@ -72,8 +56,6 @@ const checkIfUserHasParticipatedInRound = async (discordUser, votingRound) => {
 
 module.exports = {
   numberRegex,
-  formatDate,
-  getStartAndEndDate,
   checkIfVerified,
   checkIfUserHasParticipatedInRound,
 };
