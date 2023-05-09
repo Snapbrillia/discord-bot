@@ -45,13 +45,14 @@ const getSelectVotingSystemMenu = () => {
 const getSelectIfOnlyTokenHolderCanVoteMenu = () => {
   const selectMenu = [
     {
-      label: "Yes",
-      description: "Only tokens of a specific token can vote",
+      label: "Only Specific Token Holders",
+      description: "Only holders of a specific token can vote",
       value: "Yes",
     },
     {
-      label: "No",
-      description: "They can vote as long as they are verified",
+      label: "Everyone Can Vote",
+      description:
+        "They can vote as long as they are part of your discord server",
       value: "No",
     },
   ];
@@ -80,30 +81,23 @@ const getSelectRoundDurationMenu = () => {
   return actionRow;
 };
 
-const getSelectVerificationMenu = (showWalletVerificationOnly) => {
+const getSelectBlockchainMenu = () => {
   const selectMenu = [
     {
-      label: "Ethereum Wallet",
+      label: "Ethereum Blockchain",
       description: "Users will need to verify their Ethereum wallet address",
-      value: "Ethereum Wallet",
+      value: "Ethereum Blockchain",
     },
     {
-      label: "Cardano Wallet",
+      label: "Cardano Blockchain",
       description: "Users will need to verify their Cardano wallet address",
-      value: "Cardano Wallet",
+      value: "Cardano Blockchain",
     },
   ];
-  if (!showWalletVerificationOnly) {
-    selectMenu.push({
-      label: "Discord Verification",
-      description:
-        "Users can participate as long as they are a member of the server",
-      value: "Discord Verification",
-    });
-  }
+
   const actionRow = buildActionRow(
     selectMenu,
-    "Select Verification Method",
+    "Select Blockchain",
     "selectVerificationMethodMenu"
   );
   return actionRow;
@@ -130,6 +124,11 @@ const getSelectTokenMenu = (tokens) => {
     description: "Enter the token identifier manually",
     value: "Enter Manually",
   });
+  selectMenu.push({
+    label: "ETH",
+    description: "ETH",
+    value: "ETH",
+  });
 
   const actionRow = buildActionRow(
     selectMenu,
@@ -145,7 +144,7 @@ const getListOfProposalMenu = (votingRound) => {
     selectMenu.push({
       label: votingRound[i].votingRoundName,
       description: `Voting System: ${votingRound[i].votingSystem}`,
-      value: votingRound[i].votingRoundId,
+      value: votingRound[i]._id.toString(),
     });
   }
   const actionRow = buildActionRow(
@@ -202,7 +201,7 @@ module.exports = {
   getSelectVotingSystemMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectRoundDurationMenu,
-  getSelectVerificationMenu,
+  getSelectBlockchainMenu,
   getSelectTokenMenu,
   getSelectVotingOnChainMenu,
   getListOfProposalMenu,

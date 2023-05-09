@@ -8,7 +8,7 @@ const {
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model.js");
 const { VotingRound } = require("../models/votingRound.model.js");
-const { checkIfVerified } = require("../utils/shared");
+const { checkIfVerified } = require("../utils/sharedUtils");
 const {
   getVotingSystemsEmbed,
   getQuadraticVotingResultsEmbed,

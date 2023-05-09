@@ -2,12 +2,35 @@ import { useState } from "react";
 import SnapbrilliaLogo from "../assets/snapbrillia_logo.svg";
 import Image from "next/image";
 import { Transaction, ForgeScript, BrowserWallet } from "@meshsdk/core";
+import {
+  EthereumClient,
+  w3mConnectors,
+  w3mProvider,
+} from "@web3modal/ethereum";
+import { Web3Modal, Web3Button } from "@web3modal/react";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { arbitrum, mainnet, polygon } from "wagmi/chains";
+
+const chains = [arbitrum, mainnet, polygon];
+const projectId = "124362f92b293657597554c0846ca0e5";
+
+const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors: w3mConnectors({ projectId, version: 1, chains }),
+  provider,
+});
+
+const ethereumClient = new EthereumClient(wagmiClient, chains);
 
 export default function Home() {
   const [userInputData, setUserInputData] = useState({
     proposalTitle: "",
     proposalDescription: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [txHash, setTxHash] = useState("");
+
   const [wallet, setWallet] = useState("");
 
   const wallets = [
@@ -55,24 +78,24 @@ export default function Home() {
 
   const mintNft = async () => {
     try {
+      setLoading(true);
       const wallet = await BrowserWallet.enable("nami");
       const usedAddress = await wallet.getUsedAddresses();
       const address = usedAddress[0];
       // use app wallet to get address
-      console.log("dadaada");
+
       // create forgingScript
       const forgingScript = ForgeScript.withOneSignature(address);
 
       const tx = new Transaction({ initiator: wallet });
 
       const assetMetadata = {
-        name: "Mesh Token",
-        image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-        mediaType: "image/jpg",
-        description: "This NFT is minted by Mesh (https://meshjs.dev/).",
+        proposalName: userInputData.proposalTitle,
+        proposalDescription: userInputData.proposalDescription,
       };
+
       const asset = {
-        assetName: "MeshToken",
+        assetName: "ProposalToken",
         assetQuantity: "1",
         metadata: assetMetadata,
         label: "721",
@@ -83,15 +106,21 @@ export default function Home() {
       const unsignedTx = await tx.build();
       const signedTx = await wallet.signTx(unsignedTx);
       const txHash = await wallet.submitTx(signedTx);
+      window.alert(
+        `Your transaction has been submitted successfully. Closing the alert will close the page.`
+      );
       window.close();
+      setTxHash(txHash);
+      setLoading(false);
     } catch (e) {
+      setLoading(false);
       console.log(e);
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <form className="bg-white rounded px-8 pt-6 pb-8 mb-4 shadow-md w-400">
+    <div className="flex items-center justify-center h-screen w-400">
+      <form className="bg-white rounded px-8 pt-6 pb-8 mb-4 shadow-md">
         <Image
           src={SnapbrilliaLogo}
           alt="snapbrillia-logo"
@@ -108,18 +137,19 @@ export default function Home() {
               onChange={handleInputData}
             />
           </div>
+          <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
           <div className="w-full mb-2">
             <label className="block">Proposal Description</label>
-            <input
+            <textarea
               className="w-full h-10 px-3 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline"
-              type="text"
+              style={{ height: "100px" }}
               name="proposalDescription"
               value={userInputData.proposalDescription}
               onChange={handleInputData}
             />
           </div>
         </div>
-        <div>
+        {/* <div>
           <label className="block">Wallet</label>
           <select
             className="w-full h-10 px-3 text-base placeholder-gray-600 border rounded-lg"
@@ -132,17 +162,24 @@ export default function Home() {
               </option>
             ))}
           </select>
-        </div>
-        <button
-          type="button"
-          className="focus:outline-none float-right px-5 py-2 text-white mt-5 rounded-full"
-          style={{
-            backgroundColor: `${readyToSubmit ? "#a900a6" : "#dfdede"}`,
-          }}
-          onClick={() => mintNft()}
-        >
-          Register Proposal
-        </button>
+        </div> */}
+        <Web3Button />
+        {loading ? (
+          <div className="float-right px-5 py-2">
+            <div className="loading-spinner"></div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="focus:outline-none float-right px-5 py-2 text-white mt-5 rounded-full"
+            style={{
+              backgroundColor: `${readyToSubmit ? "#a900a6" : "#dfdede"}`,
+            }}
+            onClick={() => mintNft()}
+          >
+            Register Proposal
+          </button>
+        )}
       </form>
     </div>
   );

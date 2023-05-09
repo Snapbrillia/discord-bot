@@ -30,7 +30,7 @@ const {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
-const { numberRegex } = require("../utils/shared");
+const { numberRegex } = require("../utils/sharedUtils");
 const { PendingVerification } = require("../models/pendingVerification.model");
 const { getImage } = require("../sharedDiscordComponents/image");
 
@@ -265,11 +265,12 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   const image = getImage();
   const votingRoundInfoEmbed = getVotingRoundInfoEmbed(
     votingRound.votingSystem,
+    votingRound.storeVotesOnChain,
     votingRound.onlyTokenHolderCanVote,
     votingRound.verificationMethod,
     votingRound.tokenName,
+    votingRound.requiredVerifiableCredential,
     votingRound.roundDurationInDays,
-    votingRound.storeVotesOnChain,
     votingRound.votingRoundName,
     votingRound.votingRoundDescription
   );

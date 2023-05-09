@@ -122,6 +122,9 @@ client.on("interactionCreate", async (interaction) => {
     case "selectVotingSystemMenu":
       await handleVotingSystemMenu(interaction);
       break;
+    case "selectOnChainOrOffChainVotingMenu":
+      await handleOnChainOrOffChainVotingMenu(interaction);
+      break;
     case "selectIfOnlyTokenHolderCanVoteMenu":
       await handleSelectIfOnlyTokenHolderCanVoteMenu(interaction);
       break;
@@ -136,9 +139,6 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
-      break;
-    case "selectOnChainOrOffChainVotingMenu":
-      await handleOnChainOrOffChainVotingMenu(interaction);
       break;
     case "selectRegisterProposalVotingRoundMenu":
       await handleListOfProposalsMenu(interaction);

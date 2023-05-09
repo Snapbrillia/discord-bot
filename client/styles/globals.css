@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 5px solid #a900a6; /* Light grey */
+  border-top: 5px solid white; /* Black */
+  border-radius: 50%;
+  animation: spinner 1.5s linear infinite;
+}

@@ -1,7 +1,6 @@
 const { VotingRound } = require("../models/votingRound.model");
 const {
-  getListOfVerifiedEmbed,
-  getWalletVerificationEmbed,
+  getSelectBlockchainEmbed,
   getVotingRoundDurationEmbed,
   getSelectIfOnlyTokenHolderCanVoteEmbed,
   getEthereumSelectTokenEmbed,
@@ -11,18 +10,17 @@ const {
   getSelectOnchainOrOffchainEmbed,
   getEnterProposalInformationEmbed,
   getVerifyWalletEmbed,
+  getVotingRoundInfoEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
   getSelectRoundDurationMenu,
-  getSelectVerificationMenu,
+  getSelectBlockchainMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectTokenMenu,
   getSelectVotingOnChainMenu,
   getEnableKYCMenu,
 } = require("../sharedDiscordComponents/selectMenu");
-const { getCardanoTokenInWalletMenu } = require("../utils/cardanoUtils");
-const { getEthereumTokenInWalletMenu } = require("../utils/cardanoUtils");
 const {
   getNameOfVotingRoundButton,
   getRegisterProposalButton,
@@ -32,7 +30,7 @@ const {
 const { DiscordUser } = require("../models/discordUser.model");
 const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
 const { Proposal } = require("../models/projectProposal.model");
-const { checkIfVerified } = require("../utils/shared");
+const { checkIfVerified } = require("../utils/sharedUtils");
 
 const handleVotingSystemMenu = async (interaction) => {
   const votingSystem = interaction.values[0];
@@ -59,118 +57,13 @@ const handleVotingSystemMenu = async (interaction) => {
       });
     }
   }
-  let embedContent = "";
-  let component = "";
-  if (votingSystem === "Quadratic Voting (Tokens In Wallet)") {
-    const showWalletVerificationOnly = true;
-    embedContent = getWalletVerificationEmbed(votingSystem);
-    component = getSelectVerificationMenu(showWalletVerificationOnly);
-  } else {
-    embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(votingSystem);
-    component = getSelectIfOnlyTokenHolderCanVoteMenu();
-  }
+  let embedContent = getSelectOnchainOrOffchainEmbed(votingSystem);
+  let component = getSelectVotingOnChainMenu();
   const image = getImage();
   interaction.reply({
     embeds: [embedContent],
     components: [component],
     files: [image],
-  });
-};
-
-// If only token holder can vote is true, then we need to verify the wallet
-// If only token holder can vote is false, then we display all verification method including discord
-const handleSelectIfOnlyTokenHolderCanVoteMenu = async (interaction) => {
-  const onlyTokenHolderCanVoteValue = interaction.values[0];
-  const pendingVotingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "pending",
-  });
-  let onlyTokenHolderCanVote;
-  if (onlyTokenHolderCanVoteValue === "Yes") {
-    onlyTokenHolderCanVote = true;
-  } else {
-    onlyTokenHolderCanVote = false;
-  }
-  pendingVotingRound.onlyTokenHolderCanVote = onlyTokenHolderCanVote;
-  await pendingVotingRound.save();
-  let embedContent = "";
-  let confirmVerificationMenu = "";
-  if (onlyTokenHolderCanVote) {
-    const showWalletVerificationOnly = true;
-    embedContent = getWalletVerificationEmbed(
-      pendingVotingRound.votingSystem,
-      onlyTokenHolderCanVote
-    );
-    confirmVerificationMenu = getSelectVerificationMenu(
-      showWalletVerificationOnly
-    );
-  } else {
-    embedContent = getListOfVerifiedEmbed(
-      pendingVotingRound.votingSystem,
-      onlyTokenHolderCanVote
-    );
-    confirmVerificationMenu = getSelectVerificationMenu();
-  }
-  const image = getImage();
-
-  interaction.reply({
-    embeds: [embedContent],
-    components: [confirmVerificationMenu],
-    files: [image],
-  });
-};
-
-// After selecting the round duration we will ask the
-// user to enter the name of the voting round
-const handleRoundDurationMenu = async (interaction) => {
-  try {
-    const votingRound = await VotingRound.findOne({
-      serverId: interaction.guildId,
-      status: "pending",
-    });
-    const roundDurationInDays = interaction.values[0];
-    votingRound.roundDurationInDays = parseInt(roundDurationInDays);
-    await votingRound.save();
-    let embedContent = getSelectOnchainOrOffchainEmbed(
-      votingRound.votingSystem,
-      votingRound.onlyTokenHolderCanVote,
-      votingRound.verificationMethod,
-      votingRound.tokenName,
-      votingRound.roundDurationInDays
-    );
-    const nameOfVotingRoundButton = getSelectVotingOnChainMenu();
-    const image = getImage();
-    interaction.reply({
-      embeds: [embedContent],
-      components: [nameOfVotingRoundButton],
-      files: [image],
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const handleSelectSSIAndKYCMenu = async (interaction) => {
-  const votingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "pending",
-  });
-  const useSSI = interaction.values[0] === "Yes";
-  votingRound.knowYourCustomerSSIEnabled = useSSI;
-  await votingRound.save();
-  const embedContent = getVotingRoundDurationEmbed(
-    votingRound.votingSystem,
-    true,
-    votingRound.verificationMethod,
-    votingRound.tokenName,
-    votingRound.knowYourCustomerSSIEnabled
-  );
-  const component = getSelectRoundDurationMenu();
-  const image = getImage();
-  interaction.reply({
-    embeds: [embedContent],
-    files: [image],
-    components: [component],
   });
 };
 
@@ -183,15 +76,11 @@ const handleOnChainOrOffChainVotingMenu = async (interaction) => {
     const storeVotesOnChain = interaction.values[0] === "On-chain";
     votingRound.storeVotesOnChain = storeVotesOnChain;
     await votingRound.save();
-    let embedContent = getNameOfVotingRoundEmbed(
+    let embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(
       votingRound.votingSystem,
-      votingRound.onlyTokenHolderCanVote,
-      votingRound.verificationMethod,
-      votingRound.tokenName,
-      votingRound.roundDurationInDays,
-      storeVotesOnChain.toString()
+      storeVotesOnChain
     );
-    const nameOfVotingRoundButton = getNameOfVotingRoundButton();
+    const nameOfVotingRoundButton = getSelectIfOnlyTokenHolderCanVoteMenu();
     const image = getImage();
     interaction.reply({
       embeds: [embedContent],
@@ -201,6 +90,38 @@ const handleOnChainOrOffChainVotingMenu = async (interaction) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+// If only token holder can vote is true, then we need to verify the wallet
+// If only token holder can vote is false, then we display all verification method including discord
+const handleSelectIfOnlyTokenHolderCanVoteMenu = async (interaction) => {
+  const onlyTokenHolderCanVoteValue = interaction.values[0];
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "pending",
+  });
+  let onlyTokenHolderCanVote;
+  if (onlyTokenHolderCanVoteValue === "Yes") {
+    onlyTokenHolderCanVote = true;
+  } else {
+    onlyTokenHolderCanVote = false;
+  }
+  votingRound.onlyTokenHolderCanVote = onlyTokenHolderCanVote;
+  await votingRound.save();
+
+  let embedContent = getSelectBlockchainEmbed(
+    votingRound.votingSystem,
+    votingRound.storeVotesOnChain,
+    onlyTokenHolderCanVote
+  );
+  let confirmVerificationMenu = getSelectBlockchainMenu();
+
+  const image = getImage();
+  interaction.reply({
+    embeds: [embedContent],
+    components: [confirmVerificationMenu],
+    files: [image],
+  });
 };
 
 // After selecting verification method we will check if token is needed for this round. If it is needed
@@ -225,10 +146,11 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
     );
     let component = getSelectRoundDurationMenu();
     if (votingRound.onlyTokenHolderCanVote) {
-      if (verificationMethod === "Ethereum Wallet") {
+      if (verificationMethod === "Ethereum Blockchain") {
         votingRound.blockchain = "Ethereum";
         embedContent = getEthereumSelectTokenEmbed(
           votingRound.votingSystem,
+          votingRound.storeVotesOnChain,
           true,
           verificationMethod
         );
@@ -236,10 +158,11 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
           discordUser.ethereumTokenInWallet
         );
         component = getSelectTokenMenu(tokenInWallet);
-      } else if (verificationMethod === "Cardano Wallet") {
+      } else if (verificationMethod === "Cardano Blockchain") {
         votingRound.blockchain = "Cardano";
         embedContent = getCardanoSelectTokenEmbed(
           votingRound.votingSystem,
+          votingRound.storeVotesOnChain,
           true,
           verificationMethod
         );
@@ -265,23 +188,24 @@ const handleSelectTokenMenu = async (interaction) => {
     serverId: interaction.guildId,
     status: "pending",
   });
-  const discordUser = await DiscordUser.findOne({
-    discordId: interaction.user.id,
-  });
-  const token = discordUser.cardanoTokenInWallet.find(
-    (token) => token.tokenIdentifier === tokenIdentifier
-  );
+  // const discordUser = await DiscordUser.findOne({
+  //   discordId: interaction.user.id,
+  // });
+  // const token = discordUser.cardanoTokenInWallet.find(
+  //   (token) => token.tokenIdentifier === tokenIdentifier
+  // );
   if (tokenIdentifier === "Enter Manually") {
     const modal = getSelectTokenModal();
     return interaction.showModal(modal);
   } else {
   }
   votingRound.tokenIdentiferOnBlockchain = tokenIdentifier;
-  votingRound.tokenName = token.tokenName;
+  votingRound.tokenName = "ETH";
   await votingRound.save();
   const embedContent = getEnableKYCEmbed(
     votingRound.votingSystem,
-    true,
+    votingRound.storeVotesOnChain,
+    votingRound.onlyTokenHolderCanVote,
     votingRound.verificationMethod,
     votingRound.tokenName
   );
@@ -292,6 +216,63 @@ const handleSelectTokenMenu = async (interaction) => {
     files: [image],
     components: [component],
   });
+};
+
+const handleSelectSSIAndKYCMenu = async (interaction) => {
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+    status: "pending",
+  });
+  const useSSI = interaction.values[0] === "Yes";
+  votingRound.requiredVerifiableCredential = useSSI;
+  await votingRound.save();
+  const embedContent = getVotingRoundDurationEmbed(
+    votingRound.votingSystem,
+    votingRound.storeVotesOnChain,
+    votingRound.onlyTokenHolderCanVote,
+    votingRound.verificationMethod,
+    votingRound.tokenName,
+    votingRound.requiredVerifiableCredential
+  );
+  const component = getSelectRoundDurationMenu();
+  const image = getImage();
+  interaction.reply({
+    embeds: [embedContent],
+    files: [image],
+    components: [component],
+  });
+};
+
+// After selecting the round duration we will ask the
+// user to enter the name of the voting round
+const handleRoundDurationMenu = async (interaction) => {
+  try {
+    const votingRound = await VotingRound.findOne({
+      serverId: interaction.guildId,
+      status: "pending",
+    });
+    const roundDurationInDays = interaction.values[0];
+    votingRound.roundDurationInDays = parseInt(roundDurationInDays);
+    await votingRound.save();
+    let embedContent = getVotingRoundInfoEmbed(
+      votingRound.votingSystem,
+      votingRound.storeVotesOnChain,
+      votingRound.onlyTokenHolderCanVote,
+      votingRound.verificationMethod,
+      votingRound.tokenName,
+      votingRound.requiredVerifiableCredential,
+      votingRound.roundDurationInDays
+    );
+    const nameOfVotingRoundButton = getNameOfVotingRoundButton();
+    const image = getImage();
+    interaction.reply({
+      embeds: [embedContent],
+      components: [nameOfVotingRoundButton],
+      files: [image],
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // Since there is no way of perserving state of interaction,

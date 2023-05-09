@@ -44,7 +44,7 @@ const VotingRoundSchema = new mongoose.Schema(
     storeVotesOnChain: {
       type: Boolean,
     },
-    knowYourCustomerSSIEnabled: {
+    requiredVerifiableCredential: {
       type: Boolean,
     },
   },
