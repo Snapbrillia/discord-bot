@@ -1,11 +1,12 @@
-const { DiscordUser } = require("../models/discordUser.model.js");
+const { DiscordUser } = require("../models/discordUser.model");
+const { Proposal } = require("../models/projectProposal.model");
 const {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
-} = require("../sharedDiscordComponents/buttons.js");
-const {
-  getVerifyWalletEmbed,
-} = require("../sharedDiscordComponents/embeds.js");
+} = require("../sharedDiscordComponents/buttons");
+const { getVerifyWalletEmbed } = require("../sharedDiscordComponents/embeds");
+
+const numberRegex = /^[0-9]+$/;
 
 const checkIfVerified = async (interaction, votingRound) => {
   const discordUser = await DiscordUser.findOne({
@@ -37,6 +38,24 @@ const checkIfVerified = async (interaction, votingRound) => {
   return true;
 };
 
+const checkIfUserHasParticipatedInRound = async (discordUser, votingRound) => {
+  const proposal = await Proposal.find({
+    votingRoundId: votingRound._id,
+    discordId: discordUser.discordId,
+  });
+  const votes = await Votes.find({
+    votingRoundId: votingRound._id,
+    discordId: discordUser.discordId,
+  });
+  if (proposal.length > 0 || votes.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 module.exports = {
+  numberRegex,
   checkIfVerified,
+  checkIfUserHasParticipatedInRound,
 };

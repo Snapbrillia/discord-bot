@@ -2,24 +2,21 @@ const { Client, GatewayIntentBits } = require("discord.js");
 const {
   handleVerifyCardanoWalletButton,
   handleRegisterProposalButton,
-  handleStartRoundButton,
   handleVoteProposalButton,
   handleDownVoteProposalButton,
-  handleVerificationMethodButton,
-  handleSelectTokenButton,
   handleConfirmVotingRoundInfoButton,
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
+  handleNameOfVotingRoundButton,
 } = require("./handleButtonClickActions/functions");
 const {
   handleConfirmCardanoWalletAddressInputModal,
-  handleVotingSystemInputModal,
   handleRegisterProposalInputModal,
   handleVoteProposalInputModal,
-  handleVerificationMethodInputModal,
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
+  handleNameOfVotingRoundInputModal,
 } = require("./handleModalSubmitActions/functions");
 const {
   handleVerifyCardanoWalletCommand,
@@ -37,7 +34,18 @@ const { deployScripts } = require("./deployCommandScript");
 const {
   createChannelWithOwner,
   createChannelWithUsers,
+  createDiscordUser,
 } = require("./handleGuildCreateActions/functions");
+const {
+  handleVotingSystemMenu,
+  handleRoundDurationMenu,
+  handleSelectVerificationMethodMenu,
+  handleSelectIfOnlyTokenHolderCanVoteMenu,
+  handleSelectTokenMenu,
+  handleSelectSSIAndKYCMenu,
+  handleOnChainOrOffChainVotingMenu,
+  handleListOfProposalsMenu,
+} = require("./handleSelectMenuActions/functions");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -61,11 +69,11 @@ client.on("guildCreate", async (guild) => {
   const owner = await guild.fetchOwner();
   createChannelWithOwner(guild, owner, client.user.id);
   members.forEach((member) => {
-    console.log(member);
     if (member.user.bot) {
       return;
     }
     createChannelWithUsers(guild, member, client.user.id);
+    createDiscordUser(guild, member);
   });
   await deployScripts(guild);
 });
@@ -74,82 +82,6 @@ client.on("guildCreate", async (guild) => {
 // TODO PRIVATE CHANNEL WITH ALL USERS
 // When new members join. Create a private channel with them
 client.on("guildMemberAdd", (member) => {});
-
-// Handle button clicks
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
-
-  switch (interaction.customId) {
-    case "selectVotingSystemButton":
-      await handleStartRoundButton(interaction);
-      break;
-    case "selectVerificationMethodButton":
-      await handleVerificationMethodButton(interaction);
-      break;
-    case "selectQVTokenVerificationMethodButton":
-      await handleVerificationMethodButton(interaction, true);
-      break;
-    case "selectTokenButton":
-      await handleSelectTokenButton(interaction);
-      break;
-    case "confirmVotingRoundInfoButton":
-      await handleConfirmVotingRoundInfoButton(interaction);
-      break;
-    case "verifyCardanoWalletButton":
-      await handleVerifyCardanoWalletButton(interaction);
-      break;
-    case "verifyEthereumWalletButton":
-      await handleVerifyEthereumWalletButton(interaction);
-      break;
-    case "registerProposal":
-      await handleRegisterProposalButton(interaction);
-      break;
-    case "confirmProposalButton":
-      await handleConfirmRegisterProposalButton(interaction);
-      break;
-    case "voteProposalButton":
-      await handleVoteProposalButton(interaction);
-      break;
-    case "confirmVoteProposalButton":
-      await handleConfirmVoteProposalButton(interaction);
-      break;
-    case "downVoteProposal":
-      await handleDownVoteProposalButton(interaction);
-      break;
-  }
-});
-
-// Handle modal submits
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isModalSubmit()) return;
-
-  switch (interaction.customId) {
-    case "selectVotingSystemInputModal":
-      await handleVotingSystemInputModal(interaction);
-      break;
-    case "confirmVerificationMethodInputModal":
-      await handleVerificationMethodInputModal(interaction);
-      break;
-    case "confirmTokenInputModal":
-      await handleTokenSelectInputModal(interaction);
-      break;
-    case "confirmCardanoWalletAddressInputModal":
-      await handleConfirmCardanoWalletAddressInputModal(interaction);
-      break;
-    case "confirmEthereumWalletAddressInputModal":
-      await handleConfirmEthereumWalletAddressInputModal(interaction);
-      break;
-    case "registerProposalInputModal":
-      await handleRegisterProposalInputModal(interaction);
-      break;
-    case "voteProposalInputModal":
-      await handleVoteProposalInputModal(interaction, "vote");
-      break;
-    case "downVoteProposalInputModal":
-      await handleVoteProposalInputModal(interaction, "down-vote");
-      break;
-  }
-});
 
 // Handle commands
 client.on("interactionCreate", async (interaction) => {
@@ -178,6 +110,102 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "help":
       await handleHelpCommand(interaction);
+      break;
+  }
+});
+
+// Handle select menu
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isStringSelectMenu()) return;
+
+  switch (interaction.customId) {
+    case "selectVotingSystemMenu":
+      await handleVotingSystemMenu(interaction);
+      break;
+    case "selectOnChainOrOffChainVotingMenu":
+      await handleOnChainOrOffChainVotingMenu(interaction);
+      break;
+    case "selectIfOnlyTokenHolderCanVoteMenu":
+      await handleSelectIfOnlyTokenHolderCanVoteMenu(interaction);
+      break;
+    case "selectVerificationMethodMenu":
+      await handleSelectVerificationMethodMenu(interaction);
+      break;
+    case "selectTokenMenu":
+      await handleSelectTokenMenu(interaction);
+      break;
+    case "selectSSIAndKYCMenu":
+      await handleSelectSSIAndKYCMenu(interaction);
+      break;
+    case "selectRoundDurationMenu":
+      await handleRoundDurationMenu(interaction);
+      break;
+    case "selectRegisterProposalVotingRoundMenu":
+      await handleListOfProposalsMenu(interaction);
+      break;
+  }
+});
+
+// Handle modal submits
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isModalSubmit()) return;
+
+  switch (interaction.customId) {
+    case "confirmTokenInputModal":
+      await handleTokenSelectInputModal(interaction);
+      break;
+    case "confirmNameOfVotingRoundInputModal":
+      await handleNameOfVotingRoundInputModal(interaction);
+      break;
+    case "confirmCardanoWalletAddressInputModal":
+      await handleConfirmCardanoWalletAddressInputModal(interaction);
+      break;
+    case "confirmEthereumWalletAddressInputModal":
+      await handleConfirmEthereumWalletAddressInputModal(interaction);
+      break;
+    case "registerProposalInputModal":
+      await handleRegisterProposalInputModal(interaction);
+      break;
+    case "voteProposalInputModal":
+      await handleVoteProposalInputModal(interaction, "vote");
+      break;
+    case "downVoteProposalInputModal":
+      await handleVoteProposalInputModal(interaction, "down-vote");
+      break;
+  }
+});
+
+// Handle button clicks
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  switch (interaction.customId) {
+    case "nameOfVotingRoundButton":
+      await handleNameOfVotingRoundButton(interaction);
+      break;
+    case "confirmVotingRoundInfoButton":
+      await handleConfirmVotingRoundInfoButton(interaction);
+      break;
+    case "verifyCardanoWalletButton":
+      await handleVerifyCardanoWalletButton(interaction);
+      break;
+    case "verifyEthereumWalletButton":
+      await handleVerifyEthereumWalletButton(interaction);
+      break;
+    case "registerProposal":
+      await handleRegisterProposalButton(interaction);
+      break;
+    case "voteProposalButton":
+      await handleVoteProposalButton(interaction);
+      break;
+    case "downVoteProposal":
+      await handleDownVoteProposalButton(interaction);
+      break;
+    case "confirmProposalButton":
+      await handleConfirmRegisterProposalButton(interaction);
+      break;
+    case "confirmVoteProposalButton":
+      await handleConfirmVoteProposalButton(interaction);
       break;
   }
 });

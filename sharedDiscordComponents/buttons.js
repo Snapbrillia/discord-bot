@@ -71,8 +71,21 @@ const getVoteProposalButton = () => {
   return button;
 };
 
+const getNameOfVotingRoundButton = () => {
+  const button = getPrimaryButton(
+    "nameOfVotingRoundButton",
+    "Enter Voting Round Info"
+  );
+  return button;
+};
+
 const getConfirmVoteButton = () => {
   const button = getPrimaryButton("confirmVoteProposalButton", "Confirm Vote");
+  return button;
+};
+
+const getRegisterProposalButton = () => {
+  const button = getPrimaryButton("registerProposal", "Register Proposal");
   return button;
 };
 
@@ -86,5 +99,7 @@ module.exports = {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
   getVoteProposalButton,
+  getNameOfVotingRoundButton,
   getConfirmVoteButton,
+  getRegisterProposalButton,
 };

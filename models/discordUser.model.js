@@ -1,37 +1,42 @@
 const mongoose = require("mongoose");
 
+const tokenInWalletSchema = new mongoose.Schema(
+  {
+    tokenName: {
+      type: String,
+    },
+    tokenIdentifier: {
+      type: String,
+    },
+  },
+  { _id: false }
+);
+
 const DiscordUserSchema = new mongoose.Schema(
   {
-    cardanoWalletAddress: {
-      type: String,
-    },
-    ethereumWalletAddress: {
-      type: String,
-    },
-    cardanoIsVerified: {
-      type: Boolean,
-    },
-    ethereumIsVerified: {
-      type: Boolean,
-    },
-    ssiIsVerified: {
-      type: Boolean,
-    },
+    cardanoWallets: [
+      {
+        type: String,
+      },
+    ],
+    ethereumWallets: [
+      {
+        type: String,
+      },
+    ],
     discordId: {
       type: String,
     },
-    serverId: {
-      type: String,
-    },
+    serverId: [
+      {
+        type: String,
+      },
+    ],
     discordUsername: {
       type: String,
     },
-    confirmLovelaceAmount: {
-      type: Number,
-    },
-    confirmEthAmount: {
-      type: Number,
-    },
+    cardanoTokenInWallet: [tokenInWalletSchema],
+    ethereumTokenInWallet: [tokenInWalletSchema],
   },
   { timestamps: true }
 );

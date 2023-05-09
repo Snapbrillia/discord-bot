@@ -8,9 +8,12 @@ const VotingRoundSchema = new mongoose.Schema(
     votingRoundId: {
       type: String,
     },
-    // Quadratic Voting(Tokens In Wallet), Quadratic Voting(Same Voting Powe), Basic Voting , Single Choice Voting
-    votingSystemToUse: {
+    // Quadratic Voting (Tokens In Wallet), Quadratic Voting (Same Voting Powe), Basic Voting , Single Choice Voting
+    votingSystem: {
       type: String,
+    },
+    onlyTokenHolderCanVote: {
+      type: Boolean,
     },
     // Ethereum Wallet, Cardano Wallet, Discord Verification, SSI
     verificationMethod: {
@@ -23,17 +26,26 @@ const VotingRoundSchema = new mongoose.Schema(
     status: {
       type: String,
     },
-    assetIdentifierOnChain: {
+    tokenIdentiferOnBlockchain: {
       type: String,
     },
-    assetName: {
+    tokenName: {
       type: String,
     },
     blockchain: {
       type: String,
     },
-    projectInfo: {
+    votingRoundName: {
       type: String,
+    },
+    votingRoundDescription: {
+      type: String,
+    },
+    storeVotesOnChain: {
+      type: Boolean,
+    },
+    requiredVerifiableCredential: {
+      type: Boolean,
     },
   },
   { timestamps: true }
