@@ -42,6 +42,32 @@ const getSelectVotingSystemMenu = () => {
   return actionRow;
 };
 
+const getSelectLinkWalletMenu = () => {
+  const selectMenu = [
+    {
+      label: "Ethereum Wallet",
+      description: "Link your Ethereum wallet",
+      value: "Ethereum Wallet",
+    },
+    {
+      label: "Cardano Wallet",
+      description: "Link your Cardano wallet",
+      value: "Cardano Wallet",
+    },
+    {
+      label: "SSI Wallet",
+      description: "Link your SSI wallet",
+      value: "SSI Wallet",
+    },
+  ];
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Wallet To Link",
+    "selectLinkWalletMenu"
+  );
+  return actionRow;
+};
+
 const getSelectIfOnlyTokenHolderCanVoteMenu = () => {
   const selectMenu = [
     {
@@ -158,7 +184,7 @@ const getListOfProposalMenu = (votingRound) => {
 const getSelectVotingOnChainMenu = () => {
   const selectMenu = [
     {
-      label: "On-chain",
+      label: " ",
       description: "Store the votes on chain",
       value: "On-chain",
     },
@@ -206,4 +232,5 @@ module.exports = {
   getSelectVotingOnChainMenu,
   getListOfProposalMenu,
   getEnableKYCMenu,
+  getSelectLinkWalletMenu,
 };

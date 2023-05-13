@@ -2,6 +2,6 @@ const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("verify-cardano-wallet")
-    .setDescription("Verify your Cardano wallet address."),
+    .setName("link-wallets")
+    .setDescription("Link your Ethereum, Cardano, or SSI wallet"),
 };

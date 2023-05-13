@@ -1,7 +1,9 @@
 // Setup: npm install alchemy-sdk
 const { Alchemy, Network } = require("alchemy-sdk");
 const { DiscordUser } = require("../models/discordUser.model");
-const { PendingVerification } = require("../models/pendingVerification.model");
+const {
+  PendingVerification,
+} = require("../models/pendingBlockchainVerification.model.js");
 
 require("dotenv").config();
 

@@ -84,8 +84,48 @@ const getConfirmVoteButton = () => {
   return button;
 };
 
+const getConfirmRegisterProposalButton = () => {
+  const button = getPrimaryButton(
+    "confirmProposalButton",
+    "Confirm Register Proposal"
+  );
+  return button;
+};
+
 const getRegisterProposalButton = () => {
   const button = getPrimaryButton("registerProposal", "Register Proposal");
+  return button;
+};
+
+const getSSIEmailVerificationButton = () => {
+  const button = getPrimaryButton(
+    "verifySSIEmailButton",
+    "Enter Email Address"
+  );
+  return button;
+};
+
+const getEnterSSIEmailVerificationButton = () => {
+  const button = getPrimaryButton(
+    "enterSSIEmailVerificationButton",
+    "Enter Email Verification Code"
+  );
+  return button;
+};
+
+const getEnterSSIPhoneVerificationButton = () => {
+  const button = getPrimaryButton(
+    "enterSSIPhoneVerificationButton",
+    "Enter Phone Number"
+  );
+  return button;
+};
+
+const getEnterSSIPhoneCodeButton = () => {
+  const button = getPrimaryButton(
+    "enterSSIPhoneCodeButton",
+    "Enter Phone Number Verification Code"
+  );
   return button;
 };
 
@@ -102,4 +142,9 @@ module.exports = {
   getNameOfVotingRoundButton,
   getConfirmVoteButton,
   getRegisterProposalButton,
+  getSSIEmailVerificationButton,
+  getEnterSSIEmailVerificationButton,
+  getEnterSSIPhoneVerificationButton,
+  getEnterSSIPhoneCodeButton,
+  getConfirmRegisterProposalButton,
 };

@@ -11,6 +11,8 @@ const {
   getEnterProposalInformationEmbed,
   getVerifyWalletEmbed,
   getVotingRoundInfoEmbed,
+  getEnterEmailVerificationSSIEmbed,
+  getSSIEmailVerificationEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
@@ -24,8 +26,9 @@ const {
 const {
   getNameOfVotingRoundButton,
   getRegisterProposalButton,
-  getVerifyEthereumWalletButton,
+  getSSIEmailVerificationButton,
   getVerifyCardanoWalletButton,
+  getEnterSSIEmailVerificationButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
 const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
@@ -57,39 +60,14 @@ const handleVotingSystemMenu = async (interaction) => {
       });
     }
   }
-  let embedContent = getSelectOnchainOrOffchainEmbed(votingSystem);
-  let component = getSelectVotingOnChainMenu();
+  let embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(votingSystem);
+  const nameOfVotingRoundButton = getSelectIfOnlyTokenHolderCanVoteMenu();
   const image = getImage();
   interaction.reply({
     embeds: [embedContent],
-    components: [component],
+    components: [nameOfVotingRoundButton],
     files: [image],
   });
-};
-
-const handleOnChainOrOffChainVotingMenu = async (interaction) => {
-  try {
-    const votingRound = await VotingRound.findOne({
-      serverId: interaction.guildId,
-      status: "pending",
-    });
-    const storeVotesOnChain = interaction.values[0] === "On-chain";
-    votingRound.storeVotesOnChain = storeVotesOnChain;
-    await votingRound.save();
-    let embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(
-      votingRound.votingSystem,
-      storeVotesOnChain
-    );
-    const nameOfVotingRoundButton = getSelectIfOnlyTokenHolderCanVoteMenu();
-    const image = getImage();
-    interaction.reply({
-      embeds: [embedContent],
-      components: [nameOfVotingRoundButton],
-      files: [image],
-    });
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 // If only token holder can vote is true, then we need to verify the wallet
@@ -320,13 +298,25 @@ const handleListOfProposalsMenu = async (interaction) => {
   });
 };
 
+const handleLinkWalletMenu = async (interaction) => {
+  const enterEmailEmbed = getSSIEmailVerificationEmbed();
+  const enterEmailButton = getSSIEmailVerificationButton();
+  const image = getImage();
+
+  interaction.reply({
+    embeds: [enterEmailEmbed],
+    components: [enterEmailButton],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
   handleSelectSSIAndKYCMenu,
   handleRoundDurationMenu,
-  handleOnChainOrOffChainVotingMenu,
   handleSelectVerificationMethodMenu,
   handleListOfProposalsMenu,
+  handleLinkWalletMenu,
 };

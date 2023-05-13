@@ -2,7 +2,7 @@ const axios = require("axios");
 const { DiscordUser } = require("../models/discordUser.model.js");
 const {
   PendingVerification,
-} = require("../models/pendingVerification.model.js");
+} = require("../models/pendingBlockchainVerification.model.js.js");
 require("dotenv").config();
 
 const blockfrostHeaders = {

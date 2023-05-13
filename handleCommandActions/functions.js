@@ -14,7 +14,7 @@ const {
   getQuadraticVotingResultsEmbed,
   getVerifyWalletEmbed,
   getRegisterProposalEmbed,
-  getVerifyEthereumWalletEmbed,
+  getLinkWalletEmbed,
   getVoteProposalEmbed,
   getDownVoteProposalEmbed,
   getAlreadyVerifiedCardanoWalletEmbed,
@@ -26,6 +26,7 @@ const {
 const {
   getSelectVotingSystemMenu,
   getListOfProposalMenu,
+  getSelectLinkWalletMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
 const {
   getVotingResult,
@@ -35,14 +36,15 @@ const { getImage } = require("../sharedDiscordComponents/image");
 const { ActionRow } = require("discord.js");
 const { ActionRowBuilder } = require("@discordjs/builders");
 
-const handleVerifyCardanoWalletCommand = async (interaction) => {
-  const verifyCardanoWalletEmbed = getVerifyWalletEmbed("ADA");
-  const verifyCardanoWalletButton = getVerifyCardanoWalletButton();
+const handleLinkWalletCommand = async (interaction) => {
+  console.log("handleLinkWalletCommand");
+  const linkWalletEmbed = getLinkWalletEmbed();
+  const linkWalletMenu = getSelectLinkWalletMenu();
   const image = getImage();
 
   interaction.reply({
-    embeds: [verifyCardanoWalletEmbed],
-    components: [verifyCardanoWalletButton],
+    embeds: [linkWalletEmbed],
+    components: [linkWalletMenu],
     files: [image],
   });
 };
@@ -153,12 +155,11 @@ const handleHelpCommand = async (interaction) => {
 };
 
 module.exports = {
-  handleVerifyCardanoWalletCommand,
+  handleLinkWalletCommand,
   handleRegisterProposalCommand,
   handleStartRoundCommand,
   handleVoteProposalCommand,
   handleDownVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
-  handleVerifyEthereumWalletCommand,
 };
