@@ -29,6 +29,7 @@ const {
   getSSIEmailVerificationButton,
   getVerifyCardanoWalletButton,
   getEnterSSIEmailVerificationButton,
+  getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
 const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
@@ -259,9 +260,6 @@ const handleRoundDurationMenu = async (interaction) => {
 // they also need to select the wallet they want to use to represent themselves.
 const handleListOfProposalsMenu = async (interaction) => {
   const votingRoundId = interaction.values[0];
-  const votingRound = await VotingRound.findOne({
-    votingRoundId: votingRoundId,
-  });
   const existingProposal = await Proposal.findOne({
     serverId: interaction.guildId,
     votingRoundId: votingRoundId,
@@ -299,13 +297,31 @@ const handleListOfProposalsMenu = async (interaction) => {
 };
 
 const handleLinkWalletMenu = async (interaction) => {
-  const enterEmailEmbed = getSSIEmailVerificationEmbed();
-  const enterEmailButton = getSSIEmailVerificationButton();
+  let embed;
+  let button;
+  const linkWallet = interaction.values[0];
+  switch (linkWallet) {
+    case "Ethereum Wallet":
+      embed = getVerifyWalletEmbed("Ethereum");
+      button = getVerifyEthereumWalletButton();
+      break;
+    case "Cardano Wallet":
+      embed = getVerifyWalletEmbed("Cardano");
+      button = getVerifyCardanoWalletButton();
+      break;
+    case "SSI Wallet":
+      embed = getSSIEmailVerificationEmbed();
+      button = getSSIEmailVerificationButton();
+      break;
+    default:
+      break;
+  }
+
   const image = getImage();
 
   interaction.reply({
-    embeds: [enterEmailEmbed],
-    components: [enterEmailButton],
+    embeds: [embed],
+    components: [button],
     files: [image],
   });
 };

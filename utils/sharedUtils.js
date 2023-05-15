@@ -8,10 +8,11 @@ const { getVerifyWalletEmbed } = require("../sharedDiscordComponents/embeds");
 
 const numberRegex = /^[0-9]+$/;
 
+// TODO: Fix findOne Method since servers user is in is an array
 const checkIfVerified = async (interaction, votingRound) => {
   const discordUser = await DiscordUser.findOne({
     discordId: interaction.user.id,
-    serverId: interaction.guildId,
+    serversUserIsIn: interaction.guildId,
   });
 
   switch (votingRound.verificationMethod) {

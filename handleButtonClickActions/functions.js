@@ -86,6 +86,7 @@ const handleConfirmVotingRoundInfoButton = async (interaction) => {
 };
 
 const handleConfirmRegisterProposalButton = async (interaction) => {
+  await createProposalInDatabase(interaction);
   await issueCredentialEmailAndPhoneCredential(interaction.user.id);
 
   const confirmRegisterProposalEmbed = getConfirmProposalEmbed();

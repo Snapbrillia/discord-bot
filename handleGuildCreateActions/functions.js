@@ -1,67 +1,77 @@
 const { ChannelType, PermissionsBitField } = require("discord.js");
+const { DiscordServer } = require("../models/discordServer.model");
 const { DiscordUser } = require("../models/discordUser.model");
 const {
   getMemberIntrouductionEmbed,
   getAdminIntroductionEmbed,
 } = require("../sharedDiscordComponents/embeds");
 
-const createChannelWithUsers = (guild, user, botId) => {
+const createCategory = async (guild) => {
   try {
-    guild.channels
-      .create({
-        name: "snapbrillia-voting-server",
-        type: ChannelType.GuildText,
-        permissionOverwrites: [
-          {
-            id: guild.id, // shortcut for @everyone role ID
-            deny: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: user.id,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: botId,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-        ],
-      })
-      .then((channel) => {
-        channel.send({
-          embeds: [getMemberIntrouductionEmbed()],
-        });
-      });
+    const category = await guild.channels.create({
+      name: "Snapbrillia Voting",
+      type: ChannelType.GuildCategory,
+    });
+    return category.id;
   } catch (err) {
     console.log(err);
   }
 };
 
-const createChannelWithOwner = (guild, user, botId) => {
+const createChannelWithUsers = async (guild, user, botId, category) => {
   try {
-    guild.channels
-      .create({
-        name: "snapbrillia-voting-server-config",
-        type: ChannelType.GuildText,
-        permissionOverwrites: [
-          {
-            id: guild.id, // shortcut for @everyone role ID
-            deny: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: user.id,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: botId,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-        ],
-      })
-      .then((channel) => {
-        channel.send({
-          embeds: [getAdminIntroductionEmbed()],
-        });
-      });
+    const channel = await guild.channels.create({
+      name: "snapbrillia-voting-server",
+      type: ChannelType.GuildText,
+      permissionOverwrites: [
+        {
+          id: guild.id, // shortcut for @everyone role ID
+          deny: [PermissionsBitField.Flags.ViewChannel],
+        },
+        {
+          id: user.id,
+          allow: [PermissionsBitField.Flags.ViewChannel],
+        },
+        {
+          id: botId,
+          allow: [PermissionsBitField.Flags.ViewChannel],
+        },
+      ],
+    });
+    await channel.setParent(category);
+    channel.send({
+      embeds: [getMemberIntrouductionEmbed()],
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const createChannelWithOwner = async (guild, user, botId, category) => {
+  try {
+    const channel = await guild.channels.create({
+      name: "snapbrillia-voting-server-admins",
+      type: ChannelType.GuildText,
+      permissionOverwrites: [
+        {
+          id: guild.id,
+          deny: [PermissionsBitField.Flags.ViewChannel],
+        },
+        {
+          id: user.id,
+          allow: [PermissionsBitField.Flags.ViewChannel],
+        },
+        {
+          id: botId,
+          allow: [PermissionsBitField.Flags.ViewChannel],
+        },
+      ],
+    });
+    await channel.setParent(category);
+    channel.send({
+      embeds: [getAdminIntroductionEmbed()],
+    });
+    return channel.id;
   } catch (err) {
     console.log(err);
   }
@@ -74,11 +84,11 @@ const createDiscordUser = async (guild, member) => {
       discordId: member.id,
     });
     if (discordUserExists) {
-      const serverIdExists = discordUserExists.serverId.includes(
+      const serverIdExists = discordUserExists.serversUserIsIn.includes(
         member.guild.id
       );
       if (!serverIdExists) {
-        discordUserExists.serverId.push(member.guild.id);
+        discordUserExists.serversUserIsIn.push(member.guild.id);
         await discordUserExists.save();
       }
       return;
@@ -86,7 +96,7 @@ const createDiscordUser = async (guild, member) => {
     await DiscordUser.create({
       discordId: member.id,
       discordUsername: member.user.username,
-      serverId: [guild.id],
+      serversUserIsIn: [guild.id],
       ethereumTokenInWallet: [
         {
           tokenName: "ETH",
@@ -105,8 +115,23 @@ const createDiscordUser = async (guild, member) => {
   }
 };
 
+const createDiscordServer = async (guild, adminChannel) => {
+  try {
+    console.log(adminChannel);
+    await DiscordServer.create({
+      adminChannel: adminChannel,
+      serverId: guild.id,
+      serverOwner: guild.ownerId,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
+  createCategory,
   createChannelWithUsers,
   createChannelWithOwner,
   createDiscordUser,
+  createDiscordServer,
 };

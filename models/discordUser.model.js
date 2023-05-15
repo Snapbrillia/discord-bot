@@ -27,7 +27,7 @@ const DiscordUserSchema = new mongoose.Schema(
     discordId: {
       type: String,
     },
-    serverId: [
+    serversUserIsIn: [
       {
         type: String,
       },

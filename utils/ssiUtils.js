@@ -36,8 +36,6 @@ const issueCredential = async () => {
     .createEcosystem(CreateEcosystemRequest.fromPartial({}));
   const ecosystemId = ecosystem.ecosystem?.id;
 
-  console.log("eco systemId", ecosystemId);
-
   const user = await trinsic
     .wallet()
     .createWallet({ ecosystemId: ecosystemId });
@@ -231,15 +229,15 @@ const verifyProof = async (proof, authToken) => {
 };
 
 const generateEmailProof = async (email, userId) => {
-  const ecosystemId = "condescending-mcclintock-zuphcw6dhccm";
+  // const ecosystemId = "condescending-mcclintock-zuphcw6dhccm";
 
-  // const user = await trinsic
-  //   .wallet()
-  //   .createWallet({ ecosystemId: ecosystemId });
+  // // const user = await trinsic
+  // //   .wallet()
+  // //   .createWallet({ ecosystemId: ecosystemId });
 
-  const discordUser = await DiscordUser.findOne({ discordId: userId });
-  // discordUser.ssiAuthToken = user.authToken;
-  // await discordUser.save();
+  // const discordUser = await DiscordUser.findOne({ discordId: userId });
+  // // discordUser.ssiAuthToken = user.authToken;
+  // // await discordUser.save();
 
   trinsic.options.authToken = discordUser.ssiAuthToken;
   const request = AddExternalIdentityInitRequest.create({

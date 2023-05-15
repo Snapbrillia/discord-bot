@@ -507,7 +507,7 @@ const getNameOfVotingRoundEmbed = (
 const getEnterProposalInformationEmbed = () => {
   const embed = createEmbed(
     "📌📃 Register Proposal 📃📌",
-    `Please enter the name and description of your proposal\n
+    `Please enter the name and description of your proposal. \n
     `
   );
   return embed;
@@ -576,6 +576,15 @@ const getSSIWalletCreatedEmbed = () => {
   return embed;
 };
 
+const getNoPermessionToStartVotingRoundEmbed = () => {
+  const embed = createEmbed(
+    "🔒🛡️ Permission Denied 🛡️🔒",
+    `You do not have permission to start a voting round. Please contact an admin to start a voting round. \n
+    `
+  );
+  return embed;
+};
+
 module.exports = {
   getVotingRoundInfoEmbed,
   getSendFundToWalletEmbed,
@@ -613,4 +622,5 @@ module.exports = {
   getEnterSSIPhoneNumberEmbed,
   getEnterSSIPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,
+  getNoPermessionToStartVotingRoundEmbed,
 };

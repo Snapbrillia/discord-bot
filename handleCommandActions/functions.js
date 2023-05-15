@@ -16,6 +16,7 @@ const {
   getRegisterProposalEmbed,
   getLinkWalletEmbed,
   getVoteProposalEmbed,
+  getNoPermessionToStartVotingRoundEmbed,
   getDownVoteProposalEmbed,
   getAlreadyVerifiedCardanoWalletEmbed,
   getPendingVerifiedCardanoWalletEmbed,
@@ -35,42 +36,34 @@ const {
 const { getImage } = require("../sharedDiscordComponents/image");
 const { ActionRow } = require("discord.js");
 const { ActionRowBuilder } = require("@discordjs/builders");
+const { DiscordServer } = require("../models/discordServer.model");
 
 const handleLinkWalletCommand = async (interaction) => {
-  console.log("handleLinkWalletCommand");
   const linkWalletEmbed = getLinkWalletEmbed();
   const linkWalletMenu = getSelectLinkWalletMenu();
   const image = getImage();
 
-  interaction.reply({
+  return interaction.reply({
     embeds: [linkWalletEmbed],
     components: [linkWalletMenu],
     files: [image],
   });
 };
 
-const handleVerifyEthereumWalletCommand = async (interaction) => {
-  const verifyEthereumWalletEmbed = getVerifyWalletEmbed("ETH");
-  const verifyEthereumWalletButton = getVerifyEthereumWalletButton();
-  const image = getImage();
-
-  interaction.reply({
-    embeds: [verifyEthereumWalletEmbed],
-    components: [verifyEthereumWalletButton],
-    files: [image],
-  });
-};
-
 const handleStartRoundCommand = async (interaction) => {
-  const serverOwner = await interaction.guild.fetchOwner();
-  if (serverOwner.user.id !== interaction.user.id) {
-    return interaction.reply(
-      `You must be the owner of this server to start a voting round.`
-    );
+  const server = await DiscordServer.findOne({
+    serverId: interaction.guildId,
+  });
+  const image = getImage();
+  if (interaction.channelId !== server.adminChannel) {
+    const embed = getNoPermessionToStartVotingRoundEmbed();
+    return interaction.reply({
+      embeds: [embed],
+      files: [image],
+    });
   }
   const selectMenu = getSelectVotingSystemMenu();
   const embed = getVotingSystemsEmbed();
-  const image = getImage();
   return interaction.reply({
     embeds: [embed],
     components: [selectMenu],
@@ -116,40 +109,18 @@ const handleVoteProposalCommand = async (interaction) => {
   });
 };
 
-const handleDownVoteProposalCommand = async (interaction) => {
-  const votingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-  });
-  if (!votingRound) {
-    return interaction.reply("No active voting round");
-  }
-  const isVerified = await checkIfVerified(message);
-  if (!isVerified) {
-    return;
-  }
-  const voteProposalButton = getPrimaryButton(
-    "downVoteProposal",
-    "Down Vote Proposal"
-  );
-  const downVoteProposalEmbed = getDownVoteProposalEmbed();
-  await interaction.reply({
-    embeds: [downVoteProposalEmbed],
-    components: [voteProposalButton],
-  });
-};
-
 const handleGetVotingRoundResultsCommand = async (interaction) => {
   const votingRoundInfo = await getVotingResult();
   const projectInfo = await getAllProposalsInfo();
   const embed = getQuadraticVotingResultsEmbed(votingRoundInfo, projectInfo);
-  interaction.reply({
+  return interaction.reply({
     embeds: [embed],
   });
 };
 
 const handleHelpCommand = async (interaction) => {
   const helpCommandEmbed = getHelpCommandEmbed();
-  await interaction.reply({
+  return interaction.reply({
     embeds: [helpCommandEmbed],
   });
 };
@@ -159,7 +130,6 @@ module.exports = {
   handleRegisterProposalCommand,
   handleStartRoundCommand,
   handleVoteProposalCommand,
-  handleDownVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
 };

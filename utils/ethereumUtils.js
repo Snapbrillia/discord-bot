@@ -38,6 +38,8 @@ const verifyEthereumUsers = async () => {
         discordId,
       });
       discordUser.ethereumWallets.push(walletAddress);
+      const tokensInWallet = await getAllTokensInWallet(walletAddress);
+      discordUser.ethereumTokenInWallet.push(...tokensInWallet);
       await discordUser.save();
       await PendingVerification.deleteOne({
         walletAddress,
@@ -77,7 +79,31 @@ const getTokenFromAddress = async (address) => {
   }
 };
 
+const getAllTokensInWallet = async (address) => {
+  const alchemy = new Alchemy(config);
+  // Get token balances
+  const balances = await alchemy.core.getTokenBalances(address);
+
+  // Remove tokens with zero balance
+  const nonZeroBalances = balances.tokenBalances.filter((token) => {
+    return token.tokenBalance !== "0";
+  });
+
+  let tokens = [];
+  for (let token of nonZeroBalances) {
+    // Get metadata of token
+    const metadata = await alchemy.core.getTokenMetadata(token.contractAddress);
+
+    tokens.push({
+      tokenName: metadata.name,
+      tokenIdentifier: token.contractAddress,
+    });
+  }
+  return tokens;
+};
+
 module.exports = {
   verifyEthereumUsers,
   getTokenFromAddress,
+  getAllTokensInWallet,
 };

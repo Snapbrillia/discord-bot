@@ -42,6 +42,8 @@ const {
   createChannelWithOwner,
   createChannelWithUsers,
   createDiscordUser,
+  createCategory,
+  createDiscordServer,
 } = require("./handleGuildCreateActions/functions");
 const {
   handleVotingSystemMenu,
@@ -75,21 +77,30 @@ client.on("ready", () => {
 client.on("guildCreate", async (guild) => {
   const members = await guild.members.fetch();
   const owner = await guild.fetchOwner();
-  createChannelWithOwner(guild, owner, client.user.id);
-  members.forEach((member) => {
+  const category = await createCategory(guild);
+  const channelId = await createChannelWithOwner(
+    guild,
+    owner,
+    client.user.id,
+    category
+  );
+  members.forEach(async (member) => {
     if (member.user.bot) {
       return;
     }
-    createChannelWithUsers(guild, member, client.user.id);
-    createDiscordUser(guild, member);
+    await createChannelWithUsers(guild, member, client.user.id, category);
+    await createDiscordUser(guild, member);
   });
   await deployScripts(guild);
+  await createDiscordServer(guild, channelId);
 });
 
 // creare private channel with every user, private chaneel with the owner
 // TODO PRIVATE CHANNEL WITH ALL USERS
 // When new members join. Create a private channel with them
-client.on("guildMemberAdd", (member) => {});
+client.on("guildMemberAdd", (member) => {
+  console.log(member);
+});
 
 // Handle commands
 client.on("interactionCreate", async (interaction) => {
