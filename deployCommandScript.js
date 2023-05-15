@@ -17,6 +17,7 @@ const deployScripts = async (guild) => {
       "registerProposalCommand.js",
       "voteProposalCommand.js",
       "getVotingRoundResultsCommand.js",
+      "linkWalletsCommand.js",
       "viewPersonalInfo.js",
     ];
 

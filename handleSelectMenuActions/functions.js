@@ -133,10 +133,7 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
           true,
           verificationMethod
         );
-        const tokenInWallet = getSelectTokenMenu(
-          discordUser.ethereumTokenInWallet
-        );
-        component = getSelectTokenMenu(tokenInWallet);
+        component = getSelectTokenMenu(discordUser.ethereumTokenInWallet);
       } else if (verificationMethod === "Cardano Blockchain") {
         votingRound.blockchain = "Cardano";
         embedContent = getCardanoSelectTokenEmbed(
@@ -167,19 +164,25 @@ const handleSelectTokenMenu = async (interaction) => {
     serverId: interaction.guildId,
     status: "pending",
   });
-  // const discordUser = await DiscordUser.findOne({
-  //   discordId: interaction.user.id,
-  // });
-  // const token = discordUser.cardanoTokenInWallet.find(
-  //   (token) => token.tokenIdentifier === tokenIdentifier
-  // );
+  const discordUser = await DiscordUser.findOne({
+    discordId: interaction.user.id,
+  });
+  let token = {};
+  if (votingRound.blockchain === "Cardano") {
+    token = discordUser.cardanoTokenInWallet.find(
+      (token) => token.tokenIdentifier === tokenIdentifier
+    );
+  } else {
+    token = discordUser.ethereumTokenInWallet.find(
+      (token) => token.tokenIdentifier === tokenIdentifier
+    );
+  }
   if (tokenIdentifier === "Enter Manually") {
     const modal = getSelectTokenModal();
     return interaction.showModal(modal);
-  } else {
   }
   votingRound.tokenIdentiferOnBlockchain = tokenIdentifier;
-  votingRound.tokenName = "ETH";
+  votingRound.tokenName = token.tokenName;
   await votingRound.save();
   const embedContent = getEnableKYCEmbed(
     votingRound.votingSystem,
@@ -260,6 +263,15 @@ const handleRoundDurationMenu = async (interaction) => {
 // they also need to select the wallet they want to use to represent themselves.
 const handleListOfProposalsMenu = async (interaction) => {
   const votingRoundId = interaction.values[0];
+  const votingRound = await VotingRound.findOne({
+    serverId: interaction.guildId,
+  });
+  if (votingRound.onlyTokenHolderCanVote) {
+    const isVerified = await checkIfVerified(interaction, votingRound);
+    if (!isVerified) {
+      return;
+    }
+  }
   const existingProposal = await Proposal.findOne({
     serverId: interaction.guildId,
     votingRoundId: votingRoundId,
@@ -277,12 +289,6 @@ const handleListOfProposalsMenu = async (interaction) => {
       status: "pending",
     });
   }
-
-  // const isVerified = await checkIfVerified(interaction, votingRound);
-  // if (!isVerified) {
-  //   return;
-  // }
-
   // const hasParticipatedInRound = await checkIfUserHasParticipatedInRound();
 
   const image = getImage();

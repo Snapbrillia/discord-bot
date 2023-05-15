@@ -495,15 +495,6 @@ const getNameOfVotingRoundEmbed = (
   return embed;
 };
 
-// const getEnterProposalInformationEmbed = () => {
-//   const embed = createEmbed(
-//     "📌📃 Register Proposal 📃📌",
-//     `The admins of this voting round has selected to store the votes on chain. Please click the following link to register a proposal. http://localhost:3000 \n
-//     `
-//   );
-//   return embed;
-// };
-
 const getEnterProposalInformationEmbed = () => {
   const embed = createEmbed(
     "📌📃 Register Proposal 📃📌",
@@ -585,6 +576,18 @@ const getNoPermessionToStartVotingRoundEmbed = () => {
   return embed;
 };
 
+const getNoWhitelistTokenFound = (tokenName, wallet) => {
+  const embed = createEmbed(
+    "🔒🗳️ Token Missing 🗳️🔒",
+    `To participate in the current voting round, it is necessary to hold a specific token. However, our records indicate that you do not currently possess the required token: ** ${tokenName} **. \n
+    You can do one of the following: \n
+    ** Link ${wallet} ** \n - Link a new wallet to your account that contains the token. \n
+    ** Refresh Assets In Wallet ** \n - If you hold the tokens in your linked wallets then you can run the command ** /refresh-assets-in-wallet ** to fetch the latest assets in your wallet. \n
+    `
+  );
+  return embed;
+};
+
 module.exports = {
   getVotingRoundInfoEmbed,
   getSendFundToWalletEmbed,
@@ -623,4 +626,5 @@ module.exports = {
   getEnterSSIPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,
   getNoPermessionToStartVotingRoundEmbed,
+  getNoWhitelistTokenFound,
 };

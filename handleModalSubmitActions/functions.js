@@ -49,6 +49,7 @@ const {
   submitEmailProof,
   generatePhoneProof,
 } = require("../utils/ssiUtils");
+const { Proposal } = require("../models/projectProposal.model");
 
 const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
   const image = getImage();
@@ -192,16 +193,10 @@ const handleRegisterProposalInputModal = async (interaction) => {
     serverId: interaction.guildId,
     status: "active",
   });
-  const discordUser = await DiscordUser.findOne({
+  const proposal = await Proposal.findOne({
     discordId: interaction.user.id,
-    serverId: interaction.guildId,
+    votingRoundId: votingRound._id,
   });
-  // let walletAddress = "";
-  // if (votingRound.blockchain === "Ethereum") {
-  //   walletAddress = discordUser.ethereumWalletAddress;
-  // } else {
-  //   walletAddress = discordUser.cardanoWalletAddress;
-  // }
   const proposalName =
     interaction.fields.getTextInputValue("proposalNameInput");
   const proposalDescription = interaction.fields.getTextInputValue(
@@ -211,15 +206,11 @@ const handleRegisterProposalInputModal = async (interaction) => {
     proposalName,
     proposalDescription,
   };
-  // const registerProposalResponse = await registerProposal(
-  //   walletAddress,
-  //   votingRound.votingRoundId,
-  //   projectInfo
-  // );
-  // if (registerProposalResponse.err) {
-  //   interaction.reply(registerProposalResponse.message);
-  //   return;
-  // }
+  console.log(proposal);
+  proposal.name = proposalName;
+  proposal.description = proposalDescription;
+  console.log(proposal);
+  await proposal.save();
   const image = getImage();
   const registerProposalButton = getConfirmRegisterProposalButton();
   interaction.reply({

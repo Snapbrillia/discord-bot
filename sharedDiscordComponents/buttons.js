@@ -53,7 +53,7 @@ const getConfirmVotingRoundInfoButton = () => {
 const getVerifyCardanoWalletButton = () => {
   const button = getPrimaryButton(
     "verifyCardanoWalletButton",
-    "Verify Cardano Wallet"
+    "Link Cardano Wallet"
   );
   return button;
 };
@@ -61,7 +61,7 @@ const getVerifyCardanoWalletButton = () => {
 const getVerifyEthereumWalletButton = () => {
   const button = getPrimaryButton(
     "verifyEthereumWalletButton",
-    "Verify Ethereum Wallet"
+    "Link Ethereum Wallet"
   );
   return button;
 };

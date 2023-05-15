@@ -1,7 +1,6 @@
 const {
   getCardanoWalletAddressModal,
   getRegisterProposalModal,
-  getStartRoundModal,
   getVoteProposalModal,
   getDownVoteProposalModal,
   getVerificationMethodModal,
@@ -19,9 +18,9 @@ const {
   getConfirmVoteProposalEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { VotingRound } = require("../models/votingRound.model");
-const { initateFund } = require("../api/quadraticVoting");
 const { getImage } = require("../sharedDiscordComponents/image");
 const { issueCredentialEmailAndPhoneCredential } = require("../utils/ssiUtils");
+const { Proposal } = require("../models/projectProposal.model");
 
 const handleStartRoundButton = async (interaction) => {
   console.log("handleStartRoundButton");
@@ -86,8 +85,13 @@ const handleConfirmVotingRoundInfoButton = async (interaction) => {
 };
 
 const handleConfirmRegisterProposalButton = async (interaction) => {
-  await createProposalInDatabase(interaction);
-  await issueCredentialEmailAndPhoneCredential(interaction.user.id);
+  const proposal = await Proposal.findOne({
+    discordId: interaction.user.id,
+    status: "pending",
+  });
+
+  proposal.status = "active";
+  await proposal.save();
 
   const confirmRegisterProposalEmbed = getConfirmProposalEmbed();
   await interaction.reply({

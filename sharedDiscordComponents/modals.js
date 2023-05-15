@@ -93,29 +93,6 @@ const getVerificationMethodModal = (isWalletVerification) => {
   return modal;
 };
 
-const getStartRoundModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("selectVotingSystemInputModal")
-    .setTitle("Start Round");
-
-  const votingSystem = new TextInputBuilder()
-    .setCustomId("votingSystemInput")
-    .setLabel("Voting System To Use(1-4)")
-    .setStyle(TextInputStyle.Short);
-
-  const deadlineInput = new TextInputBuilder()
-    .setCustomId("deadlineInput")
-    .setLabel("Days The Voting Round Should Last")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(votingSystem);
-  const secondActionRow = new ActionRowBuilder().addComponents(deadlineInput);
-
-  modal.addComponents(firstActionRow, secondActionRow);
-
-  return modal;
-};
-
 const getSelectTokenModal = () => {
   const modal = new ModalBuilder()
     .setCustomId("confirmTokenInputModal")
@@ -277,7 +254,6 @@ module.exports = {
   getNameOfVotingRoundModal,
   getCardanoWalletAddressModal,
   getEthereumWalletAddressModal,
-  getStartRoundModal,
   getSelectTokenModal,
   getVerificationMethodModal,
   getRegisterProposalModal,

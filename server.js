@@ -118,9 +118,6 @@ client.on("interactionCreate", async (interaction) => {
     case "vote-proposal":
       await handleVoteProposalCommand(interaction);
       break;
-    case "down-vote-proposal":
-      await handleDownVoteProposalCommand(interaction);
-      break;
     case "get-voting-round-results":
       await handleGetVotingRoundResultsCommand(interaction);
       break;

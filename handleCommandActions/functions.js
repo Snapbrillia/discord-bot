@@ -28,6 +28,7 @@ const {
   getSelectVotingSystemMenu,
   getListOfProposalMenu,
   getSelectLinkWalletMenu,
+  getListOfVotingRoundMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
 const {
   getVotingResult,
@@ -37,6 +38,7 @@ const { getImage } = require("../sharedDiscordComponents/image");
 const { ActionRow } = require("discord.js");
 const { ActionRowBuilder } = require("@discordjs/builders");
 const { DiscordServer } = require("../models/discordServer.model");
+const { Proposal } = require("../models/projectProposal.model");
 
 const handleLinkWalletCommand = async (interaction) => {
   const linkWalletEmbed = getLinkWalletEmbed();
@@ -84,7 +86,7 @@ const handleRegisterProposalCommand = async (interaction) => {
   const registerProposalEmbed = getRegisterProposalEmbed();
   const image = getImage();
 
-  const listOfProposalMenu = getListOfProposalMenu(votingRound);
+  const listOfProposalMenu = getListOfVotingRoundMenu(votingRound);
   await interaction.reply({
     embeds: [registerProposalEmbed],
     components: [listOfProposalMenu],
@@ -101,11 +103,12 @@ const handleVoteProposalCommand = async (interaction) => {
     interaction.reply("No active voting round");
     return false;
   }
+
   const voteProposalEmbed = getVoteProposalEmbed();
-  const listOfProposalMenu = getListOfProposalMenu(votingRound);
+  const listOfProposalMenu = getListOfVotingRoundMenu(votingRound);
   await interaction.reply({
     embeds: [voteProposalEmbed],
-    components: [voteProposalButton],
+    components: [listOfProposalMenu],
   });
 };
 
