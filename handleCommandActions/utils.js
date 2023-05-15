@@ -10,7 +10,7 @@ const {
 const checkIfVerified = async (interaction, votingRound) => {
   const discordUser = await DiscordUser.findOne({
     discordId: interaction.user.id,
-    serverId: interaction.guildId,
+    serverUserIsIn: interaction.guildId,
   });
 
   switch (votingRound.verificationMethod) {

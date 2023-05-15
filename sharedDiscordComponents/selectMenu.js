@@ -42,6 +42,32 @@ const getSelectVotingSystemMenu = () => {
   return actionRow;
 };
 
+const getSelectLinkWalletMenu = () => {
+  const selectMenu = [
+    {
+      label: "Ethereum Wallet",
+      description: "Link your Ethereum wallet",
+      value: "Ethereum Wallet",
+    },
+    {
+      label: "Cardano Wallet",
+      description: "Link your Cardano wallet",
+      value: "Cardano Wallet",
+    },
+    {
+      label: "SSI Wallet",
+      description: "Link your SSI wallet",
+      value: "SSI Wallet",
+    },
+  ];
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Wallet To Link",
+    "selectLinkWalletMenu"
+  );
+  return actionRow;
+};
+
 const getSelectIfOnlyTokenHolderCanVoteMenu = () => {
   const selectMenu = [
     {
@@ -112,6 +138,7 @@ const getSelectTokenMenu = (tokens) => {
       description: tokens[i].tokenIdentifier,
       value: tokens[i].tokenIdentifier,
     });
+    console.log(selectMenu);
     if (i === 22)
       selectMenu.push({
         label: "More Tokens",
@@ -119,15 +146,11 @@ const getSelectTokenMenu = (tokens) => {
         value: "More Tokens",
       });
   }
+
   selectMenu.push({
     label: "Enter Manually",
     description: "Enter the token identifier manually",
     value: "Enter Manually",
-  });
-  selectMenu.push({
-    label: "ETH",
-    description: "ETH",
-    value: "ETH",
   });
 
   const actionRow = buildActionRow(
@@ -138,7 +161,7 @@ const getSelectTokenMenu = (tokens) => {
   return actionRow;
 };
 
-const getListOfProposalMenu = (votingRound) => {
+const getListOfVotingRoundMenu = (votingRound) => {
   const selectMenu = [];
   for (let i = 0; i < votingRound.length; i++) {
     selectMenu.push({
@@ -158,7 +181,7 @@ const getListOfProposalMenu = (votingRound) => {
 const getSelectVotingOnChainMenu = () => {
   const selectMenu = [
     {
-      label: "On-chain",
+      label: " ",
       description: "Store the votes on chain",
       value: "On-chain",
     },
@@ -197,6 +220,23 @@ const getEnableKYCMenu = () => {
   return actionRow;
 };
 
+const getListOfProposalMenu = (proposals) => {
+  const selectMenu = [];
+  for (let i = 0; i < proposals.length; i++) {
+    selectMenu.push({
+      label: proposals[i].name,
+      description: proposals[i].description,
+      value: proposals[i]._id.toString(),
+    });
+  }
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Voting Round",
+    "selectRegisterProposalVotingRoundMenu"
+  );
+  return actionRow;
+};
+
 module.exports = {
   getSelectVotingSystemMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
@@ -205,5 +245,7 @@ module.exports = {
   getSelectTokenMenu,
   getSelectVotingOnChainMenu,
   getListOfProposalMenu,
+  getListOfVotingRoundMenu,
   getEnableKYCMenu,
+  getSelectLinkWalletMenu,
 };

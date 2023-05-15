@@ -11,6 +11,8 @@ const {
   getEnterProposalInformationEmbed,
   getVerifyWalletEmbed,
   getVotingRoundInfoEmbed,
+  getEnterEmailVerificationSSIEmbed,
+  getSSIEmailVerificationEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
@@ -24,8 +26,10 @@ const {
 const {
   getNameOfVotingRoundButton,
   getRegisterProposalButton,
-  getVerifyEthereumWalletButton,
+  getSSIEmailVerificationButton,
   getVerifyCardanoWalletButton,
+  getEnterSSIEmailVerificationButton,
+  getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
 const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
@@ -57,39 +61,14 @@ const handleVotingSystemMenu = async (interaction) => {
       });
     }
   }
-  let embedContent = getSelectOnchainOrOffchainEmbed(votingSystem);
-  let component = getSelectVotingOnChainMenu();
+  let embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(votingSystem);
+  const nameOfVotingRoundButton = getSelectIfOnlyTokenHolderCanVoteMenu();
   const image = getImage();
   interaction.reply({
     embeds: [embedContent],
-    components: [component],
+    components: [nameOfVotingRoundButton],
     files: [image],
   });
-};
-
-const handleOnChainOrOffChainVotingMenu = async (interaction) => {
-  try {
-    const votingRound = await VotingRound.findOne({
-      serverId: interaction.guildId,
-      status: "pending",
-    });
-    const storeVotesOnChain = interaction.values[0] === "On-chain";
-    votingRound.storeVotesOnChain = storeVotesOnChain;
-    await votingRound.save();
-    let embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(
-      votingRound.votingSystem,
-      storeVotesOnChain
-    );
-    const nameOfVotingRoundButton = getSelectIfOnlyTokenHolderCanVoteMenu();
-    const image = getImage();
-    interaction.reply({
-      embeds: [embedContent],
-      components: [nameOfVotingRoundButton],
-      files: [image],
-    });
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 // If only token holder can vote is true, then we need to verify the wallet
@@ -154,10 +133,7 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
           true,
           verificationMethod
         );
-        const tokenInWallet = getSelectTokenMenu(
-          discordUser.ethereumTokenInWallet
-        );
-        component = getSelectTokenMenu(tokenInWallet);
+        component = getSelectTokenMenu(discordUser.ethereumTokenInWallet);
       } else if (verificationMethod === "Cardano Blockchain") {
         votingRound.blockchain = "Cardano";
         embedContent = getCardanoSelectTokenEmbed(
@@ -188,19 +164,25 @@ const handleSelectTokenMenu = async (interaction) => {
     serverId: interaction.guildId,
     status: "pending",
   });
-  // const discordUser = await DiscordUser.findOne({
-  //   discordId: interaction.user.id,
-  // });
-  // const token = discordUser.cardanoTokenInWallet.find(
-  //   (token) => token.tokenIdentifier === tokenIdentifier
-  // );
+  const discordUser = await DiscordUser.findOne({
+    discordId: interaction.user.id,
+  });
+  let token = {};
+  if (votingRound.blockchain === "Cardano") {
+    token = discordUser.cardanoTokenInWallet.find(
+      (token) => token.tokenIdentifier === tokenIdentifier
+    );
+  } else {
+    token = discordUser.ethereumTokenInWallet.find(
+      (token) => token.tokenIdentifier === tokenIdentifier
+    );
+  }
   if (tokenIdentifier === "Enter Manually") {
     const modal = getSelectTokenModal();
     return interaction.showModal(modal);
-  } else {
   }
   votingRound.tokenIdentiferOnBlockchain = tokenIdentifier;
-  votingRound.tokenName = "ETH";
+  votingRound.tokenName = token.tokenName;
   await votingRound.save();
   const embedContent = getEnableKYCEmbed(
     votingRound.votingSystem,
@@ -282,8 +264,14 @@ const handleRoundDurationMenu = async (interaction) => {
 const handleListOfProposalsMenu = async (interaction) => {
   const votingRoundId = interaction.values[0];
   const votingRound = await VotingRound.findOne({
-    votingRoundId: votingRoundId,
+    serverId: interaction.guildId,
   });
+  if (votingRound.onlyTokenHolderCanVote) {
+    const isVerified = await checkIfVerified(interaction, votingRound);
+    if (!isVerified) {
+      return;
+    }
+  }
   const existingProposal = await Proposal.findOne({
     serverId: interaction.guildId,
     votingRoundId: votingRoundId,
@@ -301,12 +289,6 @@ const handleListOfProposalsMenu = async (interaction) => {
       status: "pending",
     });
   }
-
-  // const isVerified = await checkIfVerified(interaction, votingRound);
-  // if (!isVerified) {
-  //   return;
-  // }
-
   // const hasParticipatedInRound = await checkIfUserHasParticipatedInRound();
 
   const image = getImage();
@@ -320,13 +302,43 @@ const handleListOfProposalsMenu = async (interaction) => {
   });
 };
 
+const handleLinkWalletMenu = async (interaction) => {
+  let embed;
+  let button;
+  const linkWallet = interaction.values[0];
+  switch (linkWallet) {
+    case "Ethereum Wallet":
+      embed = getVerifyWalletEmbed("Ethereum");
+      button = getVerifyEthereumWalletButton();
+      break;
+    case "Cardano Wallet":
+      embed = getVerifyWalletEmbed("Cardano");
+      button = getVerifyCardanoWalletButton();
+      break;
+    case "SSI Wallet":
+      embed = getSSIEmailVerificationEmbed();
+      button = getSSIEmailVerificationButton();
+      break;
+    default:
+      break;
+  }
+
+  const image = getImage();
+
+  interaction.reply({
+    embeds: [embed],
+    components: [button],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
   handleSelectSSIAndKYCMenu,
   handleRoundDurationMenu,
-  handleOnChainOrOffChainVotingMenu,
   handleSelectVerificationMethodMenu,
   handleListOfProposalsMenu,
+  handleLinkWalletMenu,
 };

@@ -17,6 +17,11 @@ const {
   getVoteProposalInfoEmbed,
   getAlreadyVerifiedWalletEmbed,
   getPendingVerifiedWalletEmbed,
+  getEnterVerificationEmbed,
+  getEnterSSIEmailAddressEmbed,
+  getEnterSSIPhoneNumberEmbed,
+  getEnterSSIPhoneCodeEmbed,
+  getSSIWalletCreatedEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getTokenFromAddress } = require("../utils/ethereumUtils");
 const { getTokenFromPolicyId } = require("../utils/cardanoUtils");
@@ -29,10 +34,22 @@ const {
   getConfirmVoteButton,
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
+  getEnterSSIEmailVerificationButton,
+  getEnterSSIPhoneVerificationButton,
+  getEnterSSIPhoneCodeButton,
+  getConfirmRegisterProposalButton,
 } = require("../sharedDiscordComponents/buttons");
 const { numberRegex } = require("../utils/sharedUtils");
-const { PendingVerification } = require("../models/pendingVerification.model");
+const {
+  PendingVerification,
+} = require("../models/pendingBlockchainVerification.model.js");
 const { getImage } = require("../sharedDiscordComponents/image");
+const {
+  generateEmailProof,
+  submitEmailProof,
+  generatePhoneProof,
+} = require("../utils/ssiUtils");
+const { Proposal } = require("../models/projectProposal.model");
 
 const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
   const image = getImage();
@@ -176,16 +193,10 @@ const handleRegisterProposalInputModal = async (interaction) => {
     serverId: interaction.guildId,
     status: "active",
   });
-  const discordUser = await DiscordUser.findOne({
+  const proposal = await Proposal.findOne({
     discordId: interaction.user.id,
-    serverId: interaction.guildId,
+    votingRoundId: votingRound._id,
   });
-  // let walletAddress = "";
-  // if (votingRound.blockchain === "Ethereum") {
-  //   walletAddress = discordUser.ethereumWalletAddress;
-  // } else {
-  //   walletAddress = discordUser.cardanoWalletAddress;
-  // }
   const proposalName =
     interaction.fields.getTextInputValue("proposalNameInput");
   const proposalDescription = interaction.fields.getTextInputValue(
@@ -195,18 +206,16 @@ const handleRegisterProposalInputModal = async (interaction) => {
     proposalName,
     proposalDescription,
   };
-  // const registerProposalResponse = await registerProposal(
-  //   walletAddress,
-  //   votingRound.votingRoundId,
-  //   projectInfo
-  // );
-  // if (registerProposalResponse.err) {
-  //   interaction.reply(registerProposalResponse.message);
-  //   return;
-  // }
+  console.log(proposal);
+  proposal.name = proposalName;
+  proposal.description = proposalDescription;
+  console.log(proposal);
+  await proposal.save();
   const image = getImage();
+  const registerProposalButton = getConfirmRegisterProposalButton();
   interaction.reply({
-    embeds: [getProposalInfoEmbed(projectInfo)],
+    embeds: [getProposalInfoEmbed(projectInfo, votingRound.votingRoundName)],
+    components: [registerProposalButton],
     files: [image],
   });
 };
@@ -282,6 +291,76 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   });
 };
 
+const handleVerifySSIEmailInputModal = async (interaction) => {
+  const enterSSIEmailVerificationEmbed = getEnterSSIEmailAddressEmbed();
+  const enterSSIEmailVerificationButton = getEnterSSIEmailVerificationButton();
+
+  const email = interaction.fields.getTextInputValue("emailInput");
+  await generateEmailProof(email, interaction.user.id);
+
+  const image = getImage();
+  interaction.reply({
+    embeds: [enterSSIEmailVerificationEmbed],
+    components: [enterSSIEmailVerificationButton],
+    files: [image],
+  });
+};
+
+const handleEnterSSIEmailCodeInputModal = async (interaction) => {
+  const code = interaction.fields.getTextInputValue("emailCodeInput");
+
+  await submitEmailProof(code, interaction.user.id);
+
+  const enterSSIPhoneVerificationEmbed = getSSIWalletCreatedEmbed();
+  const image = getImage();
+
+  interaction.reply({
+    embeds: [enterSSIPhoneVerificationEmbed],
+    files: [image],
+  });
+};
+
+// const handleEnterSSIEmailCodeInputModal = async (interaction) => {
+//   const enterSSIPhoneVerificationEmbed = getEnterSSIPhoneNumberEmbed();
+//   const enterSSIPhoneVerificationButton = getEnterSSIPhoneVerificationButton();
+//   const image = getImage();
+
+//   const code = interaction.fields.getTextInputValue("emailCodeInput");
+
+//   await submitEmailProof(code, interaction.user.id);
+
+//   interaction.reply({
+//     embeds: [enterSSIPhoneVerificationEmbed],
+//     components: [enterSSIPhoneVerificationButton],
+//     files: [image],
+//   });
+// };
+
+const handleEnterSSIPhoneInputModal = async (interaction) => {
+  const enterPhoneNumberVerificationCode = getEnterSSIPhoneCodeEmbed();
+  const enterPhoneNumberVerificationButton = getEnterSSIPhoneCodeButton();
+  const phoneNumber = interaction.fields.getTextInputValue("phoneInput");
+
+  const image = getImage();
+  await generatePhoneProof(phoneNumber, interaction.user.id);
+  interaction.reply({
+    embeds: [enterPhoneNumberVerificationCode],
+    components: [enterPhoneNumberVerificationButton],
+    files: [image],
+  });
+};
+
+const handleEnterSSIPhoneCodeInputModal = async (interaction) => {
+  const ssiWalletCreatedEmbed = getSSIWalletCreatedEmbed();
+
+  const image = getImage();
+
+  interaction.reply({
+    embeds: [ssiWalletCreatedEmbed],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleConfirmCardanoWalletAddressInputModal,
   handleTokenSelectInputModal,
@@ -289,4 +368,8 @@ module.exports = {
   handleVoteProposalInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
+  handleVerifySSIEmailInputModal,
+  handleEnterSSIEmailCodeInputModal,
+  handleEnterSSIPhoneInputModal,
+  handleEnterSSIPhoneCodeInputModal,
 };

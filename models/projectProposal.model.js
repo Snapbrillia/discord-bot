@@ -14,13 +14,10 @@ const ProposalSchema = new mongoose.Schema(
     status: {
       type: String,
     },
-    projectName: {
-      type: Number,
-    },
-    projectDescription: {
+    name: {
       type: String,
     },
-    proposalWalletAddress: {
+    description: {
       type: String,
     },
   },

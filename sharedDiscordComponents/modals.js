@@ -93,29 +93,6 @@ const getVerificationMethodModal = (isWalletVerification) => {
   return modal;
 };
 
-const getStartRoundModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("selectVotingSystemInputModal")
-    .setTitle("Start Round");
-
-  const votingSystem = new TextInputBuilder()
-    .setCustomId("votingSystemInput")
-    .setLabel("Voting System To Use(1-4)")
-    .setStyle(TextInputStyle.Short);
-
-  const deadlineInput = new TextInputBuilder()
-    .setCustomId("deadlineInput")
-    .setLabel("Days The Voting Round Should Last")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(votingSystem);
-  const secondActionRow = new ActionRowBuilder().addComponents(deadlineInput);
-
-  modal.addComponents(firstActionRow, secondActionRow);
-
-  return modal;
-};
-
 const getSelectTokenModal = () => {
   const modal = new ModalBuilder()
     .setCustomId("confirmTokenInputModal")
@@ -207,15 +184,84 @@ const getDownVoteProposalModal = () => {
   return modal;
 };
 
+const getVerifySSIEmailModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("enterSSIEmailInputModal")
+    .setTitle("Confirm Email");
+
+  const emailInput = new TextInputBuilder()
+    .setCustomId("emailInput")
+    .setLabel("Please enter your email")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(emailInput);
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
+const getEnterSSIEmailCodeModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("enterSSIEmailCodeInputModal")
+    .setTitle("Confirm Email Verification Code");
+
+  const emailCodeInput = new TextInputBuilder()
+    .setCustomId("emailCodeInput")
+    .setLabel("Please enter your email code")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(emailCodeInput);
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
+const getEnterSSIPhoneNumberCodeModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("enterSSIPhoneNumberInputModal")
+    .setTitle("Enter Phone Number");
+
+  const phoneNumberInput = new TextInputBuilder()
+    .setCustomId("phoneInput")
+    .setLabel("Please enter phone number")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(phoneNumberInput);
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
+const getEnterSSIPhoneCodeModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("enterSSIPhoneCodeInputModal")
+    .setTitle("Enter Phone Verification Code");
+
+  const phoneNumberCodeInput = new TextInputBuilder()
+    .setCustomId("phoneCodeInput")
+    .setLabel("Please the code")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(
+    phoneNumberCodeInput
+  );
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
 module.exports = {
   getNameOfVotingRoundModal,
   getCardanoWalletAddressModal,
   getEthereumWalletAddressModal,
-  getStartRoundModal,
   getSelectTokenModal,
   getVerificationMethodModal,
   getRegisterProposalModal,
   getVoteProposalModal,
   getDownVoteProposalModal,
   getDownVoteProposalModal,
+  getVerifySSIEmailModal,
+  getEnterSSIEmailCodeModal,
+  getEnterSSIPhoneNumberCodeModal,
+  getEnterSSIPhoneCodeModal,
 };

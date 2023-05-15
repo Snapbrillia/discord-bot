@@ -498,7 +498,91 @@ const getNameOfVotingRoundEmbed = (
 const getEnterProposalInformationEmbed = () => {
   const embed = createEmbed(
     "📌📃 Register Proposal 📃📌",
-    `The admins of this voting round has selected to store the votes on chain. Please click the following link to register a proposal. http://localhost:3000 \n
+    `Please enter the name and description of your proposal. \n
+    `
+  );
+  return embed;
+};
+
+const getLinkWalletEmbed = () => {
+  const embed = createEmbed(
+    "🔒🔗 Link Wallet 🔗🔒",
+    `To ensure a secure and trustworthy voting experience, we've implemented a wallet linking feature. By linking your wallet to your user account, you can participate in the upcoming voting round with confidence. Please select the wallet you'd like to link. \n
+    ** Cardano Wallet ** \n - Link your Cardano Wallet. To verify your wallet, you will send a small sum of ADA from the wallet address you provided to the same wallet address. \n
+    ** Ethereum Wallet ** \n - Link your Cardano Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
+    ** SSI Wallet ** \n - Link your SSI Wallet. We will create a SSI wallet on yourbehalf and issue you a Verifiable Crential proving your identity. \n
+    By linking your wallet, you'll have a unique identifier tied to your account for the upcoming voting round. This adds an extra layer of security and ensures fair participation. Voting rounds might also require you to hold a certain token to particiapte.\n
+    `
+  );
+  return embed;
+};
+
+const getSSIEmailVerificationEmbed = () => {
+  const embed = createEmbed(
+    "🔒💼 SSI Wallet 💼🔒",
+    `You are just moments away from linking a secure Self-Sovereign Identity (SSI) wallet to your Discord account. We will create this wallet for you, granting you full control and ownership over it. By linking your SSI wallet, we enhance the security measures for voting rounds and ensure a safe and fair experience for all participants. \n
+    To proceed, please provide us with your email address. This step is crucial to further strengthen the security of your SSI wallet and maintain the integrity of the voting process. \n
+    Rest assured that your email address will be handled with utmost care and privacy. We are committed to safeguarding your personal information and ensuring a secure environment for all users.
+    `
+  );
+  return embed;
+};
+
+const getEnterSSIEmailAddressEmbed = () => {
+  const embed = createEmbed(
+    "🔒💼 SSI Wallet 💼🔒",
+    `Thank you for taking the first step to link your Self-Sovereign Identity (SSI) wallet to your Discord account. To ensure the security of your SSI wallet, we have sent a verification code to the email address you provided.
+    Please check your email inbox and locate the verification code. Once you have found it, return to this Discord channel and enter the code below to complete the verification process:
+    `
+  );
+  return embed;
+};
+
+const getEnterSSIPhoneNumberEmbed = () => {
+  const embed = createEmbed(
+    "🔒💼 SSI Wallet 💼🔒",
+    `You have successfully verified your email address.The last step is for you to link your phone number. \n
+    Please provide us with your phone number by clicking the button below. \n
+    Rest assured that your personal information will be handled with utmost care and privacy. We are committed to safeguarding your personal information and ensuring a secure environment for all users.
+    `
+  );
+  return embed;
+};
+
+const getEnterSSIPhoneCodeEmbed = () => {
+  const embed = createEmbed(
+    "🔒💼 SSI Wallet 💼🔒",
+    `Please check your phone and locate the verification code. Once you have found it, return to this Discord channel and enter the code below to complete the verification process:
+    `
+  );
+  return embed;
+};
+
+const getSSIWalletCreatedEmbed = () => {
+  const embed = createEmbed(
+    "🎉✨ Wallet Created ✨🎉",
+    `We are thrilled to inform you that your Self-Sovereign Identity (SSI) wallet has been successfully created and a verifiable credential (VC) has been issued to you. This is a significant step towards enhancing the security and privacy of your digital identity.
+    `
+  );
+  return embed;
+};
+
+const getNoPermessionToStartVotingRoundEmbed = () => {
+  const embed = createEmbed(
+    "🔒🛡️ Permission Denied 🛡️🔒",
+    `You do not have permission to start a voting round. Please contact an admin to start a voting round. \n
+    `
+  );
+  return embed;
+};
+
+const getNoWhitelistTokenFound = (tokenName, wallet) => {
+  const embed = createEmbed(
+    "🔒🗳️ Token Missing 🗳️🔒",
+    `To participate in the current voting round, it is necessary to hold a specific token. However, our records indicate that you do not currently possess the required token: ** ${tokenName} **. \n
+    You can do one of the following: \n
+    ** Link ${wallet} ** \n - Link a new wallet to your account that contains the token. \n
+    ** Refresh Assets In Wallet ** \n - If you hold the tokens in your linked wallets then you can run the command ** /refresh-assets-in-wallet ** to fetch the latest assets in your wallet. \n
     `
   );
   return embed;
@@ -510,6 +594,7 @@ module.exports = {
   getSelectIfOnlyTokenHolderCanVoteEmbed,
   getSelectBlockchainEmbed,
   getVerifyWalletEmbed,
+  getLinkWalletEmbed,
   getEnableKYCEmbed,
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
@@ -535,4 +620,11 @@ module.exports = {
   getEnterProposalInformationEmbed,
   getVoteProposalEmbed1,
   getSelectOnchainOrOffchainEmbed,
+  getSSIEmailVerificationEmbed,
+  getEnterSSIEmailAddressEmbed,
+  getEnterSSIPhoneNumberEmbed,
+  getEnterSSIPhoneCodeEmbed,
+  getSSIWalletCreatedEmbed,
+  getNoPermessionToStartVotingRoundEmbed,
+  getNoWhitelistTokenFound,
 };

@@ -27,12 +27,21 @@ const DiscordUserSchema = new mongoose.Schema(
     discordId: {
       type: String,
     },
-    serverId: [
+    serversUserIsIn: [
       {
         type: String,
       },
     ],
     discordUsername: {
+      type: String,
+    },
+    ssiAuthToken: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    phoneNumber: {
       type: String,
     },
     cardanoTokenInWallet: [tokenInWalletSchema],

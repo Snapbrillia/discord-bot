@@ -1,13 +1,16 @@
 const {
   getCardanoWalletAddressModal,
   getRegisterProposalModal,
-  getStartRoundModal,
   getVoteProposalModal,
   getDownVoteProposalModal,
   getVerificationMethodModal,
   getSelectTokenModal,
   getEthereumWalletAddressModal,
   getNameOfVotingRoundModal,
+  getVerifySSIEmailModal,
+  getEnterSSIEmailCodeModal,
+  getEnterSSIPhoneNumberCodeModal,
+  getEnterSSIPhoneCodeModal,
 } = require("../sharedDiscordComponents/modals");
 const {
   getConfirmVotingRoundInfoEmbed,
@@ -15,8 +18,9 @@ const {
   getConfirmVoteProposalEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { VotingRound } = require("../models/votingRound.model");
-const { initateFund } = require("../api/quadraticVoting");
 const { getImage } = require("../sharedDiscordComponents/image");
+const { issueCredentialEmailAndPhoneCredential } = require("../utils/ssiUtils");
+const { Proposal } = require("../models/projectProposal.model");
 
 const handleStartRoundButton = async (interaction) => {
   console.log("handleStartRoundButton");
@@ -81,6 +85,14 @@ const handleConfirmVotingRoundInfoButton = async (interaction) => {
 };
 
 const handleConfirmRegisterProposalButton = async (interaction) => {
+  const proposal = await Proposal.findOne({
+    discordId: interaction.user.id,
+    status: "pending",
+  });
+
+  proposal.status = "active";
+  await proposal.save();
+
   const confirmRegisterProposalEmbed = getConfirmProposalEmbed();
   await interaction.reply({
     embeds: [confirmRegisterProposalEmbed],
@@ -92,6 +104,26 @@ const handleConfirmVoteProposalButton = async (interaction) => {
   await interaction.reply({
     embeds: [confirmVoteProposalEmbed],
   });
+};
+
+const hanldeVerifySSIEmailButton = async (interaction) => {
+  const modal = getVerifySSIEmailModal();
+  await interaction.showModal(modal);
+};
+
+const handleEnterSSIEmailVerificationButton = async (interaction) => {
+  const modal = getEnterSSIEmailCodeModal();
+  await interaction.showModal(modal);
+};
+
+const handleEnterSSIPhoneVerificationButton = async (interaction) => {
+  const modal = getEnterSSIPhoneNumberCodeModal();
+  await interaction.showModal(modal);
+};
+
+const handleEnterSSIPhoneCodeButton = async (interaction) => {
+  const modal = getEnterSSIPhoneCodeModal();
+  await interaction.showModal(modal);
 };
 
 module.exports = {
@@ -107,4 +139,8 @@ module.exports = {
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
+  hanldeVerifySSIEmailButton,
+  handleEnterSSIEmailVerificationButton,
+  handleEnterSSIPhoneVerificationButton,
+  handleEnterSSIPhoneCodeButton,
 };

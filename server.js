@@ -9,6 +9,10 @@ const {
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
   handleNameOfVotingRoundButton,
+  hanldeVerifySSIEmailButton,
+  handleEnterSSIEmailVerificationButton,
+  handleEnterSSIPhoneVerificationButton,
+  handleEnterSSIPhoneCodeButton,
 } = require("./handleButtonClickActions/functions");
 const {
   handleConfirmCardanoWalletAddressInputModal,
@@ -17,16 +21,19 @@ const {
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
+  handleVerifySSIEmailInputModal,
+  handleEnterSSIEmailCodeInputModal,
+  handleEnterSSIPhoneInputModal,
+  handleEnterSSIPhoneCodeInputModal,
 } = require("./handleModalSubmitActions/functions");
 const {
-  handleVerifyCardanoWalletCommand,
+  handleLinkWalletCommand,
   handleRegisterProposalCommand,
   handleStartRoundCommand,
   handleVoteProposalCommand,
   handleDownVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
-  handleVerifyEthereumWalletCommand,
 } = require("./handleCommandActions/functions");
 const { verifyCardanoUsers } = require("./utils/cardanoUtils");
 const { verifyEthereumUsers } = require("./utils/ethereumUtils");
@@ -35,6 +42,8 @@ const {
   createChannelWithOwner,
   createChannelWithUsers,
   createDiscordUser,
+  createCategory,
+  createDiscordServer,
 } = require("./handleGuildCreateActions/functions");
 const {
   handleVotingSystemMenu,
@@ -45,6 +54,7 @@ const {
   handleSelectSSIAndKYCMenu,
   handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
+  handleLinkWalletMenu,
 } = require("./handleSelectMenuActions/functions");
 
 require("dotenv").config();
@@ -67,21 +77,30 @@ client.on("ready", () => {
 client.on("guildCreate", async (guild) => {
   const members = await guild.members.fetch();
   const owner = await guild.fetchOwner();
-  createChannelWithOwner(guild, owner, client.user.id);
-  members.forEach((member) => {
+  const category = await createCategory(guild);
+  const channelId = await createChannelWithOwner(
+    guild,
+    owner,
+    client.user.id,
+    category
+  );
+  members.forEach(async (member) => {
     if (member.user.bot) {
       return;
     }
-    createChannelWithUsers(guild, member, client.user.id);
-    createDiscordUser(guild, member);
+    await createChannelWithUsers(guild, member, client.user.id, category);
+    await createDiscordUser(guild, member);
   });
   await deployScripts(guild);
+  await createDiscordServer(guild, channelId);
 });
 
 // creare private channel with every user, private chaneel with the owner
 // TODO PRIVATE CHANNEL WITH ALL USERS
 // When new members join. Create a private channel with them
-client.on("guildMemberAdd", (member) => {});
+client.on("guildMemberAdd", (member) => {
+  console.log(member);
+});
 
 // Handle commands
 client.on("interactionCreate", async (interaction) => {
@@ -90,20 +109,14 @@ client.on("interactionCreate", async (interaction) => {
     case "start-voting-round":
       await handleStartRoundCommand(interaction);
       break;
-    case "verify-cardano-wallet":
-      await handleVerifyCardanoWalletCommand(interaction);
-      break;
-    case "verify-ethereum-wallet":
-      await handleVerifyEthereumWalletCommand(interaction);
+    case "link-wallets":
+      await handleLinkWalletCommand(interaction);
       break;
     case "register-proposal":
       await handleRegisterProposalCommand(interaction);
       break;
     case "vote-proposal":
       await handleVoteProposalCommand(interaction);
-      break;
-    case "down-vote-proposal":
-      await handleDownVoteProposalCommand(interaction);
       break;
     case "get-voting-round-results":
       await handleGetVotingRoundResultsCommand(interaction);
@@ -143,6 +156,9 @@ client.on("interactionCreate", async (interaction) => {
     case "selectRegisterProposalVotingRoundMenu":
       await handleListOfProposalsMenu(interaction);
       break;
+    case "selectLinkWalletMenu":
+      await handleLinkWalletMenu(interaction);
+      break;
   }
 });
 
@@ -172,6 +188,18 @@ client.on("interactionCreate", async (interaction) => {
     case "downVoteProposalInputModal":
       await handleVoteProposalInputModal(interaction, "down-vote");
       break;
+    case "enterSSIEmailInputModal":
+      await handleVerifySSIEmailInputModal(interaction);
+      break;
+    case "enterSSIEmailCodeInputModal":
+      await handleEnterSSIEmailCodeInputModal(interaction);
+      break;
+    case "enterSSIPhoneNumberInputModal":
+      await handleEnterSSIPhoneInputModal(interaction);
+      break;
+    case "enterSSIPhoneCodeInputModal":
+      await handleEnterSSIPhoneCodeInputModal(interaction);
+      break;
   }
 });
 
@@ -191,6 +219,18 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "verifyEthereumWalletButton":
       await handleVerifyEthereumWalletButton(interaction);
+      break;
+    case "verifySSIEmailButton":
+      await hanldeVerifySSIEmailButton(interaction);
+      break;
+    case "enterSSIEmailVerificationButton":
+      await handleEnterSSIEmailVerificationButton(interaction);
+      break;
+    case "enterSSIPhoneVerificationButton":
+      await handleEnterSSIPhoneVerificationButton(interaction);
+      break;
+    case "enterSSIPhoneCodeButton":
+      await handleEnterSSIPhoneCodeButton(interaction);
       break;
     case "registerProposal":
       await handleRegisterProposalButton(interaction);
@@ -216,3 +256,5 @@ setInterval(() => {
   verifyCardanoUsers();
   verifyEthereumUsers();
 }, 15000);
+
+// starting node server
