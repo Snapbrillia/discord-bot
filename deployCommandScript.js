@@ -19,6 +19,7 @@ const deployScripts = async (guild) => {
       "getVotingRoundResultsCommand.js",
       "linkWalletsCommand.js",
       "viewPersonalInfo.js",
+      "refreshAssetsCommand.js",
     ];
 
     for (const file of desiredOrder) {
