@@ -44,8 +44,8 @@ const DiscordUserSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
     },
-    cardanoTokenInWallet: [tokenInWalletSchema],
-    ethereumTokenInWallet: [tokenInWalletSchema],
+    cardanoTokensInWallet: [tokenInWalletSchema],
+    ethereumTokensInWallet: [tokenInWalletSchema],
   },
   { timestamps: true }
 );

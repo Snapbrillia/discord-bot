@@ -93,7 +93,10 @@ const getConfirmRegisterProposalButton = () => {
 };
 
 const getRegisterProposalButton = () => {
-  const button = getPrimaryButton("registerProposal", "Register Proposal");
+  const button = getPrimaryButton(
+    "registerProposalButton",
+    "Register Proposal"
+  );
   return button;
 };
 
@@ -113,9 +116,9 @@ const getEnterSSIEmailVerificationButton = () => {
   return button;
 };
 
-const getEnterSSIPhoneVerificationButton = () => {
+const getEnterSSIPhoneNumberButton = () => {
   const button = getPrimaryButton(
-    "enterSSIPhoneVerificationButton",
+    "enterSSIPhoneNumberButton",
     "Enter Phone Number"
   );
   return button;
@@ -144,7 +147,7 @@ module.exports = {
   getRegisterProposalButton,
   getSSIEmailVerificationButton,
   getEnterSSIEmailVerificationButton,
-  getEnterSSIPhoneVerificationButton,
+  getEnterSSIPhoneNumberButton,
   getEnterSSIPhoneCodeButton,
   getConfirmRegisterProposalButton,
 };

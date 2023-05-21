@@ -1,52 +1,9 @@
-// Setup: npm install alchemy-sdk
 const { Alchemy, Network } = require("alchemy-sdk");
-const { DiscordUser } = require("../models/discordUser.model");
-const {
-  PendingVerification,
-} = require("../models/pendingBlockchainVerification.model.js");
-
 require("dotenv").config();
 
 const config = {
   apiKey: process.env.ALCHEMY_API,
   network: Network.ETH_GOERLI,
-};
-
-const verifyEthereumUsers = async () => {
-  const pendingVerification = await PendingVerification.find({
-    blockchain: "Ethereum",
-  });
-  if (pendingVerification.length === 0) {
-    return;
-  }
-  for (let i = 0; i < pendingVerification.length; i++) {
-    const { walletAddress, sendAmount, discordId } = pendingVerification[i];
-    const currentDate = new Date();
-    const verificationDate = new Date(pendingVerification[i].createdAt);
-    const difference = currentDate.getTime() - verificationDate.getTime();
-    const differenceInMinutes = Math.round(difference / 60000);
-    if (differenceInMinutes > 5) {
-      await PendingVerification.deleteOne({
-        walletAddress,
-        sendAmount,
-      });
-      return;
-    }
-    const verified = await checkIfEthSend(walletAddress, sendAmount);
-    if (verified) {
-      const discordUser = await DiscordUser.findOne({
-        discordId,
-      });
-      discordUser.ethereumWallets.push(walletAddress);
-      const tokensInWallet = await getAllTokensInWallet(walletAddress);
-      discordUser.ethereumTokenInWallet.push(...tokensInWallet);
-      await discordUser.save();
-      await PendingVerification.deleteOne({
-        walletAddress,
-        sendAmount,
-      });
-    }
-  }
 };
 
 const checkIfEthSend = async (address, amount) => {
@@ -79,31 +36,37 @@ const getTokenFromAddress = async (address) => {
   }
 };
 
-const getAllTokensInWallet = async (address) => {
-  const alchemy = new Alchemy(config);
-  // Get token balances
-  const balances = await alchemy.core.getTokenBalances(address);
+const getEthereumTokensInWallet = async (address) => {
+  try {
+    const alchemy = new Alchemy(config);
+    // Get token balances
+    const balances = await alchemy.core.getTokenBalances(address);
 
-  // Remove tokens with zero balance
-  const nonZeroBalances = balances.tokenBalances.filter((token) => {
-    return token.tokenBalance !== "0";
-  });
-
-  let tokens = [];
-  for (let token of nonZeroBalances) {
-    // Get metadata of token
-    const metadata = await alchemy.core.getTokenMetadata(token.contractAddress);
-
-    tokens.push({
-      tokenName: metadata.name,
-      tokenIdentifier: token.contractAddress,
+    // Remove tokens with zero balance
+    const nonZeroBalances = balances.tokenBalances.filter((token) => {
+      return token.tokenBalance !== "0";
     });
+
+    let tokens = [];
+    for (let token of nonZeroBalances) {
+      // Get metadata of token
+      const metadata = await alchemy.core.getTokenMetadata(
+        token.contractAddress
+      );
+
+      tokens.push({
+        tokenName: metadata.name,
+        tokenIdentifier: token.contractAddress,
+      });
+    }
+    return tokens;
+  } catch (err) {
+    throw err;
   }
-  return tokens;
 };
 
 module.exports = {
-  verifyEthereumUsers,
+  checkIfEthSend,
   getTokenFromAddress,
-  getAllTokensInWallet,
+  getEthereumTokensInWallet,
 };

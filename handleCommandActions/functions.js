@@ -30,10 +30,6 @@ const {
   getSelectLinkWalletMenu,
   getListOfVotingRoundMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
-const {
-  getVotingResult,
-  getAllProposalsInfo,
-} = require("../api/quadraticVoting.js");
 const { getImage } = require("../sharedDiscordComponents/image");
 const { ActionRow } = require("discord.js");
 const { ActionRowBuilder } = require("@discordjs/builders");

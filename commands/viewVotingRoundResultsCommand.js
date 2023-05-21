@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("view-personal-info")
+    .setName("view-voting-round-info")
     .setDescription(
-      "View your linked wallets, previous participation in voting rounds, etc..."
+      "View the details of current voting round, current proposals, etc..."
     ),
 };

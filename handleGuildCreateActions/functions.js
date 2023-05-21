@@ -18,7 +18,7 @@ const createCategory = async (guild) => {
   }
 };
 
-const createChannelWithUsers = async (guild, user, botId, category) => {
+const createChannelWithUser = async (guild, user, botId, category) => {
   try {
     const channel = await guild.channels.create({
       name: "snapbrillia-voting-server",
@@ -47,7 +47,7 @@ const createChannelWithUsers = async (guild, user, botId, category) => {
   }
 };
 
-const createChannelWithOwner = async (guild, user, botId, category) => {
+const createChannelWithAdmins = async (guild, user, botId, category) => {
   try {
     const channel = await guild.channels.create({
       name: "snapbrillia-voting-server-admins",
@@ -97,13 +97,13 @@ const createDiscordUser = async (guild, member) => {
       discordId: member.id,
       discordUsername: member.user.username,
       serversUserIsIn: [guild.id],
-      ethereumTokenInWallet: [
+      ethereumTokensInWallet: [
         {
           tokenName: "ETH",
           tokenIdentifier: "ETH",
         },
       ],
-      cardanoTokenInWallet: [
+      cardanoTokensInWallet: [
         {
           tokenName: "ADA",
           tokenIdentifier: "ADA",
@@ -130,8 +130,8 @@ const createDiscordServer = async (guild, adminChannel) => {
 
 module.exports = {
   createCategory,
-  createChannelWithUsers,
-  createChannelWithOwner,
+  createChannelWithUser,
+  createChannelWithAdmins,
   createDiscordUser,
   createDiscordServer,
 };

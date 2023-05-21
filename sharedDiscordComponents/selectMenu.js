@@ -23,14 +23,20 @@ const getSelectVotingSystemMenu = () => {
       value: "Yes/No Voting",
     },
     {
+      label: "Regular Voting (Tokens In Wallet)",
+      description:
+        "Each user can vote with the amount of tokens they have in their wallet.",
+      value: "Regular Voting (Tokens In Wallet)",
+    },
+    {
       label: "Quadratic Voting (Tokens In Wallet)",
       description:
-        "Each user can vote with the amount of tokens they have in their wallet",
+        "Quadratic Voting with voting power based on the amount of tokens they have in their wallet",
       value: "Quadratic Voting (Tokens In Wallet)",
     },
     {
       label: "Quadratic Voting (Same Voting Power)",
-      description: "Each user can vote with the same amount of tokens",
+      description: "Quadratic Voting with the same voting power for each user",
       value: "Quadratic Voting (Same Voting Power)",
     },
   ];
@@ -72,19 +78,19 @@ const getSelectIfOnlyTokenHolderCanVoteMenu = () => {
   const selectMenu = [
     {
       label: "Only Specific Token Holders",
-      description: "Only holders of a specific token can vote",
+      description: "Only holders of a specific token can participate",
       value: "Yes",
     },
     {
-      label: "Everyone Can Vote",
+      label: "Everyone Can Participate",
       description:
-        "They can vote as long as they are part of your discord server",
+        "They can participate as long as they are part of your discord server",
       value: "No",
     },
   ];
   const actionRow = buildActionRow(
     selectMenu,
-    "Select Voting Permissions",
+    "Select Participation Permission",
     "selectIfOnlyTokenHolderCanVoteMenu"
   );
   return actionRow;
@@ -111,12 +117,12 @@ const getSelectBlockchainMenu = () => {
   const selectMenu = [
     {
       label: "Ethereum Blockchain",
-      description: "Users will need to verify their Ethereum wallet address",
+      description: "The voting round will be on the Ethereum blockchain",
       value: "Ethereum Blockchain",
     },
     {
       label: "Cardano Blockchain",
-      description: "Users will need to verify their Cardano wallet address",
+      description: "The voting round will be on the Cardano blockchain",
       value: "Cardano Blockchain",
     },
   ];
@@ -199,23 +205,23 @@ const getSelectVotingOnChainMenu = () => {
   return actionRow;
 };
 
-const getEnableKYCMenu = () => {
+const getEnableSSIAuthMenu = () => {
   const selectMenu = [
     {
       label: "Yes",
-      description: "SSI and KYC enabled authentication",
+      description: "Enable Self-Soverign Identity Auth",
       value: "Yes",
     },
     {
       label: "No",
-      description: "No SSI and KYC enabled authentication",
+      description: "Disable Self-Soverign Identity Auth",
       value: "No",
     },
   ];
   const actionRow = buildActionRow(
     selectMenu,
-    "Select Enable SSI and KYC",
-    "selectSSIAndKYCMenu"
+    "Select Enable Self-Soverign Identity Auth",
+    "selectSSIAuthMenu"
   );
   return actionRow;
 };
@@ -246,6 +252,6 @@ module.exports = {
   getSelectVotingOnChainMenu,
   getListOfProposalMenu,
   getListOfVotingRoundMenu,
-  getEnableKYCMenu,
+  getEnableSSIAuthMenu,
   getSelectLinkWalletMenu,
 };
