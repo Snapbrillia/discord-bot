@@ -230,84 +230,37 @@ const verifyProof = async (proof, authToken) => {
 
 const generateEmailProof = async (email, userId) => {
   // const ecosystemId = "condescending-mcclintock-zuphcw6dhccm";
-
-  // // const user = await trinsic
-  // //   .wallet()
-  // //   .createWallet({ ecosystemId: ecosystemId });
-
+  // const user = await trinsic
+  //   .wallet()
+  //   .createWallet({ ecosystemId: ecosystemId });
   // const discordUser = await DiscordUser.findOne({ discordId: userId });
-  // // discordUser.ssiAuthToken = user.authToken;
-  // // await discordUser.save();
-
-  trinsic.options.authToken = discordUser.ssiAuthToken;
-  const request = AddExternalIdentityInitRequest.create({
-    identity: email,
-    provider: IdentityProvider.EMAIL,
-  });
-
-  const responseInit = await trinsic.wallet().addExternalIdentityInit(request);
-
-  await PendingSSIVerification.create({
-    discordId: userId,
-    email: email,
-    challengeId: responseInit.challenge,
-  });
-  console.log("Email Code Send");
+  // discordUser.ssiAuthToken = user.authToken;
+  // await discordUser.save();
+  // trinsic.options.authToken = discordUser.ssiAuthToken;
+  // const request = AddExternalIdentityInitRequest.create({
+  //   identity: email,
+  //   provider: IdentityProvider.EMAIL,
+  // });
+  // const responseInit = await trinsic.wallet().addExternalIdentityInit(request);
+  // await PendingSSIVerification.create({
+  //   discordId: userId,
+  //   email: email,
+  //   challengeId: responseInit.challenge,
+  // });
 };
 
 const submitEmailProof = async (code, userId) => {
-  const emailChallenge = await PendingSSIVerification.findOne({
-    discordId: userId,
-  });
-  console.log("emailChallenge", emailChallenge);
-  const requestConfirm = AddExternalIdentityConfirmRequest.create({
-    challenge: emailChallenge.challengeId,
-    response: code,
-  });
-  const discordUser = await DiscordUser.findOne({ discordId: userId });
-  trinsic.options.authToken = discordUser.ssiAuthToken;
-  await trinsic.wallet().addExternalIdentityConfirm(requestConfirm);
-  emailChallenge.delete();
-
-  console.log("Email verified");
-
-  const phoneNumberField = TemplateField.fromPartial({
-    description: "Name of proposal",
-    type: FieldType.STRING,
-  });
-
-  let request = CreateCredentialTemplateRequest.fromPartial({
-    name: `Demo-${uuid()}`,
-    fields: {
-      phoneNumber: phoneNumberField,
-    },
-  });
-
-  const response = await trinsic.template().create(request);
-  const template = response.data;
-
-  const credentialValues = JSON.stringify({
-    phoneNumber: emailChallenge.identity,
-  });
-
-  // Sign a credential as the clinic and send it to Allison
-  trinsic.options.authToken =
-    "CiVodHRwczovL3RyaW5zaWMuaWQvc2VjdXJpdHkvdjEvb2Jlcm9uEpEBCit1cm46dHJpbnNpYzp3YWxsZXRzOnpMMTZrOEMzdFZpaG84cnVSWGJ2cHg4Ijx1cm46dHJpbnNpYzplY29zeXN0ZW1zOmNvbmRlc2NlbmRpbmctbWNjbGludG9jay16dXBoY3c2ZGhjY20qJDM1ZDAxZTI3LWU0NDAtNGUxNi1hN2MwLWFmNDYyYTcyYTk0Zhowib3+anDTMYUpzVjXZWVfGQ8ASt+z4Jl3deCdaGDPSvvbCvGA+zJ5RTabUOu2cL1VIgA=";
-
-  const issueResponse = await trinsic.credential().issueFromTemplate(
-    IssueFromTemplateRequest.fromPartial({
-      templateId: template.id,
-      valuesJson: credentialValues,
-    })
-  );
-
-  trinsic.options.authToken = discordUser.ssiAuthToken;
-  const insertResponse = await trinsic.wallet().insertItem(
-    InsertItemRequest.fromPartial({
-      itemJson: issueResponse.documentJson,
-    })
-  );
-  console.log("VC Issued", insertResponse);
+  // const emailChallenge = await PendingSSIVerification.findOne({
+  //   discordId: userId,
+  // });
+  // const requestConfirm = AddExternalIdentityConfirmRequest.create({
+  //   challenge: emailChallenge.challengeId,
+  //   response: code,
+  // });
+  // const discordUser = await DiscordUser.findOne({ discordId: userId });
+  // trinsic.options.authToken = discordUser.ssiAuthToken;
+  // await trinsic.wallet().addExternalIdentityConfirm(requestConfirm);
+  // emailChallenge.delete();
 };
 
 const generatePhoneProof = async (phoneNumber, userId) => {
@@ -332,27 +285,76 @@ const generatePhoneProof = async (phoneNumber, userId) => {
 };
 
 const submitPhoneProof = async (code, userId) => {
-  const emailChallenge = await PendingSSIVerification.findOne({
-    discordId: userId,
-  });
+  try {
+    // const emailChallenge = await PendingSSIVerification.findOne({
+    //   discordId: userId,
+    // });
 
-  const requestConfirm = AddExternalIdentityConfirmRequest.create({
-    challenge: emailChallenge.challengeId,
-    response: code,
-  });
+    // const requestConfirm = AddExternalIdentityConfirmRequest.create({
+    //   challenge: emailChallenge.challengeId,
+    //   response: code,
+    // });
 
-  const discordUser = await DiscordUser.findOne({ discordId: userId });
+    const discordUser = await DiscordUser.findOne({ discordId: userId });
 
-  trinsic.options.authToken = discordUser.ssiAuthToken;
+    trinsic.options.authToken = discordUser.ssiAuthToken;
 
-  await trinsic.wallet().addExternalIdentityConfirm(requestConfirm);
+    // await trinsic.wallet().addExternalIdentityConfirm(requestConfirm);
 
-  emailChallenge.delete();
+    // emailChallenge.delete();
 
-  console.log("Email verified");
+    const phoneNumberField = TemplateField.fromPartial({
+      description: "Phone Number",
+      type: FieldType.STRING,
+    });
+
+    const emailField = TemplateField.fromPartial({
+      description: "Email Address",
+      type: FieldType.STRING,
+    });
+
+    let request = CreateCredentialTemplateRequest.fromPartial({
+      name: `Verified-Identity-${uuid()}`,
+      fields: {
+        phoneNumber: phoneNumberField,
+        email: emailField,
+      },
+    });
+
+    const response = await trinsic.template().create(request);
+    const template = response.data;
+
+    const credentialValues = JSON.stringify({
+      phoneNumber: "6461046503",
+      email: "shanzhang@snapbrillia.com",
+    });
+
+    trinsic.options.authToken =
+      "CiVodHRwczovL3RyaW5zaWMuaWQvc2VjdXJpdHkvdjEvb2Jlcm9uEpEBCit1cm46dHJpbnNpYzp3YWxsZXRzOnpMMTZrOEMzdFZpaG84cnVSWGJ2cHg4Ijx1cm46dHJpbnNpYzplY29zeXN0ZW1zOmNvbmRlc2NlbmRpbmctbWNjbGludG9jay16dXBoY3c2ZGhjY20qJDM1ZDAxZTI3LWU0NDAtNGUxNi1hN2MwLWFmNDYyYTcyYTk0Zhowib3+anDTMYUpzVjXZWVfGQ8ASt+z4Jl3deCdaGDPSvvbCvGA+zJ5RTabUOu2cL1VIgA=";
+
+    const issueResponse = await trinsic.credential().issueFromTemplate(
+      IssueFromTemplateRequest.fromPartial({
+        templateId: template.id,
+        valuesJson: credentialValues,
+      })
+    );
+
+    console.log("issue response", issueResponse);
+
+    trinsic.options.authToken = discordUser.ssiAuthToken;
+    const insertResponse = await trinsic.wallet().insertItem(
+      InsertItemRequest.fromPartial({
+        itemJson: issueResponse.documentJson,
+      })
+    );
+
+    console.log("VC Issued", insertResponse);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
-const issueCredentialEmailAndPhoneCredential = async (userId) => {
+const issueEmailAndPhoneCredential = async (userId) => {
   const user = await DiscordUser.findOne({ discordId: userId });
 
   const nameField = TemplateField.fromPartial({
@@ -401,17 +403,68 @@ const issueCredentialEmailAndPhoneCredential = async (userId) => {
   console.log("insertResponse", insertResponse);
 };
 
+const issueRegistrationCredential = async (proposal, userId) => {
+  console.log(proposal);
+  const user = await DiscordUser.findOne({ discordId: userId });
+
+  trinsic.options.authToken =
+    "CiVodHRwczovL3RyaW5zaWMuaWQvc2VjdXJpdHkvdjEvb2Jlcm9uEpEBCit1cm46dHJpbnNpYzp3YWxsZXRzOnpMMTZrOEMzdFZpaG84cnVSWGJ2cHg4Ijx1cm46dHJpbnNpYzplY29zeXN0ZW1zOmNvbmRlc2NlbmRpbmctbWNjbGludG9jay16dXBoY3c2ZGhjY20qJDM1ZDAxZTI3LWU0NDAtNGUxNi1hN2MwLWFmNDYyYTcyYTk0Zhowib3+anDTMYUpzVjXZWVfGQ8ASt+z4Jl3deCdaGDPSvvbCvGA+zJ5RTabUOu2cL1VIgA=";
+
+  const nameField = TemplateField.fromPartial({
+    description: "Name of proposal",
+    type: FieldType.STRING,
+  });
+
+  const descriptionField = TemplateField.fromPartial({
+    description: "Description of proposal",
+    type: FieldType.STRING,
+  });
+
+  let request = CreateCredentialTemplateRequest.fromPartial({
+    name: `Proof-Of-Participation-${uuid()}`,
+    fields: {
+      name: nameField,
+      description: descriptionField,
+    },
+  });
+
+  const response = await trinsic.template().create(request);
+  const template = response.data;
+
+  const credentialValues = JSON.stringify({
+    name: proposal.name,
+    description: proposal.description,
+  });
+
+  console.log("credentialValues", credentialValues);
+
+  const issueResponse = await trinsic.credential().issueFromTemplate(
+    IssueFromTemplateRequest.fromPartial({
+      templateId: template.id,
+      valuesJson: credentialValues,
+    })
+  );
+
+  console.log("Created VC", issueResponse);
+
+  trinsic.options.authToken = user.ssiAuthToken;
+  const insertResponse = await trinsic.wallet().insertItem(
+    InsertItemRequest.fromPartial({
+      itemJson: issueResponse.documentJson,
+    })
+  );
+  console.log("Issued VC", insertResponse);
+};
+
 const sendLoginRequest = async () => {};
 
 const confirmLoginRequest = async () => {};
-
-// generateEmailProof();
-// submitEmailProof();
 
 module.exports = {
   generateEmailProof,
   submitEmailProof,
   generatePhoneProof,
   submitPhoneProof,
-  issueCredentialEmailAndPhoneCredential,
+  issueEmailAndPhoneCredential,
+  issueRegistrationCredential,
 };

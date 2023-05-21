@@ -1,4 +1,7 @@
 const { DiscordUser } = require("../models/discordUser.model");
+const {
+  PendingWalletVerification,
+} = require("../models/pendingWalletVerification");
 const { Proposal } = require("../models/projectProposal.model");
 const {
   getVerifyCardanoWalletButton,
@@ -17,7 +20,7 @@ const checkIfVerified = async (interaction, votingRound) => {
     discordId: interaction.user.id,
   });
   if (votingRound.blockchain === "Cardano") {
-    const hasTokenInWallet = discordUser.cardanoTokenInWallet.some(
+    const hasTokenInWallet = discordUser.cardanoTokensInWallet.some(
       (token) =>
         token.tokenIdentifier === votingRound.tokenIdentiferOnBlockchain
     );
@@ -29,7 +32,7 @@ const checkIfVerified = async (interaction, votingRound) => {
       return false;
     }
   } else {
-    const hasTokenInWallet = discordUser.ethereumTokenInWallet.some(
+    const hasTokenInWallet = discordUser.ethereumTokensInWallet.some(
       (token) =>
         token.tokenIdentifier === votingRound.tokenIdentiferOnBlockchain
     );
@@ -62,8 +65,69 @@ const checkIfUserHasParticipatedInRound = async (discordUser, votingRound) => {
   }
 };
 
+const removeDupilcateTokens = (currentTokens, tokensInWallet) => {
+  let uniqueTokens = [...currentTokens];
+  for (let i = 0; i < tokensInWallet.length; i++) {
+    const token = tokensInWallet[i];
+    const tokenExists = uniqueTokens.some(
+      (uniqueToken) => uniqueToken.tokenIdentifier === token.tokenIdentifier
+    );
+    if (!tokenExists) {
+      uniqueTokens.push(token);
+    }
+  }
+  return uniqueTokens;
+};
+
+const randomNumber = (min, max) => {
+  const int = Math.floor(Math.random() * (max - min)) + min;
+  return int / 1000000;
+};
+
+const verifyUsers = async (
+  blockchain,
+  walletField,
+  tokenField,
+  checkFn,
+  getTokensFn
+) => {
+  try {
+    const pendingVerification = await PendingWalletVerification.find({
+      blockchain: blockchain,
+    });
+    if (pendingVerification.length === 0) {
+      return;
+    }
+
+    for (let i = 0; i < pendingVerification.length; i++) {
+      const { walletAddress, sendAmount, discordId } = pendingVerification[i];
+      const verified = await checkFn(walletAddress, sendAmount);
+
+      if (verified) {
+        const discordUser = await DiscordUser.findOne({ discordId });
+        const tokensInWallet = await getTokensFn(walletAddress);
+        const uniqueTokens = removeDupilcateTokens(
+          discordUser[tokenField],
+          tokensInWallet
+        );
+        discordUser[tokenField] = uniqueTokens;
+        discordUser[walletField].push(walletAddress);
+        await discordUser.save();
+        await PendingWalletVerification.deleteOne({
+          _id: pendingVerification[i]._id,
+        });
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   numberRegex,
+  randomNumber,
   checkIfVerified,
   checkIfUserHasParticipatedInRound,
+  removeDupilcateTokens,
+  verifyUsers,
 };

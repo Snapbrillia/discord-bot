@@ -11,7 +11,7 @@ const {
   handleNameOfVotingRoundButton,
   hanldeVerifySSIEmailButton,
   handleEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneVerificationButton,
+  handleEnterSSIPhoneNumberButton,
   handleEnterSSIPhoneCodeButton,
 } = require("./handleButtonClickActions/functions");
 const {
@@ -31,16 +31,14 @@ const {
   handleRegisterProposalCommand,
   handleStartRoundCommand,
   handleVoteProposalCommand,
-  handleDownVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
 } = require("./handleCommandActions/functions");
-const { verifyCardanoUsers } = require("./utils/cardanoUtils");
-const { verifyEthereumUsers } = require("./utils/ethereumUtils");
-const { deployScripts } = require("./deployCommandScript");
+const { deployCommands } = require("./deployCommandScript");
 const {
-  createChannelWithOwner,
-  createChannelWithUsers,
+  createChannelWithAdmins,
+  createChannelWithUser,
+  createChannelWithEveryOne,
   createDiscordUser,
   createCategory,
   createDiscordServer,
@@ -51,11 +49,21 @@ const {
   handleSelectVerificationMethodMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
-  handleSelectSSIAndKYCMenu,
+  handleSelectSSIAuthMenu,
   handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
 } = require("./handleSelectMenuActions/functions");
+const { removeExpiredPendingVerification } = require("./utils/databaseUtils");
+const { verifyUsers } = require("./utils/sharedUtils");
+const {
+  checkIfADASend,
+  getCardanoTokensInWallet,
+} = require("./utils/cardanoUtils");
+const {
+  checkIfEthSend,
+  getEthereumTokensInWallet,
+} = require("./utils/ethereumUtils");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -78,9 +86,14 @@ client.on("guildCreate", async (guild) => {
   const members = await guild.members.fetch();
   const owner = await guild.fetchOwner();
   const category = await createCategory(guild);
-  const channelId = await createChannelWithOwner(
+  const channelId = await createChannelWithAdmins(
     guild,
     owner,
+    client.user.id,
+    category
+  );
+  const generalChannelId = await createChannelWithEveryOne(
+    guild,
     client.user.id,
     category
   );
@@ -88,11 +101,11 @@ client.on("guildCreate", async (guild) => {
     if (member.user.bot) {
       return;
     }
-    await createChannelWithUsers(guild, member, client.user.id, category);
+    await createChannelWithUser(guild, member, client.user.id, category);
     await createDiscordUser(guild, member);
   });
-  await deployScripts(guild);
-  await createDiscordServer(guild, channelId);
+  await deployCommands(guild);
+  await createDiscordServer(guild, channelId, generalChannelId);
 });
 
 // creare private channel with every user, private chaneel with the owner
@@ -121,6 +134,9 @@ client.on("interactionCreate", async (interaction) => {
     case "get-voting-round-results":
       await handleGetVotingRoundResultsCommand(interaction);
       break;
+    case "view-personal-info":
+      await handleViewPersonalInfoCommand(interaction);
+      break;
     case "help":
       await handleHelpCommand(interaction);
       break;
@@ -147,8 +163,8 @@ client.on("interactionCreate", async (interaction) => {
     case "selectTokenMenu":
       await handleSelectTokenMenu(interaction);
       break;
-    case "selectSSIAndKYCMenu":
-      await handleSelectSSIAndKYCMenu(interaction);
+    case "selectSSIAuthMenu":
+      await handleSelectSSIAuthMenu(interaction);
       break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
@@ -226,13 +242,13 @@ client.on("interactionCreate", async (interaction) => {
     case "enterSSIEmailVerificationButton":
       await handleEnterSSIEmailVerificationButton(interaction);
       break;
-    case "enterSSIPhoneVerificationButton":
-      await handleEnterSSIPhoneVerificationButton(interaction);
+    case "enterSSIPhoneNumberButton":
+      await handleEnterSSIPhoneNumberButton(interaction);
       break;
     case "enterSSIPhoneCodeButton":
       await handleEnterSSIPhoneCodeButton(interaction);
       break;
-    case "registerProposal":
+    case "registerProposalButton":
       await handleRegisterProposalButton(interaction);
       break;
     case "voteProposalButton":
@@ -252,9 +268,22 @@ client.on("interactionCreate", async (interaction) => {
 
 client.login(process.env.TOKEN);
 
-setInterval(() => {
-  verifyCardanoUsers();
-  verifyEthereumUsers();
+setInterval(async () => {
+  await removeExpiredPendingVerification();
+  // verify users cardano wallet
+  verifyUsers(
+    "Cardano",
+    "cardanoWallets",
+    "cardanoTokensInWallet",
+    checkIfADASend,
+    getCardanoTokensInWallet
+  );
+  // verify users ethereum wallet
+  await verifyUsers(
+    "Ethereum",
+    "ethereumWallets",
+    "ethereumTokensInWallet",
+    checkIfEthSend,
+    getEthereumTokensInWallet
+  );
 }, 15000);
-
-// starting node server

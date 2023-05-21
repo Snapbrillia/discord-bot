@@ -10,7 +10,7 @@ const {
   getSelectOnchainOrOffchainEmbed,
   getEnterProposalInformationEmbed,
   getVerifyWalletEmbed,
-  getVotingRoundInfoEmbed,
+  getEnterNameAndDescriptionEmbed,
   getEnterEmailVerificationSSIEmbed,
   getSSIEmailVerificationEmbed,
 } = require("../sharedDiscordComponents/embeds");
@@ -21,7 +21,7 @@ const {
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectTokenMenu,
   getSelectVotingOnChainMenu,
-  getEnableKYCMenu,
+  getEnableSSIAuthMenu,
 } = require("../sharedDiscordComponents/selectMenu");
 const {
   getNameOfVotingRoundButton,
@@ -133,7 +133,7 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
           true,
           verificationMethod
         );
-        component = getSelectTokenMenu(discordUser.ethereumTokenInWallet);
+        component = getSelectTokenMenu(discordUser.ethereumTokensInWallet);
       } else if (verificationMethod === "Cardano Blockchain") {
         votingRound.blockchain = "Cardano";
         embedContent = getCardanoSelectTokenEmbed(
@@ -142,7 +142,7 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
           true,
           verificationMethod
         );
-        component = getSelectTokenMenu(discordUser.cardanoTokenInWallet);
+        component = getSelectTokenMenu(discordUser.cardanoTokensInWallet);
       }
     }
     await votingRound.save();
@@ -169,11 +169,11 @@ const handleSelectTokenMenu = async (interaction) => {
   });
   let token = {};
   if (votingRound.blockchain === "Cardano") {
-    token = discordUser.cardanoTokenInWallet.find(
+    token = discordUser.cardanoTokensInWallet.find(
       (token) => token.tokenIdentifier === tokenIdentifier
     );
   } else {
-    token = discordUser.ethereumTokenInWallet.find(
+    token = discordUser.ethereumTokensInWallet.find(
       (token) => token.tokenIdentifier === tokenIdentifier
     );
   }
@@ -191,7 +191,7 @@ const handleSelectTokenMenu = async (interaction) => {
     votingRound.verificationMethod,
     votingRound.tokenName
   );
-  const component = getEnableKYCMenu();
+  const component = getEnableSSIAuthMenu();
   const image = getImage();
   interaction.reply({
     embeds: [embedContent],
@@ -200,7 +200,7 @@ const handleSelectTokenMenu = async (interaction) => {
   });
 };
 
-const handleSelectSSIAndKYCMenu = async (interaction) => {
+const handleSelectSSIAuthMenu = async (interaction) => {
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
     status: "pending",
@@ -236,7 +236,7 @@ const handleRoundDurationMenu = async (interaction) => {
     const roundDurationInDays = interaction.values[0];
     votingRound.roundDurationInDays = parseInt(roundDurationInDays);
     await votingRound.save();
-    let embedContent = getVotingRoundInfoEmbed(
+    let embedContent = getEnterNameAndDescriptionEmbed(
       votingRound.votingSystem,
       votingRound.storeVotesOnChain,
       votingRound.onlyTokenHolderCanVote,
@@ -336,7 +336,7 @@ module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
-  handleSelectSSIAndKYCMenu,
+  handleSelectSSIAuthMenu,
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
   handleListOfProposalsMenu,

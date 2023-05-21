@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const PendingVerificationSchema = new mongoose.Schema(
+const PendingWalletVerificationSchema = new mongoose.Schema(
   {
     discordId: {
       type: String,
@@ -20,7 +20,7 @@ const PendingVerificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports.PendingVerification = mongoose.model(
-  "PendingVerification",
-  PendingVerificationSchema
+module.exports.PendingWalletVerification = mongoose.model(
+  "PendingWalletVerification",
+  PendingWalletVerificationSchema
 );

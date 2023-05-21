@@ -19,7 +19,7 @@ const {
 } = require("../sharedDiscordComponents/embeds");
 const { VotingRound } = require("../models/votingRound.model");
 const { getImage } = require("../sharedDiscordComponents/image");
-const { issueCredentialEmailAndPhoneCredential } = require("../utils/ssiUtils");
+const { issueRegistrationCredential } = require("../utils/ssiUtils");
 const { Proposal } = require("../models/projectProposal.model");
 
 const handleStartRoundButton = async (interaction) => {
@@ -90,6 +90,8 @@ const handleConfirmRegisterProposalButton = async (interaction) => {
     status: "pending",
   });
 
+  await issueRegistrationCredential(proposal, interaction.user.id);
+
   proposal.status = "active";
   await proposal.save();
 
@@ -116,7 +118,7 @@ const handleEnterSSIEmailVerificationButton = async (interaction) => {
   await interaction.showModal(modal);
 };
 
-const handleEnterSSIPhoneVerificationButton = async (interaction) => {
+const handleEnterSSIPhoneNumberButton = async (interaction) => {
   const modal = getEnterSSIPhoneNumberCodeModal();
   await interaction.showModal(modal);
 };
@@ -141,6 +143,6 @@ module.exports = {
   handleVerifyEthereumWalletButton,
   hanldeVerifySSIEmailButton,
   handleEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneVerificationButton,
+  handleEnterSSIPhoneNumberButton,
   handleEnterSSIPhoneCodeButton,
 };

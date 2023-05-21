@@ -1,9 +1,4 @@
-const { randomNumber } = require("../utils/cardanoUtils");
-const {
-  initateFund,
-  registerProposal,
-  voteToProposal,
-} = require("../api/quadraticVoting");
+const { randomNumber } = require("../utils/sharedUtils");
 const { VotingRound } = require("../models/votingRound.model");
 const { DiscordUser } = require("../models/discordUser.model");
 const {
@@ -15,7 +10,7 @@ const {
   getVotingSystemsEmbed,
   getProposalInfoEmbed,
   getVoteProposalInfoEmbed,
-  getAlreadyVerifiedWalletEmbed,
+  getAlreadyLinkedWalletEmbed,
   getPendingVerifiedWalletEmbed,
   getEnterVerificationEmbed,
   getEnterSSIEmailAddressEmbed,
@@ -35,19 +30,21 @@ const {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
   getEnterSSIEmailVerificationButton,
-  getEnterSSIPhoneVerificationButton,
+  handleEnterSSIPhoneNumberButton,
   getEnterSSIPhoneCodeButton,
   getConfirmRegisterProposalButton,
+  getEnterSSIPhoneNumberButton,
 } = require("../sharedDiscordComponents/buttons");
 const { numberRegex } = require("../utils/sharedUtils");
 const {
-  PendingVerification,
-} = require("../models/pendingBlockchainVerification.model.js");
+  PendingWalletVerification,
+} = require("../models/pendingWalletVerification.js");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
   generateEmailProof,
   submitEmailProof,
   generatePhoneProof,
+  submitPhoneProof,
 } = require("../utils/ssiUtils");
 const { Proposal } = require("../models/projectProposal.model");
 
@@ -63,12 +60,12 @@ const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
   });
   if (user.cardanoWallets.includes(walletAddress)) {
     return interaction.reply({
-      embeds: [getAlreadyVerifiedWalletEmbed()],
+      embeds: [getAlreadyLinkedWalletEmbed()],
       components: [getVerifyCardanoWalletButton()],
       files: [image],
     });
   }
-  const pendingVerification = await PendingVerification.findOne({
+  const pendingVerification = await PendingWalletVerification.findOne({
     discordId,
     walletAddress,
   });
@@ -79,7 +76,7 @@ const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
       files: [image],
     });
   }
-  await PendingVerification.create({
+  await PendingWalletVerification.create({
     discordId,
     walletAddress,
     sendAmount,
@@ -101,14 +98,14 @@ const handleConfirmEthereumWalletAddressInputModal = async (interaction) => {
   const user = await DiscordUser.findOne({
     discordId,
   });
-  if (user.cardanoWallets.includes(walletAddress)) {
+  if (user.ethereumWallets.includes(walletAddress)) {
     return interaction.reply({
-      embeds: [getAlreadyVerifiedWalletEmbed()],
+      embeds: [getAlreadyLinkedWalletEmbed()],
       components: [getVerifyEthereumWalletButton()],
       files: [image],
     });
   }
-  const pendingVerification = await PendingVerification.findOne({
+  const pendingVerification = await PendingWalletVerification.findOne({
     discordId,
     walletAddress,
   });
@@ -119,7 +116,7 @@ const handleConfirmEthereumWalletAddressInputModal = async (interaction) => {
       files: [image],
     });
   }
-  await PendingVerification.create({
+  await PendingWalletVerification.create({
     discordId,
     walletAddress,
     sendAmount,
@@ -137,6 +134,7 @@ const handleTokenSelectInputModal = async (interaction) => {
     serverId: interaction.guildId,
     status: "pending",
   });
+
   let tokenName = "";
   if (votingRound.verificationMethod === "Ethereum Wallet") {
     tokenName = await getTokenFromAddress(token);
@@ -144,73 +142,46 @@ const handleTokenSelectInputModal = async (interaction) => {
     tokenName = await getTokenFromPolicyId(token);
   }
 
-  if (!tokenName) {
-    if (votingRound.verificationMethod === "Ethereum Wallet") {
-      return interaction.reply({
-        content:
-          "Failed to find token with this contract address, please try again",
-        embeds: [
-          getEthereumSelectTokenEmbed(
-            votingRound.votingSystem,
-            true,
-            votingRound.verificationMethod
-          ),
-        ],
-        components: [getSelectTokenButton()],
-      });
-    } else {
-      return interaction.reply({
-        content:
-          "Failed to find token with this policy and asset name, please try again. ",
-        embeds: [
-          getCardanoSelectTokenEmbed(
-            votingRound.votingSystem,
-            true,
-            votingRound.verificationMethod
-          ),
-        ],
-        components: [getSelectTokenButton()],
-      });
-    }
-  } else {
-    if (votingRound.verificationMethod === "Ethereum Wallet") {
-      interaction.reply({});
-    } else {
-    }
-  }
-
   votingRound.tokenIdentiferOnBlockchain = token;
   votingRound.tokenName = tokenName;
   await votingRound.save();
+
+  const embed = getVotingRoundInfoEmbed(votingRound);
+  const components = [getConfirmVotingRoundInfoButton()];
+
   interaction.reply({
-    embeds: [getVotingRoundInfoEmbed(votingRound)],
-    components: [getConfirmVotingRoundInfoButton()],
+    embeds: [embed],
+    components: components,
   });
 };
 
 const handleRegisterProposalInputModal = async (interaction) => {
-  const votingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "active",
-  });
   const proposal = await Proposal.findOne({
     discordId: interaction.user.id,
-    votingRoundId: votingRound._id,
+    status: "pending",
+    serverId: interaction.guildId,
   });
+
+  const votingRound = await VotingRound.findOne({
+    _id: proposal.votingRoundId,
+  });
+
   const proposalName =
     interaction.fields.getTextInputValue("proposalNameInput");
   const proposalDescription = interaction.fields.getTextInputValue(
     "proposalDescriptionInput"
   );
+
   const projectInfo = {
     proposalName,
     proposalDescription,
   };
-  console.log(proposal);
+
   proposal.name = proposalName;
   proposal.description = proposalDescription;
-  console.log(proposal);
+
   await proposal.save();
+
   const image = getImage();
   const registerProposalButton = getConfirmRegisterProposalButton();
   interaction.reply({
@@ -311,30 +282,16 @@ const handleEnterSSIEmailCodeInputModal = async (interaction) => {
 
   await submitEmailProof(code, interaction.user.id);
 
-  const enterSSIPhoneVerificationEmbed = getSSIWalletCreatedEmbed();
+  const enterSSIPhoneVerificationEmbed = getEnterSSIPhoneNumberEmbed();
+  const enterSSIPhoneNumberButton = getEnterSSIPhoneNumberButton();
   const image = getImage();
 
   interaction.reply({
     embeds: [enterSSIPhoneVerificationEmbed],
+    components: [enterSSIPhoneNumberButton],
     files: [image],
   });
 };
-
-// const handleEnterSSIEmailCodeInputModal = async (interaction) => {
-//   const enterSSIPhoneVerificationEmbed = getEnterSSIPhoneNumberEmbed();
-//   const enterSSIPhoneVerificationButton = getEnterSSIPhoneVerificationButton();
-//   const image = getImage();
-
-//   const code = interaction.fields.getTextInputValue("emailCodeInput");
-
-//   await submitEmailProof(code, interaction.user.id);
-
-//   interaction.reply({
-//     embeds: [enterSSIPhoneVerificationEmbed],
-//     components: [enterSSIPhoneVerificationButton],
-//     files: [image],
-//   });
-// };
 
 const handleEnterSSIPhoneInputModal = async (interaction) => {
   const enterPhoneNumberVerificationCode = getEnterSSIPhoneCodeEmbed();
@@ -354,7 +311,7 @@ const handleEnterSSIPhoneCodeInputModal = async (interaction) => {
   const ssiWalletCreatedEmbed = getSSIWalletCreatedEmbed();
 
   const image = getImage();
-
+  await submitPhoneProof("", interaction.user.id);
   interaction.reply({
     embeds: [ssiWalletCreatedEmbed],
     files: [image],

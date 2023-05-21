@@ -41,7 +41,7 @@ const getVotingRoundConfigurationText = (
     const votingMethod = onlyTokenHolderCanVote
       ? "Only holders of a specific Token can Vote"
       : "Anybody can vote as long as they are verified";
-    text += `** Voting Permissions **: ${votingMethod} \n`;
+    text += `** Participation Permissions **: ${votingMethod} \n`;
   }
   if (blockchain) {
     text += `** Blockchain **: ${blockchain} \n`;
@@ -51,7 +51,7 @@ const getVotingRoundConfigurationText = (
   }
   if (enabledKYC !== undefined) {
     const enabled = enabledKYC ? "Enabled" : "Disabled";
-    text += `** SSI and KYC Authentication **: ${enabled} \n`;
+    text += `** Self-Soverign Identiy Auth **: ${enabled} \n`;
   }
   if (roundDuration) {
     const { startDate, endDate } = getStartAndEndDate(roundDuration);
@@ -87,8 +87,9 @@ const getVotingSystemsEmbed = () => {
     `👋 Hi there! I'm the Snapbrillia Bot and I'm here to guide you through the process of setting up a voting round in your server. 🤖 To get started, please choose the voting system you'd like to use for this round. To ensure the security of your voting round, we recommend that only administrators are included in this channel, to prevent unauthorized access and editing. 🛡️ Thanks for choosing our bot to manage voting within your community! \n  \n    
     ** Single Vote ** \n  - Voters only have one vote. \n 
     ** Yes/No Voting ** \n - Voters can choose to vote either For or Against a proposal. \n
-    ** Quadratic Voting (Tokens In Wallet) ** \n - The voting power of each voter will be decided by the amount of a specific asset the voter has in his wallet when the voting round ends. Users will specify the percentage of his voting power he will allocate to a proposal (down or up vote) when voting. Their votes will be calculated using the quadratic voting formula.\n
-    **  Quadratic Voting (Same Voting Power) ** \n - Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
+    ** Vote With Tokens In Wallet ** \n - Voters will be able to vote using the tokens they have in their wallet. Votes are calculated 1:1 to the token they have in their wallet. \n
+    ** Quadratic Voting (Tokens In Wallet) ** \n - The voting power of each voter will be decided by the amount of a specific asset the voter has in his wallet when the voting round ends. Their votes will be calculated using the quadratic voting formula.\n
+    ** Quadratic Voting (Same Voting Power) ** \n - Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
     `
   );
   return embed;
@@ -105,9 +106,9 @@ const getSendFundToWalletEmbed = (sendAmount, walletAddress) => {
   return embed;
 };
 
-const getAlreadyVerifiedWalletEmbed = () => {
+const getAlreadyLinkedWalletEmbed = () => {
   const embed = createEmbed(
-    "🔒🛡️ Wallet Already Verified 🛡️🔒",
+    "🔒🛡️ Wallet Already Linked 🛡️🔒",
     `This wallet address has already been verified and link to you. Please enter a different wallet address to verify. \n
     `
   );
@@ -125,10 +126,10 @@ const getAlreadyVerifiedEthereumWalletEmbed = () => {
 
 const getSelectIfOnlyTokenHolderCanVoteEmbed = (votingSystem, onChainVotes) => {
   const embed = createEmbed(
-    "🔒🗳️️ Select Voting Permissions 🗳️🔒",
+    "🔒🗳️️ Select Participation Permission 🗳️🔒",
     `Please select the the voting permissions for this voting round. \n \n
-     ** Only Specific Token Holders ** \n - Only users who hold a specific token can vote. \n
-     ** Everyone Can Vote ** \n - Everyone can vote as long as they are part of your discord community. \n
+     ** Only Specific Token Holders ** \n - Only users who hold a specific token can participate. \n
+     ** Everyone Can Participate ** \n - Everyone can participate as long as they are part of your discord community. \n
   ${getVotingRoundConfigurationText(votingSystem, onChainVotes)} 
   `
   );
@@ -163,10 +164,10 @@ const getEnableKYCEmbed = (
   tokenName
 ) => {
   const embed = createEmbed(
-    "🔍👤 Enable KYC 👤🔍",
-    `Would you like to secure your voting round with SSI and KYC enabled authentication. We will be asking user to provide a verifiable credential to prove their identity. The verifiable credential will be issued to them by Snapbrillia after they have been verfied. This will help prevent sybil attacks (people creating multiple accounts and voting) against the voting round. \n \n
-      ** Yes ** \n - SSI and KYC will be enabled for this voting round. \n
-      ** No ** \n - SSI and KYC will not be enabled for this voting round. \n
+    "🔍👤 Enable Self-Soverign Identity Auth👤🔍",
+    `Would you like to secure your voting round with SSI enabled authentication? We will be asking user to provide a verifiable credential to prove their identity. The verifiable credential will be issued to them by Snapbrillia after they have been verfied. This will help prevent sybil attacks (people creating multiple accounts and voting) against the voting round. Users participating in the round will also recieve a Verifiable Credential proving their participation. \n \n
+      ** Yes ** \n - Self-Soverign Identity will be enabled for this voting round. \n
+      ** No ** \n - Self-Soverign Identity will not be enabled for this voting round. \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onChainVotes,
@@ -211,10 +212,9 @@ const getEthereumSelectTokenEmbed = (
 ) => {
   const embed = createEmbed(
     "💰💸 Select Voting Token 💸💰",
-    `You have selected to require voters to verify themselve using an Ethereum wallet. \n
-    The last step is to select the token you want to use for voting. \n
-    If you want to use an token, please enter the contract address of the token. \n
-    If you want to use ETH, please enter "ETH". \n
+    `Please select the token that you want to use for whitelisting and voting. \n
+    We have selected the first 24 tokens in your wallets. If you don't see the token you want to use you can enter the command ** /refresh-assets-in-wallet **.This will fetch the latest assets you have in your wallet. \n
+    You can also enter the token manually by providing the token's contract address. \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onChainVotes,
@@ -234,9 +234,9 @@ const getCardanoSelectTokenEmbed = (
 ) => {
   const embed = createEmbed(
     "🌟 Select Whitelist And Voting Token 🌟 ",
-    `You have selected the Cardano blockchain to run your voting round on. Please select the token that you want to use for whitelisting and voting. \n
-    We have selected the first 24 tokens in your wallets. If you don't see the token you want to use you can enter the command ** /refresh-assets-in-cardano-wallet **.This will fetch the latest assets you have in your wallet. \n
-    You can also enter the token manually. You would need to provide the token's unique identifer on the blockchain (concatenation of the Asset Name in hex and Policy Id). \n
+    `Please select the token that you want to use for whitelisting and voting. \n
+    We have selected the first 24 tokens in your wallets. If you don't see the token you want to use you can enter the command ** /refresh-assets-in-wallet **.This will fetch the latest assets you have in your wallet. \n
+    You can also enter the token manually by providing the token's unique identifer on the blockchain (concatenation of the Asset Name in hex and Policy Id). \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onChainVotes,
@@ -283,9 +283,8 @@ const getVotingRoundInfoEmbed = (
   votingRoundDescription
 ) => {
   const embed = createEmbed(
-    "🗳️ Voting Round Info 🗳️ ",
-    `You have completed all the nessesary steps to create a voting round. \n
-    Please confirm the following information about the voting round \n
+    "🗳️ Enter Voting Round Name and Description🗳️ ",
+    `Please confirm the follow information about the voting round. \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       storeVotesOnChain,
@@ -296,6 +295,32 @@ const getVotingRoundInfoEmbed = (
       roundDuration,
       votingRoundName,
       votingRoundDescription
+    )}
+    `
+  );
+  return embed;
+};
+
+const getEnterNameAndDescriptionEmbed = (
+  votingSystem,
+  storeVotesOnChain,
+  onlyTokenHolderCanVote,
+  verificationMethod,
+  tokenUsed,
+  enableKYC,
+  roundDuration
+) => {
+  const embed = createEmbed(
+    "🗳️ Enter Voting Round Name and Description🗳️ ",
+    `Please enter a name and a description of the voting round. \n
+    ${getVotingRoundConfigurationText(
+      votingSystem,
+      storeVotesOnChain,
+      onlyTokenHolderCanVote,
+      verificationMethod,
+      tokenUsed,
+      enableKYC,
+      roundDuration
     )}
     `
   );
@@ -508,8 +533,8 @@ const getLinkWalletEmbed = () => {
   const embed = createEmbed(
     "🔒🔗 Link Wallet 🔗🔒",
     `To ensure a secure and trustworthy voting experience, we've implemented a wallet linking feature. By linking your wallet to your user account, you can participate in the upcoming voting round with confidence. Please select the wallet you'd like to link. \n
+    ** Ethereum Wallet ** \n - Link your Ethereum Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
     ** Cardano Wallet ** \n - Link your Cardano Wallet. To verify your wallet, you will send a small sum of ADA from the wallet address you provided to the same wallet address. \n
-    ** Ethereum Wallet ** \n - Link your Cardano Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
     ** SSI Wallet ** \n - Link your SSI Wallet. We will create a SSI wallet on yourbehalf and issue you a Verifiable Crential proving your identity. \n
     By linking your wallet, you'll have a unique identifier tied to your account for the upcoming voting round. This adds an extra layer of security and ensures fair participation. Voting rounds might also require you to hold a certain token to particiapte.\n
     `
@@ -590,6 +615,7 @@ const getNoWhitelistTokenFound = (tokenName, wallet) => {
 
 module.exports = {
   getVotingRoundInfoEmbed,
+  getEnterNameAndDescriptionEmbed,
   getSendFundToWalletEmbed,
   getSelectIfOnlyTokenHolderCanVoteEmbed,
   getSelectBlockchainEmbed,
@@ -608,7 +634,7 @@ module.exports = {
   getDownVoteProposalEmbed,
   getVoteProposalInfoEmbed,
   getConfirmVoteProposalEmbed,
-  getAlreadyVerifiedWalletEmbed,
+  getAlreadyLinkedWalletEmbed,
   getPendingVerifiedWalletEmbed,
   getPendingVerifiedEthereumWalletEmbed,
   getAlreadyVerifiedEthereumWalletEmbed,
