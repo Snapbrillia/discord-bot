@@ -81,6 +81,7 @@ const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
     walletAddress,
     sendAmount,
     blockchain: "Cardano",
+    channelId: interaction.channelId,
   });
   interaction.reply({
     embeds: [getSendFundToWalletEmbed(`${sendAmount} ADA`, walletAddress)],

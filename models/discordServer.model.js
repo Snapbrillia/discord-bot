@@ -11,6 +11,11 @@ const DiscordServerSchema = new mongoose.Schema(
     serverId: {
       type: String,
     },
+    userChannels: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -33,12 +33,12 @@ const {
   handleVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
+  handleViewPersonalInfoCommand,
 } = require("./handleCommandActions/functions");
 const { deployCommands } = require("./deployCommandScript");
 const {
   createChannelWithAdmins,
   createChannelWithUser,
-  createChannelWithEveryOne,
   createDiscordUser,
   createCategory,
   createDiscordServer,
@@ -53,6 +53,7 @@ const {
   handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
+  handleViewPersonalInfoMenu,
 } = require("./handleSelectMenuActions/functions");
 const { removeExpiredPendingVerification } = require("./utils/databaseUtils");
 const { verifyUsers } = require("./utils/sharedUtils");
@@ -67,6 +68,7 @@ const {
 
 require("dotenv").config();
 require("./mongodb.config");
+g;
 
 const client = new Client({
   intents: [
@@ -81,31 +83,37 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-// Bot is added to server. Creates private channels with admins and users
+// Bot is added to server.Deploy application commands. Creates private
+// channels with admins and users, store the channel ids in the database
 client.on("guildCreate", async (guild) => {
   const members = await guild.members.fetch();
   const owner = await guild.fetchOwner();
   const category = await createCategory(guild);
-  const channelId = await createChannelWithAdmins(
+  const adminChannelId = await createChannelWithAdmins(
     guild,
     owner,
     client.user.id,
     category
   );
-  const generalChannelId = await createChannelWithEveryOne(
-    guild,
-    client.user.id,
-    category
-  );
-  members.forEach(async (member) => {
-    if (member.user.bot) {
-      return;
+
+  let userChannelsId = [];
+
+  for (const member of members) {
+    if (member[1].user.bot) {
+      continue;
     }
-    await createChannelWithUser(guild, member, client.user.id, category);
-    await createDiscordUser(guild, member);
-  });
+    const userChannelId = await createChannelWithUser(
+      guild,
+      member[1],
+      client.user.id,
+      category
+    );
+    userChannelsId.push(userChannelId);
+    await createDiscordUser(guild, member[1], userChannelId);
+  }
+
+  await createDiscordServer(guild, adminChannelId, userChannelsId);
   await deployCommands(guild);
-  await createDiscordServer(guild, channelId, generalChannelId);
 });
 
 // creare private channel with every user, private chaneel with the owner
@@ -175,6 +183,8 @@ client.on("interactionCreate", async (interaction) => {
     case "selectLinkWalletMenu":
       await handleLinkWalletMenu(interaction);
       break;
+    case "selectViewPersonalInfoMenu":
+      await handleViewPersonalInfoMenu(interaction);
   }
 });
 
@@ -276,7 +286,8 @@ setInterval(async () => {
     "cardanoWallets",
     "cardanoTokensInWallet",
     checkIfADASend,
-    getCardanoTokensInWallet
+    getCardanoTokensInWallet,
+    client
   );
   // verify users ethereum wallet
   await verifyUsers(
@@ -284,6 +295,7 @@ setInterval(async () => {
     "ethereumWallets",
     "ethereumTokensInWallet",
     checkIfEthSend,
-    getEthereumTokensInWallet
+    getEthereumTokensInWallet,
+    client
   );
 }, 15000);

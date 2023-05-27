@@ -89,7 +89,8 @@ const verifyUsers = async (
   walletField,
   tokenField,
   checkFn,
-  getTokensFn
+  getTokensFn,
+  client
 ) => {
   try {
     const pendingVerification = await PendingWalletVerification.find({

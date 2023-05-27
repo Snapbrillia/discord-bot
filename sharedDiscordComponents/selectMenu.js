@@ -243,6 +243,37 @@ const getListOfProposalMenu = (proposals) => {
   return actionRow;
 };
 
+const getViewPeronalInfoMenu = () => {
+  const selectMenu = [
+    {
+      label: "Ethereum Wallet",
+      description: "View information about your linked Ethereum wallet",
+      value: "Ethereum Wallet",
+    },
+    {
+      label: "Cardano Wallet",
+      description: "View information about your linked Cardano wallet",
+      value: "Cardano Wallet",
+    },
+    {
+      label: "SSI Wallet",
+      description: "View information about your linked SSI wallet",
+      value: "SSI Wallet",
+    },
+    {
+      label: "Participation History",
+      description: "View your participation history",
+      value: "Participation History",
+    },
+  ];
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Info To View",
+    "selectViewPersonalInfoMenu"
+  );
+  return actionRow;
+};
+
 module.exports = {
   getSelectVotingSystemMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
@@ -254,4 +285,5 @@ module.exports = {
   getListOfVotingRoundMenu,
   getEnableSSIAuthMenu,
   getSelectLinkWalletMenu,
+  getViewPeronalInfoMenu,
 };

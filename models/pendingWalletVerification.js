@@ -16,6 +16,9 @@ const PendingWalletVerificationSchema = new mongoose.Schema(
     sendAmount: {
       type: Number,
     },
+    channelId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

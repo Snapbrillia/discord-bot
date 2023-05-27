@@ -1,11 +1,3 @@
-const {
-  getPrimaryButton,
-  getSelectVotingSystemButton,
-  getVerifyCardanoWalletButton,
-  getVerifyEthereumWalletButton,
-  getVoteProposalButton,
-  getRegisterProposalButton,
-} = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model.js");
 const { VotingRound } = require("../models/votingRound.model.js");
 const { checkIfVerified } = require("../utils/sharedUtils");
@@ -23,12 +15,15 @@ const {
   getAlreadyVerifiedEthereumWalletEmbed,
   getPendingVerifiedEthereumWalletEmbed,
   getHelpCommandEmbed,
+  getWalletLinkedSuccessfullyEmbed,
+  getViewPersonalInfoEmbed,
 } = require("../sharedDiscordComponents/embeds.js");
 const {
   getSelectVotingSystemMenu,
   getListOfProposalMenu,
   getSelectLinkWalletMenu,
   getListOfVotingRoundMenu,
+  getViewPeronalInfoMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
 const { getImage } = require("../sharedDiscordComponents/image");
 const { ActionRow } = require("discord.js");
@@ -49,22 +44,26 @@ const handleLinkWalletCommand = async (interaction) => {
 };
 
 const handleStartRoundCommand = async (interaction) => {
-  const server = await DiscordServer.findOne({
-    serverId: interaction.guildId,
-  });
+  // const server = await DiscordServer.findOne({
+  //   serverId: interaction.guildId,
+  // });
   const image = getImage();
-  if (interaction.channelId !== server.adminChannel) {
-    const embed = getNoPermessionToStartVotingRoundEmbed();
-    return interaction.reply({
-      embeds: [embed],
-      files: [image],
-    });
-  }
-  const selectMenu = getSelectVotingSystemMenu();
-  const embed = getVotingSystemsEmbed();
+  // if (interaction.channelId !== server.adminChannel) {
+  //   const embed = getNoPermessionToStartVotingRoundEmbed();
+  //   return interaction.reply({
+  //     embeds: [embed],
+  //     files: [image],
+  //   });
+  // }
+  // const selectMenu = getSelectVotingSystemMenu();
+  // const embed = getVotingSystemsEmbed();
   return interaction.reply({
-    embeds: [embed],
-    components: [selectMenu],
+    embeds: [
+      getWalletLinkedSuccessfullyEmbed(
+        "addr_test1qp3q7xj0t56zkprcrazca9lknghrmtjk8vgz0nldrec67gln8df7mlcw5kv8ay6vpewqalu8ktqmtt5696mp4nt4js0qk3y9zw"
+      ),
+    ],
+    // components: [selectMenu],
     files: [image],
   });
 };
@@ -124,6 +123,20 @@ const handleHelpCommand = async (interaction) => {
   });
 };
 
+const handleViewPersonalInfoCommand = async (interaction) => {
+  const discordUser = await DiscordUser.findOne({
+    discordId: interaction.user.id,
+  });
+  const embed = getViewPersonalInfoEmbed();
+  const image = getImage();
+  const personalInfoMenu = getViewPeronalInfoMenu();
+  return interaction.reply({
+    embeds: [embed],
+    files: [image],
+    components: [personalInfoMenu],
+  });
+};
+
 module.exports = {
   handleLinkWalletCommand,
   handleRegisterProposalCommand,
@@ -131,4 +144,5 @@ module.exports = {
   handleVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
+  handleViewPersonalInfoCommand,
 };
