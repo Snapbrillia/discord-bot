@@ -13,6 +13,7 @@ const {
   getEnterNameAndDescriptionEmbed,
   getEnterEmailVerificationSSIEmbed,
   getSSIEmailVerificationEmbed,
+  getViewEthereumWalletsEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
@@ -332,6 +333,15 @@ const handleLinkWalletMenu = async (interaction) => {
   });
 };
 
+const handleViewPersonalInfoMenu = async (interaction) => {
+  const image = getImage();
+  const embed = getViewEthereumWalletsEmbed();
+  interaction.reply({
+    embeds: [embed],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
@@ -341,4 +351,5 @@ module.exports = {
   handleSelectVerificationMethodMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
+  handleViewPersonalInfoMenu,
 };

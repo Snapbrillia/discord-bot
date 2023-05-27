@@ -8,11 +8,15 @@ require("dotenv").config();
 // because of the way the file system works.
 const deployCommands = async (guild) => {
   try {
+    const commandFiles = fs
+      .readdirSync("./commands")
+      .filter((file) => file.endsWith(".js"));
+
     const commands = [];
 
     // grab all files under the folder commands
 
-    for (const file of desiredOrder) {
+    for (const file of commandFiles) {
       const command = require(`./commands/${file}`);
       commands.push(command.data.toJSON());
     }

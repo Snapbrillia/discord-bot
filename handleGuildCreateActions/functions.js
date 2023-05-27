@@ -20,6 +20,7 @@ const createCategory = async (guild) => {
 
 const createChannelWithUser = async (guild, user, botId, category) => {
   try {
+    console.log("user", user);
     const channel = await guild.channels.create({
       name: "snapbrillia-voting-server",
       type: ChannelType.GuildText,
@@ -42,6 +43,7 @@ const createChannelWithUser = async (guild, user, botId, category) => {
     channel.send({
       embeds: [getMemberIntrouductionEmbed()],
     });
+    return channel.id;
   } catch (err) {
     console.log(err);
   }
@@ -78,7 +80,7 @@ const createChannelWithAdmins = async (guild, user, botId, category) => {
 };
 
 //create discord user in database
-const createDiscordUser = async (guild, member) => {
+const createDiscordUser = async (guild, member, userChannelId) => {
   try {
     const discordUserExists = await DiscordUser.findOne({
       discordId: member.id,
@@ -90,6 +92,7 @@ const createDiscordUser = async (guild, member) => {
       if (!serverIdExists) {
         discordUserExists.serversUserIsIn.push(member.guild.id);
         await discordUserExists.save();
+        return;
       }
       return;
     }
@@ -115,13 +118,13 @@ const createDiscordUser = async (guild, member) => {
   }
 };
 
-const createDiscordServer = async (guild, adminChannel) => {
+const createDiscordServer = async (guild, adminChannel, userChannels) => {
   try {
-    console.log(adminChannel);
     await DiscordServer.create({
       adminChannel: adminChannel,
       serverId: guild.id,
       serverOwner: guild.ownerId,
+      userChannels: userChannels,
     });
   } catch (err) {
     console.log(err);

@@ -601,13 +601,57 @@ const getNoPermessionToStartVotingRoundEmbed = () => {
   return embed;
 };
 
-const getNoWhitelistTokenFound = (tokenName, wallet) => {
+const getNoWhitelistTokenFoundEmbed = (tokenName, wallet) => {
   const embed = createEmbed(
     "🔒🗳️ Token Missing 🗳️🔒",
     `To participate in the current voting round, it is necessary to hold a specific token. However, our records indicate that you do not currently possess the required token: ** ${tokenName} **. \n
     You can do one of the following: \n
     ** Link ${wallet} ** \n - Link a new wallet to your account that contains the token. \n
     ** Refresh Assets In Wallet ** \n - If you hold the tokens in your linked wallets then you can run the command ** /refresh-assets-in-wallet ** to fetch the latest assets in your wallet. \n
+    `
+  );
+  return embed;
+};
+
+const getWalletLinkedSuccessfullyEmbed = (walletAddress) => {
+  const embed = createEmbed(
+    "🔒🗳️ Wallet Linked 🗳️🔒",
+    `You have successfully verified and linked the following wallet ** ${walletAddress} ** to your account
+    `
+  );
+  return embed;
+};
+
+const getVotingHasStartedEmbed = () => {
+  const embed = createEmbed(
+    "🗳️ A Voting Round Has Been Created 🗳️",
+    `A voting round has just been initiated. \n
+    Voting Round Name: ** New Logo ** \n
+    Voting Round Description: ** Decide new logo for discord server ** \n
+    Enter the command ** /register-proposal ** or ** /vote-proposal ** to start participating in the voting round. \n`
+  );
+  return embed;
+};
+
+const getViewPersonalInfoEmbed = () => {
+  const embed = createEmbed(
+    "🔒🗳️ View Personal Info 🗳️🔒",
+    `Please select the information you want to view. \n
+  ** Ethereum Wallets ** \n - View linked Ethereum Wallets. \n
+  ** Cardano Wallets ** \n - View linked Cardano Wallets. \n
+  ** Self-Soverign Identity ** \n - View verifiable credentials in your wallet. \n
+  ** Participation History ** \n - View your participation history in voting rounds. \n
+  `
+  );
+  return embed;
+};
+
+const getViewEthereumWalletsEmbed = (wallets) => {
+  const embed = createEmbed(
+    "🔒🗳️ Ethereum Wallets 🗳️🔒",
+    `You have the following Ethereum wallets linked to your account. \n
+    ** Linked Wallet Address ** \n - 0x1f45D3DFa47b42231806ec59Be0C4ba9507a8Cbd \n
+    ** Assets In Wallet ** \n - ETH \n
     `
   );
   return embed;
@@ -652,5 +696,9 @@ module.exports = {
   getEnterSSIPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,
   getNoPermessionToStartVotingRoundEmbed,
-  getNoWhitelistTokenFound,
+  getNoWhitelistTokenFoundEmbed,
+  getWalletLinkedSuccessfullyEmbed,
+  getVotingHasStartedEmbed,
+  getViewPersonalInfoEmbed,
+  getViewEthereumWalletsEmbed,
 };
