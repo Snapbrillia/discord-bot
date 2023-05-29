@@ -22,9 +22,10 @@ const {
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
   handleVerifySSIEmailInputModal,
-  handleEnterSSIEmailCodeInputModal,
   handleEnterSSIPhoneInputModal,
   handleEnterSSIPhoneCodeInputModal,
+  handleSnapbrilliaEmailAddressModal,
+  handleSnapbrilliaEmailCodeModal,
 } = require("./handleModalSubmitActions/functions");
 const {
   handleLinkWalletCommand,
@@ -49,11 +50,12 @@ const {
   handleSelectVerificationMethodMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
-  handleSelectSSIAuthMenu,
+  handleSelectSnapbrilliaWalletAuthMenu,
   handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
   handleViewPersonalInfoMenu,
+  handleLinkSnapbrilliaWalletMenu,
 } = require("./handleSelectMenuActions/functions");
 const { removeExpiredPendingVerification } = require("./utils/databaseUtils");
 const { verifyUsers } = require("./utils/sharedUtils");
@@ -68,7 +70,6 @@ const {
 
 require("dotenv").config();
 require("./mongodb.config");
-g;
 
 const client = new Client({
   intents: [
@@ -171,8 +172,8 @@ client.on("interactionCreate", async (interaction) => {
     case "selectTokenMenu":
       await handleSelectTokenMenu(interaction);
       break;
-    case "selectSSIAuthMenu":
-      await handleSelectSSIAuthMenu(interaction);
+    case "selectSnapbrilliaWalletAuthMenu":
+      await handleSelectSnapbrilliaWalletAuthMenu(interaction);
       break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
@@ -183,8 +184,12 @@ client.on("interactionCreate", async (interaction) => {
     case "selectLinkWalletMenu":
       await handleLinkWalletMenu(interaction);
       break;
+    case "selectSnapbrilliaWalletLoginMenu":
+      await handleLinkSnapbrilliaWalletMenu(interaction);
+      break;
     case "selectViewPersonalInfoMenu":
       await handleViewPersonalInfoMenu(interaction);
+      break;
   }
 });
 
@@ -208,23 +213,20 @@ client.on("interactionCreate", async (interaction) => {
     case "registerProposalInputModal":
       await handleRegisterProposalInputModal(interaction);
       break;
-    case "voteProposalInputModal":
-      await handleVoteProposalInputModal(interaction, "vote");
-      break;
-    case "downVoteProposalInputModal":
-      await handleVoteProposalInputModal(interaction, "down-vote");
-      break;
     case "enterSSIEmailInputModal":
       await handleVerifySSIEmailInputModal(interaction);
-      break;
-    case "enterSSIEmailCodeInputModal":
-      await handleEnterSSIEmailCodeInputModal(interaction);
       break;
     case "enterSSIPhoneNumberInputModal":
       await handleEnterSSIPhoneInputModal(interaction);
       break;
     case "enterSSIPhoneCodeInputModal":
       await handleEnterSSIPhoneCodeInputModal(interaction);
+      break;
+    case "snapbrilliaEmailAddressModal":
+      await handleSnapbrilliaEmailAddressModal(interaction);
+      break;
+    case "snapbrilliaEmailCodeModal":
+      await handleSnapbrilliaEmailCodeModal(interaction);
       break;
   }
 });

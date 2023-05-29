@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 
-const PendingSSIVerificationSchema = new mongoose.Schema(
+const PendingSnapbrilliaWalletVerificationSchema = new mongoose.Schema(
   {
     discordId: {
       type: String,
     },
-    // Ethereum, Cardano
     identity: {
       type: String,
     },
@@ -16,7 +15,7 @@ const PendingSSIVerificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports.PendingSSIVerification = mongoose.model(
-  "PendingSSIVerification",
-  PendingSSIVerificationSchema
+module.exports.PendingSnapbrilliaWalletVerification = mongoose.model(
+  "PendingSnapbrilliaWalletVerification",
+  PendingSnapbrilliaWalletVerificationSchema
 );

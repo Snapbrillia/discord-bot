@@ -61,9 +61,9 @@ const getSelectLinkWalletMenu = () => {
       value: "Cardano Wallet",
     },
     {
-      label: "SSI Wallet",
-      description: "Link your SSI wallet",
-      value: "SSI Wallet",
+      label: "Snapbrillia Wallet",
+      description: "Link your Snapbrillia Wallet",
+      value: "Snapbrillia Wallet",
     },
   ];
   const actionRow = buildActionRow(
@@ -209,19 +209,19 @@ const getEnableSSIAuthMenu = () => {
   const selectMenu = [
     {
       label: "Yes",
-      description: "Enable Self-Soverign Identity Auth",
+      description: "Enable Snapbrillia Wallet auth",
       value: "Yes",
     },
     {
       label: "No",
-      description: "Disable Self-Soverign Identity Auth",
+      description: "Disable Snapbrillia Wallet auth",
       value: "No",
     },
   ];
   const actionRow = buildActionRow(
     selectMenu,
-    "Select Enable Self-Soverign Identity Auth",
-    "selectSSIAuthMenu"
+    "Select Enable Snapbrillia Wallet Auth",
+    "selectSnapbrilliaWalletAuthMenu"
   );
   return actionRow;
 };
@@ -256,14 +256,9 @@ const getViewPeronalInfoMenu = () => {
       value: "Cardano Wallet",
     },
     {
-      label: "SSI Wallet",
-      description: "View information about your linked SSI wallet",
-      value: "SSI Wallet",
-    },
-    {
-      label: "Participation History",
-      description: "View your participation history",
-      value: "Participation History",
+      label: "Snapbrillia Wallet",
+      description: "View information about your linked Snapbrillia Wallet",
+      value: "Snapbrillia Wallet",
     },
   ];
   const actionRow = buildActionRow(
@@ -271,6 +266,28 @@ const getViewPeronalInfoMenu = () => {
     "Select Info To View",
     "selectViewPersonalInfoMenu"
   );
+  return actionRow;
+};
+
+const getSnapbrilliaWalletLoginMenu = () => {
+  const selectMenu = [
+    {
+      label: "Email Login",
+      description: "Snapbrillia Wallet Login with Email",
+      value: "Email Login",
+    },
+    {
+      label: "Phone Login",
+      description: "Snapbrillia Wallet Login with Phone",
+      value: "Phone Login",
+    },
+  ];
+  const actionRow = buildActionRow(
+    selectMenu,
+    "Select Login Method",
+    "selectSnapbrilliaWalletLoginMenu"
+  );
+
   return actionRow;
 };
 
@@ -286,4 +303,5 @@ module.exports = {
   getEnableSSIAuthMenu,
   getSelectLinkWalletMenu,
   getViewPeronalInfoMenu,
+  getSnapbrilliaWalletLoginMenu,
 };

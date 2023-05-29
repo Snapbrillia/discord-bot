@@ -12,7 +12,7 @@ const {
   getVoteProposalInfoEmbed,
   getAlreadyLinkedWalletEmbed,
   getPendingVerifiedWalletEmbed,
-  getEnterVerificationEmbed,
+  getSnapbrilliaEmailCodeEmbed,
   getEnterSSIEmailAddressEmbed,
   getEnterSSIPhoneNumberEmbed,
   getEnterSSIPhoneCodeEmbed,
@@ -41,12 +41,15 @@ const {
 } = require("../models/pendingWalletVerification.js");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
-  generateEmailProof,
-  submitEmailProof,
   generatePhoneProof,
   submitPhoneProof,
+  sendSnapbrilliaLoginCode,
+  verifySnapbrilliaLoginCode,
 } = require("../utils/ssiUtils");
 const { Proposal } = require("../models/projectProposal.model");
+const {
+  PendingSnapbrilliaWalletVerification,
+} = require("../models/pendingSSIVerification");
 
 const handleConfirmCardanoWalletAddressInputModal = async (interaction) => {
   const image = getImage();
@@ -263,37 +266,6 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   });
 };
 
-const handleVerifySSIEmailInputModal = async (interaction) => {
-  const enterSSIEmailVerificationEmbed = getEnterSSIEmailAddressEmbed();
-  const enterSSIEmailVerificationButton = getEnterSSIEmailVerificationButton();
-
-  const email = interaction.fields.getTextInputValue("emailInput");
-  await generateEmailProof(email, interaction.user.id);
-
-  const image = getImage();
-  interaction.reply({
-    embeds: [enterSSIEmailVerificationEmbed],
-    components: [enterSSIEmailVerificationButton],
-    files: [image],
-  });
-};
-
-const handleEnterSSIEmailCodeInputModal = async (interaction) => {
-  const code = interaction.fields.getTextInputValue("emailCodeInput");
-
-  await submitEmailProof(code, interaction.user.id);
-
-  const enterSSIPhoneVerificationEmbed = getEnterSSIPhoneNumberEmbed();
-  const enterSSIPhoneNumberButton = getEnterSSIPhoneNumberButton();
-  const image = getImage();
-
-  interaction.reply({
-    embeds: [enterSSIPhoneVerificationEmbed],
-    components: [enterSSIPhoneNumberButton],
-    files: [image],
-  });
-};
-
 const handleEnterSSIPhoneInputModal = async (interaction) => {
   const enterPhoneNumberVerificationCode = getEnterSSIPhoneCodeEmbed();
   const enterPhoneNumberVerificationButton = getEnterSSIPhoneCodeButton();
@@ -319,6 +291,49 @@ const handleEnterSSIPhoneCodeInputModal = async (interaction) => {
   });
 };
 
+const handleSnapbrilliaEmailAddressModal = async (interaction) => {
+  try {
+    const email = interaction.fields.getTextInputValue("emailAddressInput");
+    const challengeId = await sendSnapbrilliaLoginCode(email, "email");
+
+    await PendingSnapbrilliaWalletVerification.create({
+      discordId: interaction.user.id,
+      challengeId: challengeId,
+    });
+
+    const snapbrilliaEmailCodeEmbed = getSnapbrilliaEmailCodeEmbed();
+    const snapbrilliaEmailCodeButton = getEnterSSIEmailVerificationButton();
+    const image = getImage();
+    interaction.reply({
+      embeds: [snapbrilliaEmailCodeEmbed],
+      components: [snapbrilliaEmailCodeButton],
+      files: [image],
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const handleSnapbrilliaEmailCodeModal = async (interaction) => {
+  const code = interaction.fields.getTextInputValue("emailCodeInput");
+  const pendingVerification =
+    await PendingSnapbrilliaWalletVerification.findOne({
+      discordId: interaction.user.id,
+    });
+
+  await verifySnapbrilliaLoginCode(pendingVerification.challengeId, code);
+
+  const enterSSIPhoneVerificationEmbed = getEnterSSIPhoneNumberEmbed();
+  const enterSSIPhoneNumberButton = getEnterSSIPhoneNumberButton();
+  const image = getImage();
+
+  interaction.reply({
+    embeds: [enterSSIPhoneVerificationEmbed],
+    components: [enterSSIPhoneNumberButton],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleConfirmCardanoWalletAddressInputModal,
   handleTokenSelectInputModal,
@@ -326,8 +341,8 @@ module.exports = {
   handleVoteProposalInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
-  handleVerifySSIEmailInputModal,
-  handleEnterSSIEmailCodeInputModal,
   handleEnterSSIPhoneInputModal,
   handleEnterSSIPhoneCodeInputModal,
+  handleSnapbrilliaEmailAddressModal,
+  handleSnapbrilliaEmailCodeModal,
 };

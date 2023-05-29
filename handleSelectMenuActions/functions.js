@@ -12,7 +12,7 @@ const {
   getVerifyWalletEmbed,
   getEnterNameAndDescriptionEmbed,
   getEnterEmailVerificationSSIEmbed,
-  getSSIEmailVerificationEmbed,
+  getSnapbrilliaWalletLoginEmbed,
   getViewEthereumWalletsEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
@@ -23,17 +23,21 @@ const {
   getSelectTokenMenu,
   getSelectVotingOnChainMenu,
   getEnableSSIAuthMenu,
+  getSnapbrilliaWalletLoginMenu,
 } = require("../sharedDiscordComponents/selectMenu");
 const {
   getNameOfVotingRoundButton,
   getRegisterProposalButton,
-  getSSIEmailVerificationButton,
   getVerifyCardanoWalletButton,
   getEnterSSIEmailVerificationButton,
   getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
-const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
+const {
+  getSelectTokenModal,
+  getSnapbrilliaWalletEmailAddressModal,
+  getSnapbrilliaWalletPhoneNumberModal,
+} = require("../sharedDiscordComponents/modals");
 const { Proposal } = require("../models/projectProposal.model");
 const { checkIfVerified } = require("../utils/sharedUtils");
 
@@ -201,7 +205,7 @@ const handleSelectTokenMenu = async (interaction) => {
   });
 };
 
-const handleSelectSSIAuthMenu = async (interaction) => {
+const handleSelectSnapbrilliaWalletAuthMenu = async (interaction) => {
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
     status: "pending",
@@ -316,9 +320,9 @@ const handleLinkWalletMenu = async (interaction) => {
       embed = getVerifyWalletEmbed("Cardano");
       button = getVerifyCardanoWalletButton();
       break;
-    case "SSI Wallet":
-      embed = getSSIEmailVerificationEmbed();
-      button = getSSIEmailVerificationButton();
+    case "Snapbrillia Wallet":
+      embed = getSnapbrilliaWalletLoginEmbed();
+      button = getSnapbrilliaWalletLoginMenu();
       break;
     default:
       break;
@@ -342,14 +346,33 @@ const handleViewPersonalInfoMenu = async (interaction) => {
   });
 };
 
+const handleLinkSnapbrilliaWalletMenu = async (interaction) => {
+  const linkSnapbrilliaWalletMethod = interaction.values[0];
+  let inputModal = "";
+
+  switch (linkSnapbrilliaWalletMethod) {
+    case "Email Login":
+      inputModal = getSnapbrilliaWalletEmailAddressModal();
+      break;
+    case "Phone Login":
+      inputModal = getSnapbrilliaWalletPhoneNumberModal();
+      break;
+    default:
+      break;
+  }
+
+  interaction.showModal(inputModal);
+};
+
 module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
-  handleSelectSSIAuthMenu,
+  handleSelectSnapbrilliaWalletAuthMenu,
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
   handleViewPersonalInfoMenu,
+  handleLinkSnapbrilliaWalletMenu,
 };
