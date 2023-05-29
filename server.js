@@ -22,10 +22,10 @@ const {
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
   handleVerifySSIEmailInputModal,
-  handleEnterSSIEmailCodeInputModal,
   handleEnterSSIPhoneInputModal,
   handleEnterSSIPhoneCodeInputModal,
   handleSnapbrilliaEmailAddressModal,
+  handleSnapbrilliaEmailCodeModal,
 } = require("./handleModalSubmitActions/functions");
 const {
   handleLinkWalletCommand,
@@ -50,7 +50,7 @@ const {
   handleSelectVerificationMethodMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
-  handleSelectSSIAuthMenu,
+  handleSelectSnapbrilliaWalletAuthMenu,
   handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
@@ -172,8 +172,8 @@ client.on("interactionCreate", async (interaction) => {
     case "selectTokenMenu":
       await handleSelectTokenMenu(interaction);
       break;
-    case "selectSSIAuthMenu":
-      await handleSelectSSIAuthMenu(interaction);
+    case "selectSnapbrilliaWalletAuthMenu":
+      await handleSelectSnapbrilliaWalletAuthMenu(interaction);
       break;
     case "selectRoundDurationMenu":
       await handleRoundDurationMenu(interaction);
@@ -216,17 +216,17 @@ client.on("interactionCreate", async (interaction) => {
     case "enterSSIEmailInputModal":
       await handleVerifySSIEmailInputModal(interaction);
       break;
-    case "enterSSIEmailCodeInputModal":
-      await handleEnterSSIEmailCodeInputModal(interaction);
-      break;
     case "enterSSIPhoneNumberInputModal":
       await handleEnterSSIPhoneInputModal(interaction);
       break;
     case "enterSSIPhoneCodeInputModal":
       await handleEnterSSIPhoneCodeInputModal(interaction);
       break;
-    case "enterSnapbrilliaWalletEmailAddressInputModal":
+    case "snapbrilliaEmailAddressModal":
       await handleSnapbrilliaEmailAddressModal(interaction);
+      break;
+    case "snapbrilliaEmailCodeModal":
+      await handleSnapbrilliaEmailCodeModal(interaction);
       break;
   }
 });

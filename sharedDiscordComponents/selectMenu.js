@@ -209,19 +209,19 @@ const getEnableSSIAuthMenu = () => {
   const selectMenu = [
     {
       label: "Yes",
-      description: "Enable Self-Soverign Identity Auth",
+      description: "Enable Snapbrillia Wallet auth",
       value: "Yes",
     },
     {
       label: "No",
-      description: "Disable Self-Soverign Identity Auth",
+      description: "Disable Snapbrillia Wallet auth",
       value: "No",
     },
   ];
   const actionRow = buildActionRow(
     selectMenu,
-    "Select Enable Self-Soverign Identity Auth",
-    "selectSSIAuthMenu"
+    "Select Enable Snapbrillia Wallet Auth",
+    "selectSnapbrilliaWalletAuthMenu"
   );
   return actionRow;
 };

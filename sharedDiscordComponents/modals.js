@@ -202,7 +202,7 @@ const getVerifySSIEmailModal = () => {
 
 const getEnterSSIEmailCodeModal = () => {
   const modal = new ModalBuilder()
-    .setCustomId("enterSSIEmailCodeInputModal")
+    .setCustomId("snapbrilliaEmailCodeModal")
     .setTitle("Confirm Email Verification Code");
 
   const emailCodeInput = new TextInputBuilder()
@@ -252,7 +252,7 @@ const getEnterSSIPhoneCodeModal = () => {
 
 const getSnapbrilliaWalletEmailAddressModal = () => {
   const modal = new ModalBuilder()
-    .setCustomId("enterSnapbrilliaWalletEmailAddressInputModal")
+    .setCustomId("snapbrilliaEmailAddressModal")
     .setTitle("Enter Email Address");
 
   const emailAddressInput = new TextInputBuilder()

@@ -1,4 +1,5 @@
 const {
+  TrinsicService,
   TemplateField,
   FieldType,
   CreateCredentialTemplateRequest,
@@ -10,6 +11,17 @@ const {
 } = require("@trinsic/trinsic");
 const { v4: uuid } = require("uuid");
 const { DiscordUser } = require("../models/discordUser.model");
+
+const trinsic = new TrinsicService({
+  /** Trinsic API endpoint. Defaults to `prod.trinsic.cloud` */
+  serverEndpoint: "prod.trinsic.cloud",
+  /** Trinsic API port; defaults to `443` */
+  serverPort: 443,
+  /** Whether TLS is enabled between SDK and Trinsic API; defaults to `true` */
+  serverUseTls: true,
+  /** Authentication token for SDK calls; defaults to empty string (unauthenticated) */
+  authToken: process.env.TRINSIC_AUTH_TOKEN,
+});
 
 const issueRegistrationCredential = async (proposal, userId) => {
   const user = await DiscordUser.findOne({ discordId: userId });
@@ -59,29 +71,39 @@ const issueRegistrationCredential = async (proposal, userId) => {
   return insertResponse.itemId;
 };
 
-const sendEmailSSILoginRequest = async (email) => {
+const sendSnapbrilliaLoginCode = async (identity, identityProvider) => {
+  let provider = "";
+  if (identityProvider === "email") {
+    provider = IdentityProvider.EMAIL;
+  } else {
+    provider = IdentityProvider.PHONE;
+  }
   const requestInit = AuthenticateInitRequest.create({
-    identity: email,
-    provider: IdentityProvider.EMAIL,
+    identity: identity,
+    provider: provider,
     ecosystemId: process.env.TRINSIC_ECOSYSTEM_ID,
   });
-  const challengeId = await trinsic.wallet().authenticateInit(requestInit);
-  return challengeId;
+
+  const challengeResponse = await trinsic
+    .wallet()
+    .authenticateInit(requestInit);
+
+  return challengeResponse.challenge;
 };
 
-const verifyLoginRequest = async (challengeId, code) => {
+const verifySnapbrilliaLoginCode = async (challengeId, code) => {
   const requestConfirm = AuthenticateConfirmRequest.create({
-    challengeId: challengeId,
+    challenge: challengeId,
     response: code, // OTP code
   });
-  const responseConfirm = await trinsic
-    .wallet()
-    .authenticateConfirm(requestConfirm);
-  return responseConfirm;
+
+  const authToken = await trinsic.wallet().authenticateConfirm(requestConfirm);
+
+  return authToken;
 };
 
 module.exports = {
   issueRegistrationCredential,
-  sendEmailSSILoginRequest,
-  verifyLoginRequest,
+  sendSnapbrilliaLoginCode,
+  verifySnapbrilliaLoginCode,
 };

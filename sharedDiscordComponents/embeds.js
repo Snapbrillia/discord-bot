@@ -24,7 +24,7 @@ const getVotingRoundConfigurationText = (
   onlyTokenHolderCanVote,
   blockchain,
   tokenName,
-  enabledKYC,
+  snapbrilliaWalletAuth,
   roundDuration,
   votingRoundName,
   votingRoundDescription
@@ -49,9 +49,9 @@ const getVotingRoundConfigurationText = (
   if (tokenName) {
     text += `** Token Used **: ${tokenName} \n`;
   }
-  if (enabledKYC !== undefined) {
-    const enabled = enabledKYC ? "Enabled" : "Disabled";
-    text += `** Self-Soverign Identiy Auth **: ${enabled} \n`;
+  if (snapbrilliaWalletAuth !== undefined) {
+    const enabled = snapbrilliaWalletAuth ? "Enabled" : "Disabled";
+    text += `** Snapbrillia Wallet Auth **: ${enabled} \n`;
   }
   if (roundDuration) {
     const { startDate, endDate } = getStartAndEndDate(roundDuration);
@@ -84,12 +84,13 @@ const createEmbed = (title, description) => {
 const getVotingSystemsEmbed = () => {
   const embed = createEmbed(
     "Select Voting System",
-    `👋 Hi there! I'm the Snapbrillia Bot and I'm here to guide you through the process of setting up a voting round in your server. 🤖 To get started, please choose the voting system you'd like to use for this round. To ensure the security of your voting round, we recommend that only administrators are included in this channel, to prevent unauthorized access and editing. 🛡️ Thanks for choosing our bot to manage voting within your community! \n  \n    
-    ** Single Vote ** \n  - Voters only have one vote. \n 
-    ** Yes/No Voting ** \n - Voters can choose to vote either For or Against a proposal. \n
-    ** Vote With Tokens In Wallet ** \n - Voters will be able to vote using the tokens they have in their wallet. Votes are calculated 1:1 to the token they have in their wallet. \n
-    ** Quadratic Voting (Tokens In Wallet) ** \n - The voting power of each voter will be decided by the amount of a specific asset the voter has in his wallet when the voting round ends. Their votes will be calculated using the quadratic voting formula.\n
-    ** Quadratic Voting (Same Voting Power) ** \n - Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
+    `I'm the Snapbrillia Bot and I'm here to guide you through the process of setting up a voting round in your server. To ensure the security of your voting round, we recommend that only administrators are included in this channel, to prevent unauthorized access and editing. \n 
+    To get started, please choose the voting system you'd like to use for this round.\n
+    ** Single Vote ** \n Voters only have one vote. \n 
+    ** Yes/No Voting ** \n Voters can choose to vote either For or Against a proposal. \n
+    ** Vote With Tokens In Wallet ** \n Voters will be able to vote using the tokens they have in their wallet. Votes are calculated 1:1 to the token they have in their wallet. \n
+    ** Quadratic Voting (Tokens In Wallet) ** \n The voting power of each voter will be decided by the amount of a specific asset the voter has in his wallet when the voting round ends. Their votes will be calculated using the quadratic voting formula.\n
+    ** Quadratic Voting (Same Voting Power) ** \n Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
     `
   );
   return embed;
@@ -128,8 +129,8 @@ const getSelectIfOnlyTokenHolderCanVoteEmbed = (votingSystem, onChainVotes) => {
   const embed = createEmbed(
     "🔒🗳️️ Select Participation Permission 🗳️🔒",
     `Please select the the voting permissions for this voting round. \n \n
-     ** Only Specific Token Holders ** \n - Only users who hold a specific token can participate. \n
-     ** Everyone Can Participate ** \n - Everyone can participate as long as they are part of your discord community. \n
+     ** Only Specific Token Holders ** \n Only users who hold a specific token can participate. \n
+     ** Everyone Can Participate ** \n Everyone can participate as long as they are part of your discord community. \n
   ${getVotingRoundConfigurationText(votingSystem, onChainVotes)} 
   `
   );
@@ -144,8 +145,8 @@ const getSelectBlockchainEmbed = (
   const embed = createEmbed(
     "🔒🛡️ Select Blockchain 🛡️🔒",
     `Please select the blockchain that you want the voting round to run on.\n 
-     ** Ethereum Blockchain ** \n - The voting round will be running on the Ethereum Blockchain.  \n
-     ** Cardano Blockchain ** \n - The voting round will be running on the Cardano Blockchain. \n
+     ** Ethereum Blockchain ** \n The voting round will be running on the Ethereum Blockchain.  \n
+     ** Cardano Blockchain ** \n The voting round will be running on the Cardano Blockchain. \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onChainVotes,
@@ -164,10 +165,10 @@ const getEnableKYCEmbed = (
   tokenName
 ) => {
   const embed = createEmbed(
-    "🔍👤 Enable Self-Soverign Identity Auth👤🔍",
-    `Would you like to secure your voting round with SSI enabled authentication? We will be asking user to provide a verifiable credential to prove their identity. The verifiable credential will be issued to them by Snapbrillia after they have been verfied. This will help prevent sybil attacks (people creating multiple accounts and voting) against the voting round. Users participating in the round will also recieve a Verifiable Credential proving their participation. \n \n
-      ** Yes ** \n - Self-Soverign Identity will be enabled for this voting round. \n
-      ** No ** \n - Self-Soverign Identity will not be enabled for this voting round. \n
+    "🔍👤 Enable Snapbrillia Wallet Authentication 👤🔍",
+    `Would you like to secure your voting round with Snapbrillia Wallet authentication? Snapbrillia Wallet is a non-custodial Crypto and Self-Soverign Identity wallet. This will help prevent sybil attacks against the voting round. Users participating in the round will also recieve a Verifiable Credential proving their participation. \n \n
+      ** Yes ** \n Snapbrillia Wallet authentication will be enabled for this voting round. \n
+      ** No ** \n Snapbrillia Wallet authentication will not be enabled for this voting round. \n \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       onChainVotes,
@@ -533,9 +534,9 @@ const getLinkWalletEmbed = () => {
   const embed = createEmbed(
     "🔒🔗 Link Wallet 🔗🔒",
     `To ensure a secure and trustworthy voting experience, we've implemented a wallet linking feature. By linking your wallet to your user account, you can participate in the upcoming voting round with confidence. Please select the wallet you'd like to link. \n
-    ** Ethereum Wallet ** \n - Link your Ethereum Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
-    ** Cardano Wallet ** \n - Link your Cardano Wallet. To verify your wallet, you will send a small sum of ADA from the wallet address you provided to the same wallet address. \n
-    ** Snapbrillia Wallet ** \n - Link your Snapbrillia Wallet to your discord account.  \n
+    ** Ethereum Wallet ** \n Link your Ethereum Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
+    ** Cardano Wallet ** \n Link your Cardano Wallet. To verify your wallet, you will send a small sum of ADA from the wallet address you provided to the same wallet address. \n
+    ** Snapbrillia Wallet ** \n Link your Snapbrillia Wallet to your discord account.  \n
     By linking your wallet, you'll have a unique identifier tied to your account for the upcoming voting round. This adds an extra layer of security and ensures fair participation. Voting rounds might also require you to hold a certain token to particiapte.\n
     `
   );
@@ -544,21 +545,20 @@ const getLinkWalletEmbed = () => {
 
 const getSnapbrilliaWalletLoginEmbed = () => {
   const embed = createEmbed(
-    "🔒💼 Snapbrillia Wallet 💼🔒",
+    "🔒💼 Snapbrillia Wallet  💼🔒",
     `To link your Snapbrillia Wallet to your discord account please select one of the following verification method. \n
-    ** Email Verification ** \n - Link Snapbrillia Wallet by verifying the email address associated with the wallet. \n
-    ** Phone Number Verification ** \n - Link Snapbrillia Wallet by verifying the phone number associated with the wallet. \n
+    ** Email Verification ** \n Link Snapbrillia Wallet by verifying the email address associated with the wallet. \n
+    ** Phone Number Verification ** \n Link Snapbrillia Wallet by verifying the phone number associated with the wallet. \n
     To create a new Snapbrillia Wallet please visit https://snapbrillia.com \n 
     `
   );
   return embed;
 };
 
-const getEnterSSIEmailAddressEmbed = () => {
+const getSnapbrilliaEmailCodeEmbed = () => {
   const embed = createEmbed(
-    "🔒💼 SSI Wallet 💼🔒",
-    `Thank you for taking the first step to link your Self-Sovereign Identity (SSI) wallet to your Discord account. To ensure the security of your SSI wallet, we have sent a verification code to the email address you provided.
-    Please check your email inbox and locate the verification code. Once you have found it, return to this Discord channel and enter the code below to complete the verification process:
+    "🔒💼 Snapbrillia Wallet 💼🔒",
+    `A verification code has been sent to your email address. Please check your email and enter the code below to complete the verification process.
     `
   );
   return embed;
@@ -692,7 +692,7 @@ module.exports = {
   getVoteProposalEmbed1,
   getSelectOnchainOrOffchainEmbed,
   getSnapbrilliaWalletLoginEmbed,
-  getEnterSSIEmailAddressEmbed,
+  getSnapbrilliaEmailCodeEmbed,
   getEnterSSIPhoneNumberEmbed,
   getEnterSSIPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,

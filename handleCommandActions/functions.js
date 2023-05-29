@@ -44,26 +44,22 @@ const handleLinkWalletCommand = async (interaction) => {
 };
 
 const handleStartRoundCommand = async (interaction) => {
-  // const server = await DiscordServer.findOne({
-  //   serverId: interaction.guildId,
-  // });
+  const server = await DiscordServer.findOne({
+    serverId: interaction.guildId,
+  });
   const image = getImage();
-  // if (interaction.channelId !== server.adminChannel) {
-  //   const embed = getNoPermessionToStartVotingRoundEmbed();
-  //   return interaction.reply({
-  //     embeds: [embed],
-  //     files: [image],
-  //   });
-  // }
-  // const selectMenu = getSelectVotingSystemMenu();
-  // const embed = getVotingSystemsEmbed();
+  if (interaction.channelId !== server.adminChannel) {
+    const embed = getNoPermessionToStartVotingRoundEmbed();
+    return interaction.reply({
+      embeds: [embed],
+      files: [image],
+    });
+  }
+  const selectMenu = getSelectVotingSystemMenu();
+  const embed = getVotingSystemsEmbed();
   return interaction.reply({
-    embeds: [
-      getWalletLinkedSuccessfullyEmbed(
-        "addr_test1qp3q7xj0t56zkprcrazca9lknghrmtjk8vgz0nldrec67gln8df7mlcw5kv8ay6vpewqalu8ktqmtt5696mp4nt4js0qk3y9zw"
-      ),
-    ],
-    // components: [selectMenu],
+    embeds: [embed],
+    components: [selectMenu],
     files: [image],
   });
 };

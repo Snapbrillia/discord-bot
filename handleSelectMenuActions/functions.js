@@ -205,7 +205,7 @@ const handleSelectTokenMenu = async (interaction) => {
   });
 };
 
-const handleSelectSSIAuthMenu = async (interaction) => {
+const handleSelectSnapbrilliaWalletAuthMenu = async (interaction) => {
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
     status: "pending",
@@ -368,7 +368,7 @@ module.exports = {
   handleVotingSystemMenu,
   handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
-  handleSelectSSIAuthMenu,
+  handleSelectSnapbrilliaWalletAuthMenu,
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
   handleListOfProposalsMenu,
