@@ -17,7 +17,6 @@ const {
 const {
   handleConfirmCardanoWalletAddressInputModal,
   handleRegisterProposalInputModal,
-  handleVoteProposalInputModal,
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,

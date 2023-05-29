@@ -3,7 +3,6 @@ const {
   getRegisterProposalModal,
   getVoteProposalModal,
   getDownVoteProposalModal,
-  getVerificationMethodModal,
   getSelectTokenModal,
   getEthereumWalletAddressModal,
   getNameOfVotingRoundModal,
@@ -22,20 +21,8 @@ const { getImage } = require("../sharedDiscordComponents/image");
 const { issueRegistrationCredential } = require("../utils/ssiUtils");
 const { Proposal } = require("../models/projectProposal.model");
 
-const handleStartRoundButton = async (interaction) => {
-  console.log("handleStartRoundButton");
-};
-
 const handleNameOfVotingRoundButton = async (interaction) => {
   const modal = getNameOfVotingRoundModal();
-  await interaction.showModal(modal);
-};
-
-const handleVerificationMethodButton = async (
-  interaction,
-  isWalletVerification
-) => {
-  const modal = getVerificationMethodModal(isWalletVerification);
   await interaction.showModal(modal);
 };
 
@@ -131,11 +118,9 @@ const handleEnterSSIPhoneCodeButton = async (interaction) => {
 module.exports = {
   handleVerifyCardanoWalletButton,
   handleRegisterProposalButton,
-  handleStartRoundButton,
   handleVoteProposalButton,
   handleNameOfVotingRoundButton,
   handleDownVoteProposalButton,
-  handleVerificationMethodButton,
   handleSelectTokenButton,
   handleConfirmVotingRoundInfoButton,
   handleConfirmRegisterProposalButton,

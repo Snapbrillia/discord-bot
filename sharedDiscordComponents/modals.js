@@ -68,31 +68,6 @@ const getEthereumWalletAddressModal = () => {
   return modal;
 };
 
-const getVerificationMethodModal = (isWalletVerification) => {
-  let methods = "";
-  if (isWalletVerification) {
-    methods = "(1-2)";
-  } else {
-    methods = "(1-3)";
-  }
-
-  const modal = new ModalBuilder()
-    .setCustomId("confirmVerificationMethodInputModal")
-    .setTitle("Confirm Verification Method");
-
-  const favoriteColorInput = new TextInputBuilder()
-    .setCustomId("verificationMethodInput")
-    .setLabel(`Please enter your verification method ${methods}`)
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(
-    favoriteColorInput
-  );
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
 const getSelectTokenModal = () => {
   const modal = new ModalBuilder()
     .setCustomId("confirmTokenInputModal")
@@ -291,7 +266,6 @@ module.exports = {
   getCardanoWalletAddressModal,
   getEthereumWalletAddressModal,
   getSelectTokenModal,
-  getVerificationMethodModal,
   getRegisterProposalModal,
   getVoteProposalModal,
   getDownVoteProposalModal,
