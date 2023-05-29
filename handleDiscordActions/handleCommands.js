@@ -3,32 +3,20 @@ const { VotingRound } = require("../models/votingRound.model.js");
 const {
   getVotingSystemsEmbed,
   getQuadraticVotingResultsEmbed,
-  getVerifyWalletEmbed,
   getRegisterProposalEmbed,
   getLinkWalletEmbed,
   getVoteProposalEmbed,
   getNoPermessionToStartVotingRoundEmbed,
-  getDownVoteProposalEmbed,
-  getAlreadyVerifiedCardanoWalletEmbed,
-  getPendingVerifiedCardanoWalletEmbed,
-  getAlreadyVerifiedEthereumWalletEmbed,
-  getPendingVerifiedEthereumWalletEmbed,
   getHelpCommandEmbed,
-  getWalletLinkedSuccessfullyEmbed,
   getViewPersonalInfoEmbed,
 } = require("../sharedDiscordComponents/embeds.js");
 const {
   getSelectVotingSystemMenu,
-  getListOfProposalMenu,
-  getSelectLinkWalletMenu,
   getListOfVotingRoundMenu,
   getViewPeronalInfoMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
 const { getImage } = require("../sharedDiscordComponents/image");
-const { ActionRow } = require("discord.js");
-const { ActionRowBuilder } = require("@discordjs/builders");
 const { DiscordServer } = require("../models/discordServer.model");
-const { Proposal } = require("../models/projectProposal.model");
 
 const handleLinkWalletCommand = async (interaction) => {
   const linkWalletEmbed = getLinkWalletEmbed();

@@ -2,18 +2,13 @@ const { randomNumber } = require("../utils/sharedUtils");
 const { VotingRound } = require("../models/votingRound.model");
 const { DiscordUser } = require("../models/discordUser.model");
 const {
-  getWalletVerificationEmbed,
-  getEthereumSelectTokenEmbed,
-  getCardanoSelectTokenEmbed,
   getVotingRoundInfoEmbed,
   getSendFundToWalletEmbed,
-  getVotingSystemsEmbed,
   getProposalInfoEmbed,
   getVoteProposalInfoEmbed,
   getAlreadyLinkedWalletEmbed,
   getPendingVerifiedWalletEmbed,
   getSnapbrilliaEmailCodeEmbed,
-  getEnterSSIEmailAddressEmbed,
   getEnterSSIPhoneNumberEmbed,
   getEnterSSIPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,
@@ -21,21 +16,14 @@ const {
 const { getTokenFromAddress } = require("../utils/ethereumUtils");
 const { getTokenFromPolicyId } = require("../utils/cardanoUtils");
 const {
-  getSelectVotingSystemButton,
-  getSelectVerificationMethodButton,
-  getSelectQVTokenVerificationMethodButton,
-  getSelectTokenButton,
   getConfirmVotingRoundInfoButton,
-  getConfirmVoteButton,
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
   getEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneNumberButton,
   getEnterSSIPhoneCodeButton,
   getConfirmRegisterProposalButton,
   getEnterSSIPhoneNumberButton,
 } = require("../sharedDiscordComponents/buttons");
-const { numberRegex } = require("../utils/sharedUtils");
 const {
   PendingWalletVerification,
 } = require("../models/pendingWalletVerification.js");

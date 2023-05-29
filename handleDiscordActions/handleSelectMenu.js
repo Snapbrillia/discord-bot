@@ -6,12 +6,9 @@ const {
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getEnableKYCEmbed,
-  getNameOfVotingRoundEmbed,
-  getSelectOnchainOrOffchainEmbed,
   getEnterProposalInformationEmbed,
   getVerifyWalletEmbed,
   getEnterNameAndDescriptionEmbed,
-  getEnterEmailVerificationSSIEmbed,
   getSnapbrilliaWalletLoginEmbed,
   getViewEthereumWalletsEmbed,
 } = require("../sharedDiscordComponents/embeds");
@@ -21,7 +18,6 @@ const {
   getSelectBlockchainMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectTokenMenu,
-  getSelectVotingOnChainMenu,
   getEnableSSIAuthMenu,
   getSnapbrilliaWalletLoginMenu,
 } = require("../sharedDiscordComponents/selectMenu");
@@ -29,7 +25,6 @@ const {
   getNameOfVotingRoundButton,
   getRegisterProposalButton,
   getVerifyCardanoWalletButton,
-  getEnterSSIEmailVerificationButton,
   getVerifyEthereumWalletButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
