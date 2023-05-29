@@ -13,7 +13,7 @@ const {
   handleEnterSSIEmailVerificationButton,
   handleEnterSSIPhoneNumberButton,
   handleEnterSSIPhoneCodeButton,
-} = require("./handleButtonClickActions/functions");
+} = require("./handleDiscordActions/handleButtonClicks");
 const {
   handleConfirmCardanoWalletAddressInputModal,
   handleRegisterProposalInputModal,
@@ -25,7 +25,7 @@ const {
   handleEnterSSIPhoneCodeInputModal,
   handleSnapbrilliaEmailAddressModal,
   handleSnapbrilliaEmailCodeModal,
-} = require("./handleModalSubmitActions/functions");
+} = require("./handleDiscordActions/handleModal");
 const {
   handleLinkWalletCommand,
   handleRegisterProposalCommand,
@@ -34,7 +34,7 @@ const {
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
   handleViewPersonalInfoCommand,
-} = require("./handleCommandActions/functions");
+} = require("./handleDiscordActions/handleCommands");
 const { deployCommands } = require("./deployCommandScript");
 const {
   createChannelWithAdmins,
@@ -42,7 +42,7 @@ const {
   createDiscordUser,
   createCategory,
   createDiscordServer,
-} = require("./handleGuildCreateActions/functions");
+} = require("./handleDiscordActions/handleGuildCreate");
 const {
   handleVotingSystemMenu,
   handleRoundDurationMenu,
@@ -55,7 +55,7 @@ const {
   handleLinkWalletMenu,
   handleViewPersonalInfoMenu,
   handleLinkSnapbrilliaWalletMenu,
-} = require("./handleSelectMenuActions/functions");
+} = require("./handleDiscordActions/handleSelectMenu");
 const { removeExpiredPendingVerification } = require("./utils/databaseUtils");
 const { verifyUsers } = require("./utils/sharedUtils");
 const {
