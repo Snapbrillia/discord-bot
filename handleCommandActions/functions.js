@@ -1,6 +1,5 @@
 const { DiscordUser } = require("../models/discordUser.model.js");
 const { VotingRound } = require("../models/votingRound.model.js");
-const { checkIfVerified } = require("../utils/sharedUtils");
 const {
   getVotingSystemsEmbed,
   getQuadraticVotingResultsEmbed,
