@@ -25,6 +25,7 @@ const {
   handleEnterSSIEmailCodeInputModal,
   handleEnterSSIPhoneInputModal,
   handleEnterSSIPhoneCodeInputModal,
+  handleSnapbrilliaEmailAddressModal,
 } = require("./handleModalSubmitActions/functions");
 const {
   handleLinkWalletCommand,
@@ -54,6 +55,7 @@ const {
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
   handleViewPersonalInfoMenu,
+  handleLinkSnapbrilliaWalletMenu,
 } = require("./handleSelectMenuActions/functions");
 const { removeExpiredPendingVerification } = require("./utils/databaseUtils");
 const { verifyUsers } = require("./utils/sharedUtils");
@@ -68,7 +70,6 @@ const {
 
 require("dotenv").config();
 require("./mongodb.config");
-g;
 
 const client = new Client({
   intents: [
@@ -183,8 +184,12 @@ client.on("interactionCreate", async (interaction) => {
     case "selectLinkWalletMenu":
       await handleLinkWalletMenu(interaction);
       break;
+    case "selectSnapbrilliaWalletLoginMenu":
+      await handleLinkSnapbrilliaWalletMenu(interaction);
+      break;
     case "selectViewPersonalInfoMenu":
       await handleViewPersonalInfoMenu(interaction);
+      break;
   }
 });
 
@@ -208,12 +213,6 @@ client.on("interactionCreate", async (interaction) => {
     case "registerProposalInputModal":
       await handleRegisterProposalInputModal(interaction);
       break;
-    case "voteProposalInputModal":
-      await handleVoteProposalInputModal(interaction, "vote");
-      break;
-    case "downVoteProposalInputModal":
-      await handleVoteProposalInputModal(interaction, "down-vote");
-      break;
     case "enterSSIEmailInputModal":
       await handleVerifySSIEmailInputModal(interaction);
       break;
@@ -225,6 +224,9 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "enterSSIPhoneCodeInputModal":
       await handleEnterSSIPhoneCodeInputModal(interaction);
+      break;
+    case "enterSnapbrilliaWalletEmailAddressInputModal":
+      await handleSnapbrilliaEmailAddressModal(interaction);
       break;
   }
 });

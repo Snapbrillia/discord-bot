@@ -535,19 +535,20 @@ const getLinkWalletEmbed = () => {
     `To ensure a secure and trustworthy voting experience, we've implemented a wallet linking feature. By linking your wallet to your user account, you can participate in the upcoming voting round with confidence. Please select the wallet you'd like to link. \n
     ** Ethereum Wallet ** \n - Link your Ethereum Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
     ** Cardano Wallet ** \n - Link your Cardano Wallet. To verify your wallet, you will send a small sum of ADA from the wallet address you provided to the same wallet address. \n
-    ** SSI Wallet ** \n - Link your SSI Wallet. We will create a SSI wallet on yourbehalf and issue you a Verifiable Crential proving your identity. \n
+    ** Snapbrillia Wallet ** \n - Link your Snapbrillia Wallet to your discord account.  \n
     By linking your wallet, you'll have a unique identifier tied to your account for the upcoming voting round. This adds an extra layer of security and ensures fair participation. Voting rounds might also require you to hold a certain token to particiapte.\n
     `
   );
   return embed;
 };
 
-const getSSIEmailVerificationEmbed = () => {
+const getSnapbrilliaWalletLoginEmbed = () => {
   const embed = createEmbed(
-    "🔒💼 SSI Wallet 💼🔒",
-    `You are just moments away from linking a secure Self-Sovereign Identity (SSI) wallet to your Discord account. We will create this wallet for you, granting you full control and ownership over it. By linking your SSI wallet, we enhance the security measures for voting rounds and ensure a safe and fair experience for all participants. \n
-    To proceed, please provide us with your email address. This step is crucial to further strengthen the security of your SSI wallet and maintain the integrity of the voting process. \n
-    Rest assured that your email address will be handled with utmost care and privacy. We are committed to safeguarding your personal information and ensuring a secure environment for all users.
+    "🔒💼 Snapbrillia Wallet 💼🔒",
+    `To link your Snapbrillia Wallet to your discord account please select one of the following verification method. \n
+    ** Email Verification ** \n - Link Snapbrillia Wallet by verifying the email address associated with the wallet. \n
+    ** Phone Number Verification ** \n - Link Snapbrillia Wallet by verifying the phone number associated with the wallet. \n
+    To create a new Snapbrillia Wallet please visit https://snapbrillia.com \n 
     `
   );
   return embed;
@@ -690,7 +691,7 @@ module.exports = {
   getEnterProposalInformationEmbed,
   getVoteProposalEmbed1,
   getSelectOnchainOrOffchainEmbed,
-  getSSIEmailVerificationEmbed,
+  getSnapbrilliaWalletLoginEmbed,
   getEnterSSIEmailAddressEmbed,
   getEnterSSIPhoneNumberEmbed,
   getEnterSSIPhoneCodeEmbed,

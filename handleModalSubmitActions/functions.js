@@ -45,6 +45,7 @@ const {
   submitEmailProof,
   generatePhoneProof,
   submitPhoneProof,
+  sendEmailSSILoginRequest,
 } = require("../utils/ssiUtils");
 const { Proposal } = require("../models/projectProposal.model");
 
@@ -319,6 +320,14 @@ const handleEnterSSIPhoneCodeInputModal = async (interaction) => {
   });
 };
 
+const handleSnapbrilliaEmailAddressModal = async (interaction) => {
+  console.log("handleSnapbrilliaEmailAddressModal");
+  const email = interaction.fields.getTextInputValue("emailAddressInput");
+  console.log(email);
+  await sendEmailSSILoginRequest(email, interaction.user.id);
+  interaction.reply("Please check your email for a login link");
+};
+
 module.exports = {
   handleConfirmCardanoWalletAddressInputModal,
   handleTokenSelectInputModal,
@@ -330,4 +339,5 @@ module.exports = {
   handleEnterSSIEmailCodeInputModal,
   handleEnterSSIPhoneInputModal,
   handleEnterSSIPhoneCodeInputModal,
+  handleSnapbrilliaEmailAddressModal,
 };
