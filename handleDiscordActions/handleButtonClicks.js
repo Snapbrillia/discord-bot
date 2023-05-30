@@ -6,10 +6,8 @@ const {
   getSelectTokenModal,
   getEthereumWalletAddressModal,
   getNameOfVotingRoundModal,
-  getVerifySSIEmailModal,
-  getEnterSSIEmailCodeModal,
-  getEnterSSIPhoneNumberCodeModal,
-  getEnterSSIPhoneCodeModal,
+  getEnterSnapbrilliaEmailCodeModal,
+  getEnterSnapbrilliaPhoneCodeModal,
 } = require("../sharedDiscordComponents/modals");
 const {
   getConfirmVotingRoundInfoEmbed,
@@ -96,12 +94,12 @@ const handleConfirmVoteProposalButton = async (interaction) => {
 };
 
 const handleEnterSnapbrilliaEmailCodeButton = async (interaction) => {
-  const modal = getEnterSSIEmailCodeModal();
+  const modal = getEnterSnapbrilliaEmailCodeModal();
   await interaction.showModal(modal);
 };
 
 const handleEnterSnapbrilliaPhoneCodeButton = async (interaction) => {
-  const modal = getEnterSSIPhoneCodeModal();
+  const modal = getEnterSnapbrilliaPhoneCodeModal();
   await interaction.showModal(modal);
 };
 

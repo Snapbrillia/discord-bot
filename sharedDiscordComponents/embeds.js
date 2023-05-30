@@ -564,17 +564,6 @@ const getSnapbrilliaEmailCodeEmbed = () => {
   return embed;
 };
 
-const getEnterSSIPhoneNumberEmbed = () => {
-  const embed = createEmbed(
-    "🔒💼 SSI Wallet 💼🔒",
-    `You have successfully verified your email address.The last step is for you to link your phone number. \n
-    Please provide us with your phone number by clicking the button below. \n
-    Rest assured that your personal information will be handled with utmost care and privacy. We are committed to safeguarding your personal information and ensuring a secure environment for all users.
-    `
-  );
-  return embed;
-};
-
 const getSnapbrilliaPhoneCodeEmbed = () => {
   const embed = createEmbed(
     "🔒💼 Snapbrillia Wallet 💼🔒",
@@ -584,11 +573,10 @@ const getSnapbrilliaPhoneCodeEmbed = () => {
   return embed;
 };
 
-const getSSIWalletCreatedEmbed = () => {
+const getSnapbrilliaWalletLinkedEmbed = () => {
   const embed = createEmbed(
-    "🎉✨ Wallet Created ✨🎉",
-    `We are thrilled to inform you that your Self-Sovereign Identity (SSI) wallet has been successfully created and a verifiable credential (VC) has been issued to you. This is a significant step towards enhancing the security and privacy of your digital identity.
-    `
+    "🔒💼 SSI Wallet 💼🔒",
+    `You have successfully linked your Snapbrillia Wallet to your Discord account.`
   );
   return embed;
 };
@@ -693,9 +681,8 @@ module.exports = {
   getSelectOnchainOrOffchainEmbed,
   getSnapbrilliaWalletLoginEmbed,
   getSnapbrilliaEmailCodeEmbed,
-  getEnterSSIPhoneNumberEmbed,
   getSnapbrilliaPhoneCodeEmbed,
-  getSSIWalletCreatedEmbed,
+  getSnapbrilliaWalletLinkedEmbed,
   getNoPermessionToStartVotingRoundEmbed,
   getNoWhitelistTokenFoundEmbed,
   getWalletLinkedSuccessfullyEmbed,

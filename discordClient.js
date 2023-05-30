@@ -18,10 +18,10 @@ const {
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
-  handleEnterSSIPhoneCodeInputModal,
   handleSnapbrilliaEmailAddressModal,
   handleSnapbrilliaEmailCodeModal,
   handleSnapbrilliaPhoneNumberModal,
+  handleSnapbrilliaPhoneCodeModal,
 } = require("./handleDiscordActions/handleModal");
 const {
   handleLinkWalletCommand,
@@ -205,9 +205,6 @@ client.on("interactionCreate", async (interaction) => {
     case "registerProposalInputModal":
       await handleRegisterProposalInputModal(interaction);
       break;
-    case "enterSSIPhoneCodeInputModal":
-      await handleEnterSSIPhoneCodeInputModal(interaction);
-      break;
     case "snapbrilliaEmailAddressModal":
       await handleSnapbrilliaEmailAddressModal(interaction);
       break;
@@ -216,6 +213,9 @@ client.on("interactionCreate", async (interaction) => {
       break;
     case "snapbrilliaPhoneNumberModal":
       await handleSnapbrilliaPhoneNumberModal(interaction);
+      break;
+    case "snapbrilliaPhoneCodeModal":
+      await handleSnapbrilliaPhoneCodeModal(interaction);
       break;
   }
 });

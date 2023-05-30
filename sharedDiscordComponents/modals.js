@@ -175,56 +175,6 @@ const getVerifySSIEmailModal = () => {
   return modal;
 };
 
-const getEnterSSIEmailCodeModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("snapbrilliaEmailCodeModal")
-    .setTitle("Confirm Email Verification Code");
-
-  const emailCodeInput = new TextInputBuilder()
-    .setCustomId("emailCodeInput")
-    .setLabel("Please enter your email code")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(emailCodeInput);
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
-const getEnterSSIPhoneNumberCodeModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("enterSSIPhoneNumberInputModal")
-    .setTitle("Enter Phone Number");
-
-  const phoneNumberInput = new TextInputBuilder()
-    .setCustomId("phoneInput")
-    .setLabel("Please enter phone number")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(phoneNumberInput);
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
-const getEnterSSIPhoneCodeModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("enterSSIPhoneCodeInputModal")
-    .setTitle("Enter Phone Verification Code");
-
-  const phoneNumberCodeInput = new TextInputBuilder()
-    .setCustomId("phoneCodeInput")
-    .setLabel("Please the code")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(
-    phoneNumberCodeInput
-  );
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
 const getSnapbrilliaWalletEmailAddressModal = () => {
   const modal = new ModalBuilder()
     .setCustomId("snapbrilliaEmailAddressModal")
@@ -238,6 +188,22 @@ const getSnapbrilliaWalletEmailAddressModal = () => {
   const firstActionRow = new ActionRowBuilder().addComponents(
     emailAddressInput
   );
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
+const getEnterSnapbrilliaEmailCodeModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("snapbrilliaEmailCodeModal")
+    .setTitle("Confirm Email Verification Code");
+
+  const emailCodeInput = new TextInputBuilder()
+    .setCustomId("emailCodeInput")
+    .setLabel("Please enter your email code")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(emailCodeInput);
 
   modal.addComponents(firstActionRow);
   return modal;
@@ -261,6 +227,24 @@ const getSnapbrilliaWalletPhoneNumberModal = () => {
   return modal;
 };
 
+const getEnterSnapbrilliaPhoneCodeModal = () => {
+  const modal = new ModalBuilder()
+    .setCustomId("snapbrilliaPhoneCodeModal")
+    .setTitle("Enter Phone Verification Code");
+
+  const phoneNumberCodeInput = new TextInputBuilder()
+    .setCustomId("phoneCodeInput")
+    .setLabel("Please the code")
+    .setStyle(TextInputStyle.Short);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(
+    phoneNumberCodeInput
+  );
+
+  modal.addComponents(firstActionRow);
+  return modal;
+};
+
 module.exports = {
   getNameOfVotingRoundModal,
   getCardanoWalletAddressModal,
@@ -271,9 +255,8 @@ module.exports = {
   getDownVoteProposalModal,
   getDownVoteProposalModal,
   getVerifySSIEmailModal,
-  getEnterSSIEmailCodeModal,
-  getEnterSSIPhoneNumberCodeModal,
-  getEnterSSIPhoneCodeModal,
   getSnapbrilliaWalletEmailAddressModal,
+  getEnterSnapbrilliaEmailCodeModal,
   getSnapbrilliaWalletPhoneNumberModal,
+  getEnterSnapbrilliaPhoneCodeModal,
 };

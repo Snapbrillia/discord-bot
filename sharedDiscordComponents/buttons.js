@@ -129,7 +129,7 @@ module.exports = {
   getNameOfVotingRoundButton,
   getConfirmVoteButton,
   getRegisterProposalButton,
+  getConfirmRegisterProposalButton,
   getEnterSnapbrilliaEmailCodeButton,
   getEnterSnaprbilliaPhoneCodeButton,
-  getConfirmRegisterProposalButton,
 };

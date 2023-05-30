@@ -9,9 +9,8 @@ const {
   getAlreadyLinkedWalletEmbed,
   getPendingVerifiedWalletEmbed,
   getSnapbrilliaEmailCodeEmbed,
-  getEnterSSIPhoneNumberEmbed,
   getSnapbrilliaPhoneCodeEmbed,
-  getSSIWalletCreatedEmbed,
+  getSnapbrilliaWalletLinkedEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getTokenFromAddress } = require("../utils/ethereumUtils");
 const { getTokenFromPolicyId } = require("../utils/cardanoUtils");
@@ -251,17 +250,6 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   });
 };
 
-const handleEnterSSIPhoneCodeInputModal = async (interaction) => {
-  const ssiWalletCreatedEmbed = getSSIWalletCreatedEmbed();
-
-  const image = getImage();
-  await submitPhoneProof("", interaction.user.id);
-  interaction.reply({
-    embeds: [ssiWalletCreatedEmbed],
-    files: [image],
-  });
-};
-
 const handleSnapbrilliaEmailAddressModal = async (interaction) => {
   try {
     const email = interaction.fields.getTextInputValue("emailAddressInput");
@@ -294,7 +282,7 @@ const handleSnapbrilliaEmailCodeModal = async (interaction) => {
 
   await verifySnapbrilliaLoginCode(pendingVerification.challengeId, code);
 
-  const embed = getEnterSSIPhoneNumberEmbed();
+  const embed = getEmailLinked();
   const image = getImage();
 
   interaction.reply({
@@ -317,6 +305,18 @@ const handleSnapbrilliaPhoneNumberModal = async (interaction) => {
   });
 };
 
+const handleSnapbrilliaPhoneCodeModal = async (interaction) => {
+  await submitPhoneProof("", interaction.user.id);
+
+  const embed = getSnapbrilliaWalletLinkedEmbed();
+  const image = getImage();
+
+  interaction.reply({
+    embeds: [embed],
+    files: [image],
+  });
+};
+
 module.exports = {
   handleConfirmCardanoWalletAddressInputModal,
   handleTokenSelectInputModal,
@@ -324,8 +324,8 @@ module.exports = {
   handleVoteProposalInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
-  handleEnterSSIPhoneCodeInputModal,
   handleSnapbrilliaEmailAddressModal,
   handleSnapbrilliaEmailCodeModal,
   handleSnapbrilliaPhoneNumberModal,
+  handleSnapbrilliaPhoneCodeModal,
 };
