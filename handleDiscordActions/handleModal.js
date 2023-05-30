@@ -10,7 +10,7 @@ const {
   getPendingVerifiedWalletEmbed,
   getSnapbrilliaEmailCodeEmbed,
   getEnterSSIPhoneNumberEmbed,
-  getEnterSSIPhoneCodeEmbed,
+  getSnapbrilliaPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getTokenFromAddress } = require("../utils/ethereumUtils");
@@ -19,18 +19,15 @@ const {
   getConfirmVotingRoundInfoButton,
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
-  getEnterSSIEmailVerificationButton,
-  getEnterSSIPhoneCodeButton,
   getConfirmRegisterProposalButton,
-  getEnterSSIPhoneNumberButton,
+  getEnterSnapbrilliaEmailCodeButton,
+  getEnterSnaprbilliaPhoneCodeButton,
 } = require("../sharedDiscordComponents/buttons");
 const {
   PendingWalletVerification,
 } = require("../models/pendingWalletVerification.js");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
-  generatePhoneProof,
-  submitPhoneProof,
   sendSnapbrilliaLoginCode,
   verifySnapbrilliaLoginCode,
 } = require("../utils/ssiUtils");
@@ -254,20 +251,6 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   });
 };
 
-const handleEnterSSIPhoneInputModal = async (interaction) => {
-  const enterPhoneNumberVerificationCode = getEnterSSIPhoneCodeEmbed();
-  const enterPhoneNumberVerificationButton = getEnterSSIPhoneCodeButton();
-  const phoneNumber = interaction.fields.getTextInputValue("phoneInput");
-
-  const image = getImage();
-  await generatePhoneProof(phoneNumber, interaction.user.id);
-  interaction.reply({
-    embeds: [enterPhoneNumberVerificationCode],
-    components: [enterPhoneNumberVerificationButton],
-    files: [image],
-  });
-};
-
 const handleEnterSSIPhoneCodeInputModal = async (interaction) => {
   const ssiWalletCreatedEmbed = getSSIWalletCreatedEmbed();
 
@@ -289,12 +272,12 @@ const handleSnapbrilliaEmailAddressModal = async (interaction) => {
       challengeId: challengeId,
     });
 
-    const snapbrilliaEmailCodeEmbed = getSnapbrilliaEmailCodeEmbed();
-    const snapbrilliaEmailCodeButton = getEnterSSIEmailVerificationButton();
+    const embed = getSnapbrilliaEmailCodeEmbed();
+    const button = getEnterSnapbrilliaEmailCodeButton();
     const image = getImage();
     interaction.reply({
-      embeds: [snapbrilliaEmailCodeEmbed],
-      components: [snapbrilliaEmailCodeButton],
+      embeds: [embed],
+      components: [button],
       files: [image],
     });
   } catch (err) {
@@ -311,13 +294,25 @@ const handleSnapbrilliaEmailCodeModal = async (interaction) => {
 
   await verifySnapbrilliaLoginCode(pendingVerification.challengeId, code);
 
-  const enterSSIPhoneVerificationEmbed = getEnterSSIPhoneNumberEmbed();
-  const enterSSIPhoneNumberButton = getEnterSSIPhoneNumberButton();
+  const embed = getEnterSSIPhoneNumberEmbed();
   const image = getImage();
 
   interaction.reply({
-    embeds: [enterSSIPhoneVerificationEmbed],
-    components: [enterSSIPhoneNumberButton],
+    embeds: [embed],
+    files: [image],
+  });
+};
+
+const handleSnapbrilliaPhoneNumberModal = async (interaction) => {
+  const embed = getSnapbrilliaPhoneCodeEmbed();
+  const button = getEnterSnaprbilliaPhoneCodeButton();
+  const phoneNumber = interaction.fields.getTextInputValue("phoneNumberInput");
+
+  const image = getImage();
+  // await generatePhoneProof(phoneNumber, interaction.user.id);
+  interaction.reply({
+    embeds: [embed],
+    components: [button],
     files: [image],
   });
 };
@@ -329,8 +324,8 @@ module.exports = {
   handleVoteProposalInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
-  handleEnterSSIPhoneInputModal,
   handleEnterSSIPhoneCodeInputModal,
   handleSnapbrilliaEmailAddressModal,
   handleSnapbrilliaEmailCodeModal,
+  handleSnapbrilliaPhoneNumberModal,
 };

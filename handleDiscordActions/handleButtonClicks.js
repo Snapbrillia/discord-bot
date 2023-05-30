@@ -95,22 +95,12 @@ const handleConfirmVoteProposalButton = async (interaction) => {
   });
 };
 
-const hanldeVerifySSIEmailButton = async (interaction) => {
-  const modal = getVerifySSIEmailModal();
-  await interaction.showModal(modal);
-};
-
-const handleEnterSSIEmailVerificationButton = async (interaction) => {
+const handleEnterSnapbrilliaEmailCodeButton = async (interaction) => {
   const modal = getEnterSSIEmailCodeModal();
   await interaction.showModal(modal);
 };
 
-const handleEnterSSIPhoneNumberButton = async (interaction) => {
-  const modal = getEnterSSIPhoneNumberCodeModal();
-  await interaction.showModal(modal);
-};
-
-const handleEnterSSIPhoneCodeButton = async (interaction) => {
+const handleEnterSnapbrilliaPhoneCodeButton = async (interaction) => {
   const modal = getEnterSSIPhoneCodeModal();
   await interaction.showModal(modal);
 };
@@ -126,8 +116,6 @@ module.exports = {
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
-  hanldeVerifySSIEmailButton,
-  handleEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneNumberButton,
-  handleEnterSSIPhoneCodeButton,
+  handleEnterSnapbrilliaEmailCodeButton,
+  handleEnterSnapbrilliaPhoneCodeButton,
 };

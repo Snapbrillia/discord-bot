@@ -245,7 +245,7 @@ const getSnapbrilliaWalletEmailAddressModal = () => {
 
 const getSnapbrilliaWalletPhoneNumberModal = () => {
   const modal = new ModalBuilder()
-    .setCustomId("confirmSnapbrilliaWalletPhoneNumberInputModal")
+    .setCustomId("snapbrilliaPhoneNumberModal")
     .setTitle("Enter Phone Number");
 
   const emailAddressInput = new TextInputBuilder()

@@ -14,6 +14,7 @@ const {
   getSelectVotingSystemMenu,
   getListOfVotingRoundMenu,
   getViewPeronalInfoMenu,
+  getSelectLinkWalletMenu,
 } = require("../sharedDiscordComponents/selectMenu.js");
 const { getImage } = require("../sharedDiscordComponents/image");
 const { DiscordServer } = require("../models/discordServer.model");

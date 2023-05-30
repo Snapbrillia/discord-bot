@@ -100,33 +100,17 @@ const getRegisterProposalButton = () => {
   return button;
 };
 
-const getSSIEmailVerificationButton = () => {
+const getEnterSnapbrilliaEmailCodeButton = () => {
   const button = getPrimaryButton(
-    "verifySSIEmailButton",
-    "Enter Email Address"
-  );
-  return button;
-};
-
-const getEnterSSIEmailVerificationButton = () => {
-  const button = getPrimaryButton(
-    "enterSSIEmailVerificationButton",
+    "enterSnapbrilliaEmailCodeButton",
     "Enter Email Verification Code"
   );
   return button;
 };
 
-const getEnterSSIPhoneNumberButton = () => {
+const getEnterSnaprbilliaPhoneCodeButton = () => {
   const button = getPrimaryButton(
-    "enterSSIPhoneNumberButton",
-    "Enter Phone Number"
-  );
-  return button;
-};
-
-const getEnterSSIPhoneCodeButton = () => {
-  const button = getPrimaryButton(
-    "enterSSIPhoneCodeButton",
+    "enterSnapbrilliaPhoneCodeButton",
     "Enter Phone Number Verification Code"
   );
   return button;
@@ -145,9 +129,7 @@ module.exports = {
   getNameOfVotingRoundButton,
   getConfirmVoteButton,
   getRegisterProposalButton,
-  getSSIEmailVerificationButton,
-  getEnterSSIEmailVerificationButton,
-  getEnterSSIPhoneNumberButton,
-  getEnterSSIPhoneCodeButton,
+  getEnterSnapbrilliaEmailCodeButton,
+  getEnterSnaprbilliaPhoneCodeButton,
   getConfirmRegisterProposalButton,
 };

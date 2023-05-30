@@ -575,10 +575,10 @@ const getEnterSSIPhoneNumberEmbed = () => {
   return embed;
 };
 
-const getEnterSSIPhoneCodeEmbed = () => {
+const getSnapbrilliaPhoneCodeEmbed = () => {
   const embed = createEmbed(
-    "🔒💼 SSI Wallet 💼🔒",
-    `Please check your phone and locate the verification code. Once you have found it, return to this Discord channel and enter the code below to complete the verification process:
+    "🔒💼 Snapbrillia Wallet 💼🔒",
+    `A verification code has been sent to your phone number. Please check your phone and enter the code below to complete the verification process.
     `
   );
   return embed;
@@ -694,7 +694,7 @@ module.exports = {
   getSnapbrilliaWalletLoginEmbed,
   getSnapbrilliaEmailCodeEmbed,
   getEnterSSIPhoneNumberEmbed,
-  getEnterSSIPhoneCodeEmbed,
+  getSnapbrilliaPhoneCodeEmbed,
   getSSIWalletCreatedEmbed,
   getNoPermessionToStartVotingRoundEmbed,
   getNoWhitelistTokenFoundEmbed,
