@@ -3,10 +3,8 @@ require("dotenv").config();
 
 const blockfrostHeaders = {
   "Content-Type": "application/cbor",
-  project_id: process.env.BLOCKFROST_PRE_PROD_ID,
+  project_id: process.env.BLOCKFROST_ID,
 };
-
-const blockfrostURL = "https://cardano-preprod.blockfrost.io/api/v0";
 
 const checkIfADASend = async (address, amount) => {
   try {
@@ -26,7 +24,7 @@ const getTxHashOfTransaction = async (walletAddress, confirmLovelaceAmount) => {
   try {
     const confimaAdaAmountLoveLace = confirmLovelaceAmount * 1000000;
     const transactions = await axios.get(
-      `${blockfrostURL}/addresses/${walletAddress}/utxos`,
+      `${process.env.BLOCKFROST_URL}/addresses/${walletAddress}/utxos`,
       {
         headers: blockfrostHeaders,
       }
@@ -49,7 +47,7 @@ const getTxHashOfTransaction = async (walletAddress, confirmLovelaceAmount) => {
 const verifyTxHash = async (walletAddress, txHash) => {
   try {
     const transactions = await axios.get(
-      `${blockfrostURL}/txs/${txHash}/utxos`,
+      `${process.env.BLOCKFROST_URL}/txs/${txHash}/utxos`,
       {
         headers: blockfrostHeaders,
       }
@@ -80,7 +78,6 @@ const getTokenFromPolicyId = async (assetIdentifier) => {
     );
     return tokenName;
   } catch (err) {
-    console.log(err);
     return null;
   }
 };
@@ -88,7 +85,7 @@ const getTokenFromPolicyId = async (assetIdentifier) => {
 const getCardanoTokensInWallet = async (walletAddress) => {
   let assets = [];
   const utxos = await axios.get(
-    `${blockfrostURL}/addresses/${walletAddress}/utxos`,
+    `${process.env.BLOCKFROST_URL}/addresses/${walletAddress}/utxos`,
     {
       headers: blockfrostHeaders,
     }

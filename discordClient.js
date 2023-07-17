@@ -79,6 +79,8 @@ const client = new Client({
   ],
 });
 
+client.login(process.env.TOKEN);
+
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -276,8 +278,6 @@ client.on("interactionCreate", async (interaction) => {
       break;
   }
 });
-
-client.login(process.env.TOKEN);
 
 setInterval(async () => {
   await removeExpiredPendingVerification();
