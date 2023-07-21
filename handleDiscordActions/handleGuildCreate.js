@@ -13,14 +13,11 @@ const createCategory = async (guild) => {
       type: ChannelType.GuildCategory,
     });
     return category.id;
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 const createChannelWithUser = async (guild, user, botId, category) => {
   try {
-    console.log("user", user);
     const channel = await guild.channels.create({
       name: "snapbrillia-voting-server",
       type: ChannelType.GuildText,
@@ -44,9 +41,7 @@ const createChannelWithUser = async (guild, user, botId, category) => {
       embeds: [getMemberIntrouductionEmbed()],
     });
     return channel.id;
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 const createChannelWithAdmins = async (guild, user, botId, category) => {
@@ -74,9 +69,7 @@ const createChannelWithAdmins = async (guild, user, botId, category) => {
       embeds: [getAdminIntroductionEmbed()],
     });
     return channel.id;
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 //create discord user in database
@@ -113,9 +106,7 @@ const createDiscordUser = async (guild, member, userChannelId) => {
         },
       ],
     });
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 const createDiscordServer = async (guild, adminChannel, userChannels) => {
@@ -126,9 +117,7 @@ const createDiscordServer = async (guild, adminChannel, userChannels) => {
       serverOwner: guild.ownerId,
       userChannels: userChannels,
     });
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 module.exports = {

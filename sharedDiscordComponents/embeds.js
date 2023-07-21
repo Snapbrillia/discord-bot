@@ -658,6 +658,14 @@ const getViewEthereumWalletsEmbed = (wallets) => {
   return embed;
 };
 
+const getNotifyNewVotingRoundEmbed = (votingRound) => {
+  const embed = createEmbed(
+    "Voting Round Alert",
+    `A new voting round has been created. \n`
+  );
+  return embed;
+};
+
 module.exports = {
   getVotingRoundInfoEmbed,
   getEnterNameAndDescriptionEmbed,
@@ -702,4 +710,5 @@ module.exports = {
   getVotingHasStartedEmbed,
   getViewPersonalInfoEmbed,
   getViewEthereumWalletsEmbed,
+  getNotifyNewVotingRoundEmbed,
 };

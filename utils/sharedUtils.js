@@ -119,9 +119,7 @@ const verifyUsers = async (
         });
       }
     }
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 module.exports = {

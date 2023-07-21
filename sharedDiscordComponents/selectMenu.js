@@ -144,7 +144,6 @@ const getSelectTokenMenu = (tokens) => {
       description: tokens[i].tokenIdentifier,
       value: tokens[i].tokenIdentifier,
     });
-    console.log(selectMenu);
     if (i === 22)
       selectMenu.push({
         label: "More Tokens",

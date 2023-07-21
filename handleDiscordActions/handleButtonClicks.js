@@ -15,11 +15,13 @@ const {
   getConfirmVotingRoundInfoEmbed,
   getConfirmProposalEmbed,
   getConfirmVoteProposalEmbed,
+  getNotifyNewVotingRoundEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { VotingRound } = require("../models/votingRound.model");
 const { getImage } = require("../sharedDiscordComponents/image");
 const { issueRegistrationCredential } = require("../utils/ssiUtils");
 const { Proposal } = require("../models/projectProposal.model");
+const { DiscordServer } = require("../models/discordServer.model");
 
 const handleNameOfVotingRoundButton = async (interaction) => {
   const modal = getNameOfVotingRoundModal();
@@ -63,6 +65,19 @@ const handleConfirmVotingRoundInfoButton = async (interaction) => {
   });
   votingRound.status = "active";
   votingRound.save();
+
+  const server = await DiscordServer.findOne({
+    serverId: interaction.guildId,
+  });
+
+  const userChannels = server.userChannels;
+
+  userChannels.forEach((channel) => {
+    client.channels.cache.get(channel).send("Hello here!");
+  });
+
+  const notifyNewVotingRoundEmbed = getNotifyNewVotingRoundEmbed();
+
   const confirmVotingRoundInfoEmbed = getConfirmVotingRoundInfoEmbed();
   const image = getImage();
   return interaction.reply({

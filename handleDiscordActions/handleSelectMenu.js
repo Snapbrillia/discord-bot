@@ -152,9 +152,7 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
       files: [image],
       components: [component],
     });
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
 };
 
 //
@@ -252,9 +250,7 @@ const handleRoundDurationMenu = async (interaction) => {
       components: [nameOfVotingRoundButton],
       files: [image],
     });
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
 };
 
 // Since there is no way of perserving state of interaction,
