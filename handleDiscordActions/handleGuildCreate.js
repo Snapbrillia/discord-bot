@@ -6,45 +6,22 @@ const {
   getAdminIntroductionEmbed,
 } = require("../sharedDiscordComponents/embeds");
 
-const createCategory = async (guild) => {
-  try {
-    const category = await guild.channels.create({
-      name: "Snapbrillia Voting",
-      type: ChannelType.GuildCategory,
-    });
-    return category.id;
-  } catch (err) {}
-};
-
-const createChannelWithUser = async (guild, user, botId, category) => {
+const createVotingServer = async (guild) => {
   try {
     const channel = await guild.channels.create({
       name: "snapbrillia-voting-server",
       type: ChannelType.GuildText,
-      permissionOverwrites: [
-        {
-          id: guild.id, // shortcut for @everyone role ID
-          deny: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: user.id,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: botId,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        },
-      ],
     });
-    await channel.setParent(category);
     channel.send({
       embeds: [getMemberIntrouductionEmbed()],
     });
     return channel.id;
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-const createChannelWithAdmins = async (guild, user, botId, category) => {
+const createChannelWithAdmins = async (guild, userId, botId) => {
   try {
     const channel = await guild.channels.create({
       name: "snapbrillia-voting-server-admins",
@@ -55,7 +32,7 @@ const createChannelWithAdmins = async (guild, user, botId, category) => {
           deny: [PermissionsBitField.Flags.ViewChannel],
         },
         {
-          id: user.id,
+          id: userId,
           allow: [PermissionsBitField.Flags.ViewChannel],
         },
         {
@@ -64,16 +41,17 @@ const createChannelWithAdmins = async (guild, user, botId, category) => {
         },
       ],
     });
-    await channel.setParent(category);
     channel.send({
       embeds: [getAdminIntroductionEmbed()],
     });
     return channel.id;
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 //create discord user in database
-const createDiscordUser = async (guild, member, userChannelId) => {
+const createDiscordUser = async (guild, member) => {
   try {
     const discordUserExists = await DiscordUser.findOne({
       discordId: member.id,
@@ -106,7 +84,9 @@ const createDiscordUser = async (guild, member, userChannelId) => {
         },
       ],
     });
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const createDiscordServer = async (guild, adminChannel, userChannels) => {
@@ -121,8 +101,7 @@ const createDiscordServer = async (guild, adminChannel, userChannels) => {
 };
 
 module.exports = {
-  createCategory,
-  createChannelWithUser,
+  createVotingServer,
   createChannelWithAdmins,
   createDiscordUser,
   createDiscordServer,

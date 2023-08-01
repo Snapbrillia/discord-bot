@@ -58,7 +58,7 @@ const handleDownVoteProposalButton = async (interaction) => {
   await interaction.showModal(modal);
 };
 
-const handleConfirmVotingRoundInfoButton = async (interaction) => {
+const handleConfirmVotingRoundInfoButton = async (interaction, client) => {
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
     status: "pending",
@@ -71,12 +71,13 @@ const handleConfirmVotingRoundInfoButton = async (interaction) => {
   });
 
   const userChannels = server.userChannels;
+  const notifyNewVotingRoundEmbed = getNotifyNewVotingRoundEmbed();
 
   userChannels.forEach((channel) => {
-    client.channels.cache.get(channel).send("Hello here!");
+    client.channels.cache.get(channel).send({
+      embeds: [notifyNewVotingRoundEmbed],
+    });
   });
-
-  const notifyNewVotingRoundEmbed = getNotifyNewVotingRoundEmbed();
 
   const confirmVotingRoundInfoEmbed = getConfirmVotingRoundInfoEmbed();
   const image = getImage();
