@@ -19,6 +19,7 @@
     "langchain": "^0.0.35",
     "mongoose": "^7.0.1",
     "node-fetch": "^3.3.1",
+    "nodemon": "^3.0.1",
     "openai": "^3.2.1"
   }
 }

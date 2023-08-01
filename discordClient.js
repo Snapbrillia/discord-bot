@@ -37,10 +37,9 @@ const {
 } = require("./handleDiscordActions/handleCommands");
 const { deployCommands } = require("./deployCommandScript");
 const {
+  createVotingServer,
   createChannelWithAdmins,
-  createChannelWithUser,
   createDiscordUser,
-  createCategory,
   createDiscordServer,
 } = require("./handleDiscordActions/handleGuildCreate");
 const {
@@ -88,41 +87,39 @@ client.on("ready", () => {
 // Bot is added to server.Deploy application commands. Creates private
 // channels with admins and users, store the channel ids in the database
 client.on("guildCreate", async (guild) => {
-  const members = await guild.members.fetch();
-  const owner = await guild.fetchOwner();
-  const category = await createCategory(guild);
-  const adminChannelId = await createChannelWithAdmins(
-    guild,
-    owner,
-    client.user.id,
-    category
-  );
-
-  let userChannelsId = [];
-
-  for (const member of members) {
-    if (member[1].user.bot) {
-      continue;
-    }
-    const userChannelId = await createChannelWithUser(
+  try {
+    const members = await guild.members.fetch();
+    const owner = await guild.fetchOwner();
+    const adminChannelId = await createChannelWithAdmins(
       guild,
-      member[1],
-      client.user.id,
-      category
+      owner.id,
+      client.user.id
     );
-    userChannelsId.push(userChannelId);
-    await createDiscordUser(guild, member[1], userChannelId);
-  }
 
-  await createDiscordServer(guild, adminChannelId, userChannelsId);
-  await deployCommands(guild);
+    let userChannelsId = [];
+    const userChannelId = await createVotingServer(guild, client.user.id);
+    userChannelsId.push(userChannelId);
+    await createDiscordServer(guild, adminChannelId, userChannelsId);
+
+    for (const member of members) {
+      if (member[1].user.bot) {
+        continue;
+      }
+
+      await createDiscordUser(guild, member[1]);
+    }
+
+    await deployCommands(guild);
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 // creare private channel with every user, private chaneel with the owner
 // TODO PRIVATE CHANNEL WITH ALL USERS
 // When new members join. Create a private channel with them
-client.on("guildMemberAdd", (member) => {
-  console.log(member);
+client.on("guildMemberAdd", async (member) => {
+  await createDiscordUser(member.guild, member);
 });
 
 // Handle commands
@@ -232,6 +229,14 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+// const testing = async () => {
+//   const guild = await client.guilds.fetch("1131024409457606726");
+//   let channels = await guild.channels.fetch();
+//   console.log(channels);
+// };
+
+// testing();
+
 // Handle button clicks
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
@@ -241,7 +246,7 @@ client.on("interactionCreate", async (interaction) => {
       await handleNameOfVotingRoundButton(interaction);
       break;
     case "confirmVotingRoundInfoButton":
-      await handleConfirmVotingRoundInfoButton(interaction);
+      await handleConfirmVotingRoundInfoButton(interaction, client);
       break;
     case "verifyCardanoWalletButton":
       await handleVerifyCardanoWalletButton(interaction);

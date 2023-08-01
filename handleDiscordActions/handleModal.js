@@ -297,9 +297,7 @@ const handleSnapbrilliaEmailAddressModal = async (interaction) => {
       components: [snapbrilliaEmailCodeButton],
       files: [image],
     });
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 const handleSnapbrilliaEmailCodeModal = async (interaction) => {
