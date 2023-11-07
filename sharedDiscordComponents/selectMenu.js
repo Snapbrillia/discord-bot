@@ -268,28 +268,6 @@ const getViewPeronalInfoMenu = () => {
   return actionRow;
 };
 
-const getSnapbrilliaWalletLoginMenu = () => {
-  const selectMenu = [
-    {
-      label: "Email Login",
-      description: "Snapbrillia Wallet Login with Email",
-      value: "Email Login",
-    },
-    {
-      label: "Phone Login",
-      description: "Snapbrillia Wallet Login with Phone",
-      value: "Phone Login",
-    },
-  ];
-  const actionRow = buildActionRow(
-    selectMenu,
-    "Select Login Method",
-    "selectSnapbrilliaWalletLoginMenu"
-  );
-
-  return actionRow;
-};
-
 module.exports = {
   getSelectVotingSystemMenu,
   getSelectIfOnlyTokenHolderCanVoteMenu,
@@ -302,5 +280,4 @@ module.exports = {
   getEnableSSIAuthMenu,
   getSelectLinkWalletMenu,
   getViewPeronalInfoMenu,
-  getSnapbrilliaWalletLoginMenu,
 };

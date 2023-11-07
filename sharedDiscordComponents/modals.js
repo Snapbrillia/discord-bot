@@ -159,75 +159,9 @@ const getDownVoteProposalModal = () => {
   return modal;
 };
 
-const getVerifySSIEmailModal = () => {
+const getEmailModal = () => {
   const modal = new ModalBuilder()
-    .setCustomId("enterSSIEmailInputModal")
-    .setTitle("Confirm Email");
-
-  const emailInput = new TextInputBuilder()
-    .setCustomId("emailInput")
-    .setLabel("Please enter your email")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(emailInput);
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
-const getEnterSSIEmailCodeModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("snapbrilliaEmailCodeModal")
-    .setTitle("Confirm Email Verification Code");
-
-  const emailCodeInput = new TextInputBuilder()
-    .setCustomId("emailCodeInput")
-    .setLabel("Please enter your email code")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(emailCodeInput);
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
-const getEnterSSIPhoneNumberCodeModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("enterSSIPhoneNumberInputModal")
-    .setTitle("Enter Phone Number");
-
-  const phoneNumberInput = new TextInputBuilder()
-    .setCustomId("phoneInput")
-    .setLabel("Please enter phone number")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(phoneNumberInput);
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
-const getEnterSSIPhoneCodeModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("enterSSIPhoneCodeInputModal")
-    .setTitle("Enter Phone Verification Code");
-
-  const phoneNumberCodeInput = new TextInputBuilder()
-    .setCustomId("phoneCodeInput")
-    .setLabel("Please the code")
-    .setStyle(TextInputStyle.Short);
-
-  const firstActionRow = new ActionRowBuilder().addComponents(
-    phoneNumberCodeInput
-  );
-
-  modal.addComponents(firstActionRow);
-  return modal;
-};
-
-const getSnapbrilliaWalletEmailAddressModal = () => {
-  const modal = new ModalBuilder()
-    .setCustomId("snapbrilliaEmailAddressModal")
+    .setCustomId("snapbrilliaEmailModal")
     .setTitle("Enter Email Address");
 
   const emailAddressInput = new TextInputBuilder()
@@ -243,19 +177,17 @@ const getSnapbrilliaWalletEmailAddressModal = () => {
   return modal;
 };
 
-const getSnapbrilliaWalletPhoneNumberModal = () => {
+const getEmailOTPModal = () => {
   const modal = new ModalBuilder()
-    .setCustomId("confirmSnapbrilliaWalletPhoneNumberInputModal")
-    .setTitle("Enter Phone Number");
+    .setCustomId("snapbrilliaEmailCodeModal")
+    .setTitle("Confirm Email Verification Code");
 
-  const emailAddressInput = new TextInputBuilder()
-    .setCustomId("phoneNumberInput")
-    .setLabel("Please enter your phone number")
+  const emailCodeInput = new TextInputBuilder()
+    .setCustomId("emailCodeInput")
+    .setLabel("Please enter your email code")
     .setStyle(TextInputStyle.Short);
 
-  const firstActionRow = new ActionRowBuilder().addComponents(
-    emailAddressInput
-  );
+  const firstActionRow = new ActionRowBuilder().addComponents(emailCodeInput);
 
   modal.addComponents(firstActionRow);
   return modal;
@@ -270,10 +202,6 @@ module.exports = {
   getVoteProposalModal,
   getDownVoteProposalModal,
   getDownVoteProposalModal,
-  getVerifySSIEmailModal,
-  getEnterSSIEmailCodeModal,
-  getEnterSSIPhoneNumberCodeModal,
-  getEnterSSIPhoneCodeModal,
-  getSnapbrilliaWalletEmailAddressModal,
-  getSnapbrilliaWalletPhoneNumberModal,
+  getEmailModal,
+  getEmailOTPModal,
 };

@@ -5,10 +5,10 @@ const PendingSnapbrilliaWalletVerificationSchema = new mongoose.Schema(
     discordId: {
       type: String,
     },
-    identity: {
+    challengeId: {
       type: String,
     },
-    challengeId: {
+    email: {
       type: String,
     },
   },

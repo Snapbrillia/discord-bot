@@ -35,13 +35,10 @@ const DiscordUserSchema = new mongoose.Schema(
     discordUsername: {
       type: String,
     },
-    ssiAuthToken: {
+    snapbrilliaWalletAuthToken: {
       type: String,
     },
     email: {
-      type: String,
-    },
-    phoneNumber: {
       type: String,
     },
     cardanoTokensInWallet: [tokenInWalletSchema],

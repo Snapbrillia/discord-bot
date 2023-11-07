@@ -11,6 +11,7 @@ const {
   getEnterNameAndDescriptionEmbed,
   getSnapbrilliaWalletLoginEmbed,
   getViewEthereumWalletsEmbed,
+  getSnapbrilliaWalletLinkedAlreadyEmbed,
 } = require("../sharedDiscordComponents/embeds");
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
@@ -19,20 +20,16 @@ const {
   getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectTokenMenu,
   getEnableSSIAuthMenu,
-  getSnapbrilliaWalletLoginMenu,
 } = require("../sharedDiscordComponents/selectMenu");
 const {
   getNameOfVotingRoundButton,
   getRegisterProposalButton,
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
+  getEmailButton,
 } = require("../sharedDiscordComponents/buttons");
 const { DiscordUser } = require("../models/discordUser.model");
-const {
-  getSelectTokenModal,
-  getSnapbrilliaWalletEmailAddressModal,
-  getSnapbrilliaWalletPhoneNumberModal,
-} = require("../sharedDiscordComponents/modals");
+const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
 const { Proposal } = require("../models/projectProposal.model");
 const { checkIfVerified } = require("../utils/sharedUtils");
 
@@ -312,8 +309,20 @@ const handleLinkWalletMenu = async (interaction) => {
       button = getVerifyCardanoWalletButton();
       break;
     case "Snapbrillia Wallet":
-      embed = getSnapbrilliaWalletLoginEmbed();
-      button = getSnapbrilliaWalletLoginMenu();
+      const user = await DiscordUser.findOne({
+        discordId: interaction.user.id,
+      });
+
+      if (user.snapbrilliaWalletAuthToken) {
+        embed = getSnapbrilliaWalletLinkedAlreadyEmbed();
+        return interaction.reply({
+          embeds: [embed],
+        });
+      } else {
+        embed = getSnapbrilliaWalletLoginEmbed();
+        button = getEmailButton();
+      }
+
       break;
     default:
       break;
@@ -339,20 +348,12 @@ const handleViewPersonalInfoMenu = async (interaction) => {
 
 const handleLinkSnapbrilliaWalletMenu = async (interaction) => {
   const linkSnapbrilliaWalletMethod = interaction.values[0];
-  let inputModal = "";
 
-  switch (linkSnapbrilliaWalletMethod) {
-    case "Email Login":
-      inputModal = getSnapbrilliaWalletEmailAddressModal();
-      break;
-    case "Phone Login":
-      inputModal = getSnapbrilliaWalletPhoneNumberModal();
-      break;
-    default:
-      break;
-  }
-
-  interaction.showModal(inputModal);
+  const image = getImage();
+  const enterEmailEmbeds = interaction.reply({
+    embeds: [inputModal],
+    files: [image],
+  });
 };
 
 module.exports = {

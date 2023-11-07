@@ -6,10 +6,8 @@ const {
   getSelectTokenModal,
   getEthereumWalletAddressModal,
   getNameOfVotingRoundModal,
-  getVerifySSIEmailModal,
-  getEnterSSIEmailCodeModal,
-  getEnterSSIPhoneNumberCodeModal,
-  getEnterSSIPhoneCodeModal,
+  getEmailModal,
+  getEmailOTPModal,
 } = require("../sharedDiscordComponents/modals");
 const {
   getConfirmVotingRoundInfoEmbed,
@@ -111,23 +109,13 @@ const handleConfirmVoteProposalButton = async (interaction) => {
   });
 };
 
-const hanldeVerifySSIEmailButton = async (interaction) => {
-  const modal = getVerifySSIEmailModal();
+const handleEnterEmailButton = async (interaction) => {
+  const modal = getEmailModal();
   await interaction.showModal(modal);
 };
 
-const handleEnterSSIEmailVerificationButton = async (interaction) => {
-  const modal = getEnterSSIEmailCodeModal();
-  await interaction.showModal(modal);
-};
-
-const handleEnterSSIPhoneNumberButton = async (interaction) => {
-  const modal = getEnterSSIPhoneNumberCodeModal();
-  await interaction.showModal(modal);
-};
-
-const handleEnterSSIPhoneCodeButton = async (interaction) => {
-  const modal = getEnterSSIPhoneCodeModal();
+const handleEnterEmailOTPButton = async (interaction) => {
+  const modal = getEmailOTPModal();
   await interaction.showModal(modal);
 };
 
@@ -142,8 +130,6 @@ module.exports = {
   handleConfirmRegisterProposalButton,
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
-  hanldeVerifySSIEmailButton,
-  handleEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneNumberButton,
-  handleEnterSSIPhoneCodeButton,
+  handleEnterEmailButton,
+  handleEnterEmailOTPButton,
 };

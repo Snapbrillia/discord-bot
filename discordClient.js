@@ -9,10 +9,8 @@ const {
   handleConfirmVoteProposalButton,
   handleVerifyEthereumWalletButton,
   handleNameOfVotingRoundButton,
-  hanldeVerifySSIEmailButton,
-  handleEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneNumberButton,
-  handleEnterSSIPhoneCodeButton,
+  handleEnterEmailButton,
+  handleEnterEmailOTPButton,
 } = require("./handleDiscordActions/handleButtonClicks");
 const {
   handleConfirmCardanoWalletAddressInputModal,
@@ -20,11 +18,8 @@ const {
   handleTokenSelectInputModal,
   handleConfirmEthereumWalletAddressInputModal,
   handleNameOfVotingRoundInputModal,
-  handleVerifySSIEmailInputModal,
-  handleEnterSSIPhoneInputModal,
-  handleEnterSSIPhoneCodeInputModal,
-  handleSnapbrilliaEmailAddressModal,
-  handleSnapbrilliaEmailCodeModal,
+  handleSnapbrilliaEmailModal,
+  handleSnapbrilliaEmailOTPModal,
 } = require("./handleDiscordActions/handleModal");
 const {
   handleLinkWalletCommand,
@@ -115,8 +110,6 @@ client.on("guildCreate", async (guild) => {
   }
 });
 
-// creare private channel with every user, private chaneel with the owner
-// TODO PRIVATE CHANNEL WITH ALL USERS
 // When new members join. Create a private channel with them
 client.on("guildMemberAdd", async (member) => {
   await createDiscordUser(member.guild, member);
@@ -211,31 +204,14 @@ client.on("interactionCreate", async (interaction) => {
     case "registerProposalInputModal":
       await handleRegisterProposalInputModal(interaction);
       break;
-    case "enterSSIEmailInputModal":
-      await handleVerifySSIEmailInputModal(interaction);
-      break;
-    case "enterSSIPhoneNumberInputModal":
-      await handleEnterSSIPhoneInputModal(interaction);
-      break;
-    case "enterSSIPhoneCodeInputModal":
-      await handleEnterSSIPhoneCodeInputModal(interaction);
-      break;
-    case "snapbrilliaEmailAddressModal":
-      await handleSnapbrilliaEmailAddressModal(interaction);
+    case "snapbrilliaEmailModal":
+      await handleSnapbrilliaEmailModal(interaction);
       break;
     case "snapbrilliaEmailCodeModal":
-      await handleSnapbrilliaEmailCodeModal(interaction);
+      await handleSnapbrilliaEmailOTPModal(interaction);
       break;
   }
 });
-
-// const testing = async () => {
-//   const guild = await client.guilds.fetch("1131024409457606726");
-//   let channels = await guild.channels.fetch();
-//   console.log(channels);
-// };
-
-// testing();
 
 // Handle button clicks
 client.on("interactionCreate", async (interaction) => {
@@ -254,17 +230,11 @@ client.on("interactionCreate", async (interaction) => {
     case "verifyEthereumWalletButton":
       await handleVerifyEthereumWalletButton(interaction);
       break;
-    case "verifySSIEmailButton":
-      await hanldeVerifySSIEmailButton(interaction);
+    case "enterEmailButton":
+      await handleEnterEmailButton(interaction);
       break;
-    case "enterSSIEmailVerificationButton":
-      await handleEnterSSIEmailVerificationButton(interaction);
-      break;
-    case "enterSSIPhoneNumberButton":
-      await handleEnterSSIPhoneNumberButton(interaction);
-      break;
-    case "enterSSIPhoneCodeButton":
-      await handleEnterSSIPhoneCodeButton(interaction);
+    case "enterEmailOTPButton":
+      await handleEnterEmailOTPButton(interaction);
       break;
     case "registerProposalButton":
       await handleRegisterProposalButton(interaction);

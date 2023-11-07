@@ -464,12 +464,10 @@ const getHelpCommandEmbed = () => {
     `**For Admins** \n
     **/start-voting-round** - Start the voting round\n
     **For Voters** \n
-    **/verify-cardano-wallet** - Verify your Cardano wallet address\n
-    **/verify-ethereum-wallet** - Verify your Ethereum wallet address\n
-    **/register-proposal** - Register your proposal\n
+    **/view-voting-round-info** - View voting round information\n
+    **/register-proposal** - Register a proposal\n
     **/vote-proposal** - Vote for a proposal\n
-    **/down-vote-proposal** - Down vote a proposal\n
-    **/help** - Show this message\n`
+    **/help** - Get list of availible commands with the bot.\n`
   );
   return embed;
 };
@@ -477,7 +475,7 @@ const getHelpCommandEmbed = () => {
 const getAdminIntroductionEmbed = () => {
   const embed = createEmbed(
     "👋 Snapbrillia Voting Bot 👋",
-    `Thank You for using Snapbrillia Voting Bot. To get started enter the command /help. \n
+    `Thank You for using Snapbrillia Voting Bot. To get started enter the command **/help**. \n
     Please make sure only admins are allowed in this channel
     `
   );
@@ -534,10 +532,9 @@ const getLinkWalletEmbed = () => {
   const embed = createEmbed(
     "🔒🔗 Link Wallet 🔗🔒",
     `To ensure a secure and trustworthy voting experience, we've implemented a wallet linking feature. By linking your wallet to your user account, you can participate in the upcoming voting round with confidence. Please select the wallet you'd like to link. \n
-    ** Ethereum Wallet ** \n Link your Ethereum Wallet. To verify your wallet, you will send a small sum of ETH from the wallet address you provided to the same wallet address. \n
-    ** Cardano Wallet ** \n Link your Cardano Wallet. To verify your wallet, you will send a small sum of ADA from the wallet address you provided to the same wallet address. \n
-    ** Snapbrillia Wallet ** \n Link your Snapbrillia Wallet to your discord account.  \n
-    By linking your wallet, you'll have a unique identifier tied to your account for the upcoming voting round. This adds an extra layer of security and ensures fair participation. Voting rounds might also require you to hold a certain token to particiapte.\n
+    ** Ethereum Wallet ** \n Link a Ethereum Wallet. \n
+    ** Cardano Wallet ** \n Link a Cardano Wallet.  \n
+    ** Snapbrillia Wallet ** \n Link your Snapbrillia Wallet.  \n
     `
   );
   return embed;
@@ -546,9 +543,7 @@ const getLinkWalletEmbed = () => {
 const getSnapbrilliaWalletLoginEmbed = () => {
   const embed = createEmbed(
     "🔒💼 Snapbrillia Wallet  💼🔒",
-    `To link your Snapbrillia Wallet to your discord account please select one of the following verification method. \n
-    ** Email Verification ** \n Link Snapbrillia Wallet by verifying the email address associated with the wallet. \n
-    ** Phone Number Verification ** \n Link Snapbrillia Wallet by verifying the phone number associated with the wallet. \n
+    `To link your Snapbrillia Wallet to your discord account you will need to verify the email address you used to sign up for the Snapbrillia Wallet. \n
     To create a new Snapbrillia Wallet please visit https://snapbrillia.com \n 
     `
   );
@@ -564,30 +559,37 @@ const getSnapbrilliaEmailCodeEmbed = () => {
   return embed;
 };
 
-const getEnterSSIPhoneNumberEmbed = () => {
+const getSnapbrilliaEmailNotFoundEmbed = () => {
   const embed = createEmbed(
-    "🔒💼 SSI Wallet 💼🔒",
-    `You have successfully verified your email address.The last step is for you to link your phone number. \n
-    Please provide us with your phone number by clicking the button below. \n
-    Rest assured that your personal information will be handled with utmost care and privacy. We are committed to safeguarding your personal information and ensuring a secure environment for all users.
+    "🔒💼 Snapbrillia Wallet 💼🔒",
+    `Your information can not be verified. Please make sure you are using the same credentials you used to sign up for the Snapbrillia Wallet. \n
     `
   );
   return embed;
 };
 
-const getEnterSSIPhoneCodeEmbed = () => {
+const getEmailOTPFailedEmbed = () => {
   const embed = createEmbed(
-    "🔒💼 SSI Wallet 💼🔒",
-    `Please check your phone and locate the verification code. Once you have found it, return to this Discord channel and enter the code below to complete the verification process:
+    "🔒💼 Snapbrillia Wallet 💼🔒",
+    `The verification code you entered is incorrect. Please try again. \n
     `
   );
   return embed;
 };
 
-const getSSIWalletCreatedEmbed = () => {
+const getSnapbrilliaWalletLinkedEmbed = () => {
   const embed = createEmbed(
-    "🎉✨ Wallet Created ✨🎉",
-    `We are thrilled to inform you that your Self-Sovereign Identity (SSI) wallet has been successfully created and a verifiable credential (VC) has been issued to you. This is a significant step towards enhancing the security and privacy of your digital identity.
+    "🎉✨ Snapbrillia Wallet Linked ✨🎉",
+    `You have successfully linked your Snapbrillia Wallet to your Discord account.
+    `
+  );
+  return embed;
+};
+
+const getSnapbrilliaWalletLinkedAlreadyEmbed = () => {
+  const embed = createEmbed(
+    "🔒🛡️ Wallet Already Linked 🛡️🔒",
+    `You have already linked a Snapbrillia Wallet to this Discord account. \n
     `
   );
   return embed;
@@ -701,9 +703,10 @@ module.exports = {
   getSelectOnchainOrOffchainEmbed,
   getSnapbrilliaWalletLoginEmbed,
   getSnapbrilliaEmailCodeEmbed,
-  getEnterSSIPhoneNumberEmbed,
-  getEnterSSIPhoneCodeEmbed,
-  getSSIWalletCreatedEmbed,
+  getSnapbrilliaEmailNotFoundEmbed,
+  getEmailOTPFailedEmbed,
+  getSnapbrilliaWalletLinkedEmbed,
+  getSnapbrilliaWalletLinkedAlreadyEmbed,
   getNoPermessionToStartVotingRoundEmbed,
   getNoWhitelistTokenFoundEmbed,
   getWalletLinkedSuccessfullyEmbed,
