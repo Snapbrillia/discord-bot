@@ -220,15 +220,15 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
   const votingRoundName = interaction.fields.getTextInputValue(
     "nameOfVotingRoundInput"
   );
-  const votingRoundDescription = interaction.fields.getTextInputValue(
-    "descriptionOfVotingRound"
+  const votingRoundPurpose = interaction.fields.getTextInputValue(
+    "purposeOfVotingRoundInput"
   );
   const votingRound = await VotingRound.findOne({
     serverId: interaction.guildId,
     status: "pending",
   });
   votingRound.votingRoundName = votingRoundName;
-  votingRound.votingRoundDescription = votingRoundDescription;
+  votingRound.votingRoundPurpose = votingRoundPurpose;
   await votingRound.save();
   const image = getImage();
   const votingRoundInfoEmbed = getVotingRoundInfoEmbed(
@@ -240,7 +240,7 @@ const handleNameOfVotingRoundInputModal = async (interaction) => {
     votingRound.requiredVerifiableCredential,
     votingRound.roundDurationInDays,
     votingRound.votingRoundName,
-    votingRound.votingRoundDescription
+    votingRound.votingRoundPurpose
   );
   const confirmVotingRoundInfoButton = getConfirmVotingRoundInfoButton();
   interaction.reply({

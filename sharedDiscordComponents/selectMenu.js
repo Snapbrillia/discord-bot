@@ -1,43 +1,26 @@
-const { ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
-
-const buildActionRow = (selectMenu, placeholder, id) => {
-  const actionRow = new ActionRowBuilder().addComponents(
-    new StringSelectMenuBuilder()
-      .setCustomId(id)
-      .setPlaceholder(placeholder)
-      .addOptions(selectMenu)
-  );
-  return actionRow;
-};
+const { buildActionRow } = require("../shared/utils");
 
 const getSelectVotingSystemMenu = () => {
   const selectMenu = [
     {
+      label: "Quadratic Voting(Recommended)",
+      description: "Votes are calculated using the QVF formula",
+      value: "Quadratic Voting",
+    },
+    {
       label: "Single Vote",
-      description: "Each user can only vote once",
+      description: "Voters only have one vote",
       value: "Single Vote",
     },
     {
-      label: "Yes/No Voting",
-      description: "Each user can only vote yes or no to a proposal",
+      label: "Yes/No Vote",
+      description: "For simple yes/no voting",
       value: "Yes/No Voting",
     },
     {
-      label: "Regular Voting (Tokens In Wallet)",
-      description:
-        "Each user can vote with the amount of tokens they have in their wallet.",
+      label: "Tokens in Wallet Voting",
+      description: "Vote with the amount tokens they have in their wallet",
       value: "Regular Voting (Tokens In Wallet)",
-    },
-    {
-      label: "Quadratic Voting (Tokens In Wallet)",
-      description:
-        "Quadratic Voting with voting power based on the amount of tokens they have in their wallet",
-      value: "Quadratic Voting (Tokens In Wallet)",
-    },
-    {
-      label: "Quadratic Voting (Same Voting Power)",
-      description: "Quadratic Voting with the same voting power for each user",
-      value: "Quadratic Voting (Same Voting Power)",
     },
   ];
   const actionRow = buildActionRow(
@@ -74,28 +57,6 @@ const getSelectLinkWalletMenu = () => {
   return actionRow;
 };
 
-const getSelectIfOnlyTokenHolderCanVoteMenu = () => {
-  const selectMenu = [
-    {
-      label: "Only Specific Token Holders",
-      description: "Only holders of a specific token can participate",
-      value: "Yes",
-    },
-    {
-      label: "Everyone Can Participate",
-      description:
-        "They can participate as long as they are part of your discord server",
-      value: "No",
-    },
-  ];
-  const actionRow = buildActionRow(
-    selectMenu,
-    "Select Participation Permission",
-    "selectIfOnlyTokenHolderCanVoteMenu"
-  );
-  return actionRow;
-};
-
 const getSelectRoundDurationMenu = () => {
   let selectMenu = [];
   for (let i = 1; i <= 25; i++) {
@@ -109,28 +70,6 @@ const getSelectRoundDurationMenu = () => {
     selectMenu,
     "Select Round Duration",
     "selectRoundDurationMenu"
-  );
-  return actionRow;
-};
-
-const getSelectBlockchainMenu = () => {
-  const selectMenu = [
-    {
-      label: "Ethereum Blockchain",
-      description: "The voting round will be on the Ethereum blockchain",
-      value: "Ethereum Blockchain",
-    },
-    {
-      label: "Cardano Blockchain",
-      description: "The voting round will be on the Cardano blockchain",
-      value: "Cardano Blockchain",
-    },
-  ];
-
-  const actionRow = buildActionRow(
-    selectMenu,
-    "Select Blockchain",
-    "selectVerificationMethodMenu"
   );
   return actionRow;
 };
@@ -179,27 +118,6 @@ const getListOfVotingRoundMenu = (votingRound) => {
     selectMenu,
     "Select Voting Round",
     "selectRegisterProposalVotingRoundMenu"
-  );
-  return actionRow;
-};
-
-const getSelectVotingOnChainMenu = () => {
-  const selectMenu = [
-    {
-      label: " ",
-      description: "Store the votes on chain",
-      value: "On-chain",
-    },
-    {
-      label: "Off-chain",
-      description: "Do not store the votes on chain",
-      value: "Off-chain",
-    },
-  ];
-  const actionRow = buildActionRow(
-    selectMenu,
-    "Select On-chain or Off-chain Voting",
-    "selectOnChainOrOffChainVotingMenu"
   );
   return actionRow;
 };
@@ -270,11 +188,8 @@ const getViewPeronalInfoMenu = () => {
 
 module.exports = {
   getSelectVotingSystemMenu,
-  getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectRoundDurationMenu,
-  getSelectBlockchainMenu,
   getSelectTokenMenu,
-  getSelectVotingOnChainMenu,
   getListOfProposalMenu,
   getListOfVotingRoundMenu,
   getEnableSSIAuthMenu,

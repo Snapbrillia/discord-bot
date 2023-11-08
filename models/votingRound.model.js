@@ -38,7 +38,7 @@ const VotingRoundSchema = new mongoose.Schema(
     votingRoundName: {
       type: String,
     },
-    votingRoundDescription: {
+    votingRoundPurpose: {
       type: String,
     },
     storeVotesOnChain: {

@@ -24,7 +24,6 @@ const {
 const {
   handleLinkWalletCommand,
   handleRegisterProposalCommand,
-  handleStartRoundCommand,
   handleVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,
@@ -38,13 +37,10 @@ const {
   createDiscordServer,
 } = require("./handleDiscordActions/handleGuildCreate");
 const {
-  handleVotingSystemMenu,
   handleRoundDurationMenu,
   handleSelectVerificationMethodMenu,
-  handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
   handleSelectSnapbrilliaWalletAuthMenu,
-  handleOnChainOrOffChainVotingMenu,
   handleListOfProposalsMenu,
   handleLinkWalletMenu,
   handleViewPersonalInfoMenu,
@@ -60,6 +56,16 @@ const {
   checkIfEthSend,
   getEthereumTokensInWallet,
 } = require("./utils/ethereumUtils");
+
+// migration to new folder structure
+const {
+  handleStartRoundCommand,
+} = require("./src/start-voting-round/handleCommand");
+const {
+  handleVotingSystemMenu,
+  handleSelectIfOnlyTokenHolderCanVoteMenu,
+  handleSelectQVFVoteAllocationMenu,
+} = require("./src/start-voting-round/handleSelectMenu");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -151,8 +157,8 @@ client.on("interactionCreate", async (interaction) => {
     case "selectVotingSystemMenu":
       await handleVotingSystemMenu(interaction);
       break;
-    case "selectOnChainOrOffChainVotingMenu":
-      await handleOnChainOrOffChainVotingMenu(interaction);
+    case "selectQVFVoteAllocationMenu":
+      await handleSelectQVFVoteAllocationMenu(interaction);
       break;
     case "selectIfOnlyTokenHolderCanVoteMenu":
       await handleSelectIfOnlyTokenHolderCanVoteMenu(interaction);

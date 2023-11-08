@@ -31,27 +31,6 @@ const handleLinkWalletCommand = async (interaction) => {
   });
 };
 
-const handleStartRoundCommand = async (interaction) => {
-  const server = await DiscordServer.findOne({
-    serverId: interaction.guildId,
-  });
-  const image = getImage();
-  if (interaction.channelId !== server.adminChannel) {
-    const embed = getNoPermessionToStartVotingRoundEmbed();
-    return interaction.reply({
-      embeds: [embed],
-      files: [image],
-    });
-  }
-  const selectMenu = getSelectVotingSystemMenu();
-  const embed = getVotingSystemsEmbed();
-  return interaction.reply({
-    embeds: [embed],
-    components: [selectMenu],
-    files: [image],
-  });
-};
-
 // TODO: change this to find an active fund
 const handleRegisterProposalCommand = async (interaction) => {
   const votingRound = await VotingRound.find({
@@ -124,7 +103,6 @@ const handleViewPersonalInfoCommand = async (interaction) => {
 module.exports = {
   handleLinkWalletCommand,
   handleRegisterProposalCommand,
-  handleStartRoundCommand,
   handleVoteProposalCommand,
   handleGetVotingRoundResultsCommand,
   handleHelpCommand,

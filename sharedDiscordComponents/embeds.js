@@ -1,21 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
-
-// helper functions
-const formatDate = (date) => {
-  const d = new Date(date);
-  const day = `0${d.getDate()}`.slice(-2);
-  const year = d.getFullYear();
-  const month = `0${d.getMonth() + 1}`.slice(-2);
-  return [year, month, day].join("-");
-};
-
-const getStartAndEndDate = (days) => {
-  const startDate = new Date();
-  const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-  const formatedStartDate = formatDate(startDate);
-  const formatedEndDate = formatDate(endDate);
-  return { startDate: formatedStartDate, endDate: formatedEndDate };
-};
+const { createEmbed } = require("../shared/utils");
 
 // append them if they exist and if they are undefined, then don't append them
 const getVotingRoundConfigurationText = (
@@ -27,7 +10,7 @@ const getVotingRoundConfigurationText = (
   snapbrilliaWalletAuth,
   roundDuration,
   votingRoundName,
-  votingRoundDescription
+  votingRoundPurpose
 ) => {
   let text = `🔧** Current configuration of voting round **🔧\n
   ** Voting System **: ${votingSystem} \n `;
@@ -54,43 +37,29 @@ const getVotingRoundConfigurationText = (
     text += `** Snapbrillia Wallet Auth **: ${enabled} \n`;
   }
   if (roundDuration) {
-    const { startDate, endDate } = getStartAndEndDate(roundDuration);
+    const startDate = new Date();
+    const endDate = new Date(
+      startDate.getTime() + roundDuration * 24 * 60 * 60 * 1000
+    );
     text += `** Voting Round Start**: ${startDate} \n ** Voting Round End **: ${endDate}\n`;
   }
   if (votingRoundName) {
     text += `** Voting Round Name **: ${votingRoundName}\n`;
   }
-  if (votingRoundDescription) {
-    text += `** Voting Round Description **: ${votingRoundDescription}\n`;
+  if (votingRoundPurpose) {
+    text += `** Voting Round Purpose **: ${votingRoundPurpose}\n`;
   }
   return text;
-};
-
-// embeds
-const createEmbed = (title, description) => {
-  const embed = new EmbedBuilder()
-    .setTitle(title)
-    .setDescription(description)
-    .setAuthor({
-      name: "Snapbrillia",
-      url: "https://snapbrillia.com",
-      iconURL: `attachment://snapicon.png`,
-    })
-    .setThumbnail(`attachment://snapicon.png`)
-    .setColor("#a900a6");
-  return embed;
 };
 
 const getVotingSystemsEmbed = () => {
   const embed = createEmbed(
     "Select Voting System",
-    `I'm the Snapbrillia Bot and I'm here to guide you through the process of setting up a voting round in your server. To ensure the security of your voting round, we recommend that only administrators are included in this channel, to prevent unauthorized access and editing. \n 
-    To get started, please choose the voting system you'd like to use for this round.\n
+    `To get started, please choose the voting system you'd like to use for this round.\n
+    **⭐ Quadratic Voting ⭐** \n Voters votes will be calculated using the quadratic voting formula. To learn more about Quadratic Voting https://www.wtfisqf.com/. \n
     ** Single Vote ** \n Voters only have one vote. \n 
-    ** Yes/No Voting ** \n Voters can choose to vote either For or Against a proposal. \n
+    ** Yes/No Vote ** \n Voters can choose to vote either For or Against a proposal. \n
     ** Vote With Tokens In Wallet ** \n Voters will be able to vote using the tokens they have in their wallet. Votes are calculated 1:1 to the token they have in their wallet. \n
-    ** Quadratic Voting (Tokens In Wallet) ** \n The voting power of each voter will be decided by the amount of a specific asset the voter has in his wallet when the voting round ends. Their votes will be calculated using the quadratic voting formula.\n
-    ** Quadratic Voting (Same Voting Power) ** \n Each user will have the same voting power. Their votes will be calculated using the quadratic voting formula.\n \n
     `
   );
   return embed;
@@ -121,38 +90,6 @@ const getAlreadyVerifiedEthereumWalletEmbed = () => {
     "🔒🛡️ Verification 🛡️🔒",
     `You have already verified your Ethereum wallet. \n
     `
-  );
-  return embed;
-};
-
-const getSelectIfOnlyTokenHolderCanVoteEmbed = (votingSystem, onChainVotes) => {
-  const embed = createEmbed(
-    "🔒🗳️️ Select Participation Permission 🗳️🔒",
-    `Please select the the voting permissions for this voting round. \n \n
-     ** Only Specific Token Holders ** \n Only users who hold a specific token can participate. \n
-     ** Everyone Can Participate ** \n Everyone can participate as long as they are part of your discord community. \n
-  ${getVotingRoundConfigurationText(votingSystem, onChainVotes)} 
-  `
-  );
-  return embed;
-};
-
-const getSelectBlockchainEmbed = (
-  votingSystem,
-  onChainVotes,
-  onlyTokenHolderCanVote
-) => {
-  const embed = createEmbed(
-    "🔒🛡️ Select Blockchain 🛡️🔒",
-    `Please select the blockchain that you want the voting round to run on.\n 
-     ** Ethereum Blockchain ** \n The voting round will be running on the Ethereum Blockchain.  \n
-     ** Cardano Blockchain ** \n The voting round will be running on the Cardano Blockchain. \n
-    ${getVotingRoundConfigurationText(
-      votingSystem,
-      onChainVotes,
-      onlyTokenHolderCanVote
-    )}
-  `
   );
   return embed;
 };
@@ -281,7 +218,7 @@ const getVotingRoundInfoEmbed = (
   enableKYC,
   roundDuration,
   votingRoundName,
-  votingRoundDescription
+  votingRoundPurpose
 ) => {
   const embed = createEmbed(
     "🗳️ Enter Voting Round Name and Description🗳️ ",
@@ -295,7 +232,7 @@ const getVotingRoundInfoEmbed = (
       enableKYC,
       roundDuration,
       votingRoundName,
-      votingRoundDescription
+      votingRoundPurpose
     )}
     `
   );
@@ -313,7 +250,7 @@ const getEnterNameAndDescriptionEmbed = (
 ) => {
   const embed = createEmbed(
     "🗳️ Enter Voting Round Name and Description🗳️ ",
-    `Please enter a name and a description of the voting round. \n
+    `Please enter a name and a purpose for the voting round. \n
     ${getVotingRoundConfigurationText(
       votingSystem,
       storeVotesOnChain,
@@ -598,7 +535,7 @@ const getSnapbrilliaWalletLinkedAlreadyEmbed = () => {
 const getNoPermessionToStartVotingRoundEmbed = () => {
   const embed = createEmbed(
     "🔒🛡️ Permission Denied 🛡️🔒",
-    `You do not have permission to start a voting round. Please contact an admin to start a voting round. \n
+    `A voting round can only be started from the Admin channel. To start a voting round please go to the snapbrillia-voting-server-admins channel or contact an Admin. \n
     `
   );
   return embed;
@@ -621,17 +558,6 @@ const getWalletLinkedSuccessfullyEmbed = (walletAddress) => {
     "🔒🗳️ Wallet Linked 🗳️🔒",
     `You have successfully verified and linked the following wallet ** ${walletAddress} ** to your account
     `
-  );
-  return embed;
-};
-
-const getVotingHasStartedEmbed = () => {
-  const embed = createEmbed(
-    "🗳️ A Voting Round Has Been Created 🗳️",
-    `A voting round has just been initiated. \n
-    Voting Round Name: ** New Logo ** \n
-    Voting Round Description: ** Decide new logo for discord server ** \n
-    Enter the command ** /register-proposal ** or ** /vote-proposal ** to start participating in the voting round. \n`
   );
   return embed;
 };
@@ -672,8 +598,6 @@ module.exports = {
   getVotingRoundInfoEmbed,
   getEnterNameAndDescriptionEmbed,
   getSendFundToWalletEmbed,
-  getSelectIfOnlyTokenHolderCanVoteEmbed,
-  getSelectBlockchainEmbed,
   getVerifyWalletEmbed,
   getLinkWalletEmbed,
   getEnableKYCEmbed,
@@ -710,7 +634,6 @@ module.exports = {
   getNoPermessionToStartVotingRoundEmbed,
   getNoWhitelistTokenFoundEmbed,
   getWalletLinkedSuccessfullyEmbed,
-  getVotingHasStartedEmbed,
   getViewPersonalInfoEmbed,
   getViewEthereumWalletsEmbed,
   getNotifyNewVotingRoundEmbed,

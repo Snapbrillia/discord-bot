@@ -1,8 +1,6 @@
 const { VotingRound } = require("../models/votingRound.model");
 const {
-  getSelectBlockchainEmbed,
   getVotingRoundDurationEmbed,
-  getSelectIfOnlyTokenHolderCanVoteEmbed,
   getEthereumSelectTokenEmbed,
   getCardanoSelectTokenEmbed,
   getEnableKYCEmbed,
@@ -16,8 +14,6 @@ const {
 const { getImage } = require("../sharedDiscordComponents/image");
 const {
   getSelectRoundDurationMenu,
-  getSelectBlockchainMenu,
-  getSelectIfOnlyTokenHolderCanVoteMenu,
   getSelectTokenMenu,
   getEnableSSIAuthMenu,
 } = require("../sharedDiscordComponents/selectMenu");
@@ -32,73 +28,6 @@ const { DiscordUser } = require("../models/discordUser.model");
 const { getSelectTokenModal } = require("../sharedDiscordComponents/modals");
 const { Proposal } = require("../models/projectProposal.model");
 const { checkIfVerified } = require("../utils/sharedUtils");
-
-const handleVotingSystemMenu = async (interaction) => {
-  const votingSystem = interaction.values[0];
-  const pendingVotingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "pending",
-  });
-  if (pendingVotingRound) {
-    pendingVotingRound.votingSystem = votingSystem;
-    await pendingVotingRound.save();
-  } else {
-    if (votingSystem === "Quadratic Voting (Tokens In Wallet)") {
-      await VotingRound.create({
-        serverId: interaction.guildId,
-        votingSystem,
-        onlyTokenHolderCanVote: true,
-        status: "pending",
-      });
-    } else {
-      await VotingRound.create({
-        serverId: interaction.guildId,
-        votingSystem,
-        status: "pending",
-      });
-    }
-  }
-  let embedContent = getSelectIfOnlyTokenHolderCanVoteEmbed(votingSystem);
-  const nameOfVotingRoundButton = getSelectIfOnlyTokenHolderCanVoteMenu();
-  const image = getImage();
-  interaction.reply({
-    embeds: [embedContent],
-    components: [nameOfVotingRoundButton],
-    files: [image],
-  });
-};
-
-// If only token holder can vote is true, then we need to verify the wallet
-// If only token holder can vote is false, then we display all verification method including discord
-const handleSelectIfOnlyTokenHolderCanVoteMenu = async (interaction) => {
-  const onlyTokenHolderCanVoteValue = interaction.values[0];
-  const votingRound = await VotingRound.findOne({
-    serverId: interaction.guildId,
-    status: "pending",
-  });
-  let onlyTokenHolderCanVote;
-  if (onlyTokenHolderCanVoteValue === "Yes") {
-    onlyTokenHolderCanVote = true;
-  } else {
-    onlyTokenHolderCanVote = false;
-  }
-  votingRound.onlyTokenHolderCanVote = onlyTokenHolderCanVote;
-  await votingRound.save();
-
-  let embedContent = getSelectBlockchainEmbed(
-    votingRound.votingSystem,
-    votingRound.storeVotesOnChain,
-    onlyTokenHolderCanVote
-  );
-  let confirmVerificationMenu = getSelectBlockchainMenu();
-
-  const image = getImage();
-  interaction.reply({
-    embeds: [embedContent],
-    components: [confirmVerificationMenu],
-    files: [image],
-  });
-};
 
 // After selecting verification method we will check if token is needed for this round. If it is needed
 // we need to grab the token from the users wallet. Since discord only allows 25
@@ -247,7 +176,9 @@ const handleRoundDurationMenu = async (interaction) => {
       components: [nameOfVotingRoundButton],
       files: [image],
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // Since there is no way of perserving state of interaction,
@@ -357,8 +288,6 @@ const handleLinkSnapbrilliaWalletMenu = async (interaction) => {
 };
 
 module.exports = {
-  handleVotingSystemMenu,
-  handleSelectIfOnlyTokenHolderCanVoteMenu,
   handleSelectTokenMenu,
   handleSelectSnapbrilliaWalletAuthMenu,
   handleRoundDurationMenu,
