@@ -6,11 +6,8 @@ const { Proposal } = require("../models/projectProposal.model");
 const {
   getVerifyCardanoWalletButton,
   getVerifyEthereumWalletButton,
-} = require("../sharedDiscordComponents/buttons");
-const {
-  getVerifyWalletEmbed,
-  getNoWhitelistTokenFound,
-} = require("../sharedDiscordComponents/embeds");
+} = require("../src/link-wallet/buttons");
+const { getVerifyWalletEmbed } = require("../src/link-wallet/embeds");
 
 const numberRegex = /^[0-9]+$/;
 
@@ -21,25 +18,23 @@ const checkIfVerified = async (interaction, votingRound) => {
   });
   if (votingRound.blockchain === "Cardano") {
     const hasTokenInWallet = discordUser.cardanoTokensInWallet.some(
-      (token) =>
-        token.tokenIdentifier === votingRound.tokenIdentiferOnBlockchain
+      (token) => token.tokenIdentifier === votingRound.votingTokenIdentifer
     );
     if (!hasTokenInWallet) {
       interaction.reply({
-        embeds: [getVerifyWalletEmbed("ADA", "Ethereum Waller")],
+        embeds: [getVerifyWalletEmbed("ADA", "Cardano Wallet")],
         components: [getVerifyCardanoWalletButton()],
       });
       return false;
     }
   } else {
     const hasTokenInWallet = discordUser.ethereumTokensInWallet.some(
-      (token) =>
-        token.tokenIdentifier === votingRound.tokenIdentiferOnBlockchain
+      (token) => token.tokenIdentifier === votingRound.votingTokenIdentifer
     );
     if (!hasTokenInWallet) {
       interaction.reply({
         embeds: [
-          getNoWhitelistTokenFound(votingRound.tokenName, "Ethereum Wallet"),
+          getVerifyWalletEmbed(votingRound.votingTokenName, "Ethereum Wallet"),
         ],
         components: [getVerifyEthereumWalletButton()],
       });
@@ -89,8 +84,7 @@ const verifyUsers = async (
   walletField,
   tokenField,
   checkFn,
-  getTokensFn,
-  client
+  getTokensFn
 ) => {
   try {
     const pendingVerification = await PendingWalletVerification.find({
@@ -122,6 +116,77 @@ const verifyUsers = async (
   } catch (err) {}
 };
 
+// helper functions
+const formatDate = (date) => {
+  const d = new Date(date);
+  const day = `0${d.getUTCDate()}`.slice(-2);
+  const year = d.getUTCFullYear();
+  const month = `0${d.getUTCMonth() + 1}`.slice(-2);
+  const hours = `0${d.getUTCHours()}`.slice(-2);
+  const minutes = `0${d.getUTCMinutes()}`.slice(-2);
+  const seconds = `0${d.getUTCSeconds()}`.slice(-2);
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT`;
+};
+
+const getVotingRoundConfigurationText = (config) => {
+  const {
+    votingSystem,
+    onChainVotes,
+    onlyTokenHolderCanVote,
+    votingTokenName,
+    whitelistTokenName,
+    snapbrilliaWalletAuth,
+    roundDurationInDays,
+    votingRoundName,
+    votingRoundPurpose,
+  } = config;
+
+  let text = `🔧** Voting Round **🔧\n
+      ** Voting System **: ${votingSystem}\n \n`;
+
+  if (onChainVotes !== undefined) {
+    text += `** Voting Method **: ${
+      onChainVotes ? "Store votes on-chain" : "Store votes off-chain"
+    }\n \n`;
+  }
+  if (votingTokenName) {
+    text += `** Voting Token **: ${votingTokenName}\n \n`;
+  }
+  if (onlyTokenHolderCanVote !== undefined) {
+    text += `** Participation Permissions **: ${
+      onlyTokenHolderCanVote
+        ? "Only people who hold a specific token can participate"
+        : "Anybody can vote as long as they are verified"
+    }\n \n`;
+  }
+  if (whitelistTokenName) {
+    text += `** Whitelist Token **: ${whitelistTokenName}\n \n`;
+  }
+  if (snapbrilliaWalletAuth !== undefined) {
+    text += `** Snapbrillia Wallet Auth **: ${
+      snapbrilliaWalletAuth ? "Enabled" : "Disabled"
+    }\n \n`;
+  }
+  if (roundDurationInDays) {
+    const startDate = new Date();
+    const endDate = new Date(
+      startDate.getTime() + roundDurationInDays * 24 * 60 * 60 * 1000
+    );
+
+    text += `** Voting Round Start**: ${formatDate(
+      startDate
+    )}\n\n ** Voting Round End **: ${formatDate(endDate)}\n\n`;
+  }
+  if (votingRoundName) {
+    text += `** Voting Round Name **: ${votingRoundName}\n\n`;
+  }
+  if (votingRoundPurpose) {
+    text += `** Voting Round Purpose **: ${votingRoundPurpose}\n\n`;
+  }
+
+  return text;
+};
+
 module.exports = {
   numberRegex,
   randomNumber,
@@ -129,4 +194,6 @@ module.exports = {
   checkIfUserHasParticipatedInRound,
   removeDupilcateTokens,
   verifyUsers,
+  formatDate,
+  getVotingRoundConfigurationText,
 };

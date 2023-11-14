@@ -1,10 +1,10 @@
 const { ChannelType, PermissionsBitField } = require("discord.js");
-const { DiscordServer } = require("../models/discordServer.model");
-const { DiscordUser } = require("../models/discordUser.model");
+const { DiscordServer } = require("../../models/discordServer.model");
+const { DiscordUser } = require("../../models/discordUser.model");
 const {
-  getMemberIntrouductionEmbed,
+  getMemberIntroductionEmbed,
   getAdminIntroductionEmbed,
-} = require("../sharedDiscordComponents/embeds");
+} = require("./embeds");
 
 const createVotingServer = async (guild) => {
   try {
@@ -13,7 +13,7 @@ const createVotingServer = async (guild) => {
       type: ChannelType.GuildText,
     });
     channel.send({
-      embeds: [getMemberIntrouductionEmbed()],
+      embeds: [getMemberIntroductionEmbed()],
     });
     return channel.id;
   } catch (err) {

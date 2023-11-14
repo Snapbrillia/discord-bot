@@ -72,23 +72,19 @@ const issueRegistrationCredential = async (proposal, userId) => {
 };
 
 const sendSnapbrilliaLoginCode = async (identity) => {
-  try {
-    const provider = IdentityProvider.EMAIL;
+  const provider = IdentityProvider.EMAIL;
 
-    const requestInit = AuthenticateInitRequest.create({
-      identity: identity,
-      provider: provider,
-      ecosystemId: process.env.TRINSIC_ECOSYSTEM_ID,
-    });
+  const requestInit = AuthenticateInitRequest.create({
+    identity: identity,
+    provider: provider,
+    ecosystemId: process.env.TRINSIC_ECOSYSTEM_ID,
+  });
 
-    const challengeResponse = await trinsic
-      .wallet()
-      .authenticateInit(requestInit);
+  const challengeResponse = await trinsic
+    .wallet()
+    .authenticateInit(requestInit);
 
-    return challengeResponse.challenge;
-  } catch (err) {
-    throw err;
-  }
+  return challengeResponse.challenge;
 };
 
 const verifySnapbrilliaLoginCode = async (challengeId, code) => {

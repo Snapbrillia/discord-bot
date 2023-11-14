@@ -1,12 +1,10 @@
 const { DiscordServer } = require("../../models/discordServer.model");
+const { getImage } = require("../../utils/discordUtils");
 const {
-  getNoPermessionToStartVotingRoundEmbed,
   getVotingSystemsEmbed,
-} = require("../../sharedDiscordComponents/embeds");
-const { getImage } = require("../../sharedDiscordComponents/image");
-const {
-  getSelectVotingSystemMenu,
-} = require("../../sharedDiscordComponents/selectMenu");
+  getNoPermessionToStartVotingRoundEmbed,
+} = require("./embeds");
+const { getSelectVotingSystemMenu } = require("./selectMenus");
 
 const handleStartRoundCommand = async (interaction) => {
   const server = await DiscordServer.findOne({
