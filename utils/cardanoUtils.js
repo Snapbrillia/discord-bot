@@ -68,7 +68,7 @@ const getTokenFromPolicyId = async (assetIdentifier) => {
       return "ADA";
     }
     const tokens = await axios.get(
-      `${blockfrostURL}/assets/${assetIdentifier}`,
+      `${process.env.BLOCKFROST_URL}/assets/${assetIdentifier}`,
       {
         headers: blockfrostHeaders,
       }
@@ -107,6 +107,7 @@ const getCardanoTokensInWallet = async (walletAddress) => {
       });
     }
   }
+
   return tokenWithTokenName;
 };
 

@@ -7,62 +7,48 @@ const config = {
 };
 
 const checkIfEthSend = async (address, amount) => {
-  try {
-    const alchemy = new Alchemy(config);
-    const response = await alchemy.core.getAssetTransfers({
-      fromBlock: "0x0",
-      fromAddress: address,
-      category: ["external", "internal", "erc20", "erc721", "erc1155"],
-    });
-    const ethSend = response.transfers.some((transaction) => {
-      return transaction.value === amount;
-    });
-    return ethSend;
-  } catch (err) {
-    throw err;
-  }
+  const alchemy = new Alchemy(config);
+  const response = await alchemy.core.getAssetTransfers({
+    fromBlock: "0x0",
+    fromAddress: address,
+    category: ["external", "internal", "erc20", "erc721", "erc1155"],
+  });
+  const ethSend = response.transfers.some((transaction) => {
+    return transaction.value === amount;
+  });
+  return ethSend;
 };
 
 const getTokenFromAddress = async (address) => {
-  try {
-    if (address.toLowerCase() === "eth") {
-      return "ETH";
-    }
-    const alchemy = new Alchemy(config);
-    const response = await alchemy.core.getTokenMetadata(address);
-    return response.name;
-  } catch (err) {
-    throw err;
+  if (address.toLowerCase() === "eth") {
+    return "ETH";
   }
+  const alchemy = new Alchemy(config);
+  const response = await alchemy.core.getTokenMetadata(address);
+  return response.name;
 };
 
 const getEthereumTokensInWallet = async (address) => {
-  try {
-    const alchemy = new Alchemy(config);
-    // Get token balances
-    const balances = await alchemy.core.getTokenBalances(address);
+  const alchemy = new Alchemy(config);
+  // Get token balances
+  const balances = await alchemy.core.getTokenBalances(address);
 
-    // Remove tokens with zero balance
-    const nonZeroBalances = balances.tokenBalances.filter((token) => {
-      return token.tokenBalance !== "0";
+  // Remove tokens with zero balance
+  const nonZeroBalances = balances.tokenBalances.filter((token) => {
+    return token.tokenBalance !== "0";
+  });
+
+  let tokens = [];
+  for (let token of nonZeroBalances) {
+    // Get metadata of token
+    const metadata = await alchemy.core.getTokenMetadata(token.contractAddress);
+
+    tokens.push({
+      tokenName: metadata.name,
+      tokenIdentifier: token.contractAddress,
     });
-
-    let tokens = [];
-    for (let token of nonZeroBalances) {
-      // Get metadata of token
-      const metadata = await alchemy.core.getTokenMetadata(
-        token.contractAddress
-      );
-
-      tokens.push({
-        tokenName: metadata.name,
-        tokenIdentifier: token.contractAddress,
-      });
-    }
-    return tokens;
-  } catch (err) {
-    throw err;
   }
+  return tokens;
 };
 
 module.exports = {

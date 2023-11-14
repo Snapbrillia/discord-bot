@@ -15,7 +15,6 @@ const VotingRoundSchema = new mongoose.Schema(
     onlyTokenHolderCanVote: {
       type: Boolean,
     },
-    // Ethereum Wallet, Cardano Wallet, Discord Verification, SSI
     verificationMethod: {
       type: String,
     },
@@ -26,26 +25,33 @@ const VotingRoundSchema = new mongoose.Schema(
     status: {
       type: String,
     },
-    tokenIdentiferOnBlockchain: {
+    votingTokenIdentifer: {
       type: String,
     },
-    tokenName: {
+    votingTokenName: {
       type: String,
     },
     blockchain: {
       type: String,
+      default: "Cardano",
     },
     votingRoundName: {
       type: String,
     },
-    votingRoundDescription: {
+    votingRoundPurpose: {
       type: String,
     },
-    storeVotesOnChain: {
+    snapbrilliaWalletAuth: {
       type: Boolean,
     },
-    requiredVerifiableCredential: {
-      type: Boolean,
+    whitelistTokenIdentifier: {
+      type: String,
+    },
+    whitelistTokenName: {
+      type: String,
+    },
+    whitelistTokenBlockchain: {
+      type: String,
     },
   },
   { timestamps: true }

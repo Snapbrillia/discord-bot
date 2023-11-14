@@ -1,60 +1,11 @@
 const { Client, GatewayIntentBits } = require("discord.js");
-const {
-  handleVerifyCardanoWalletButton,
-  handleRegisterProposalButton,
-  handleVoteProposalButton,
-  handleDownVoteProposalButton,
-  handleConfirmVotingRoundInfoButton,
-  handleConfirmRegisterProposalButton,
-  handleConfirmVoteProposalButton,
-  handleVerifyEthereumWalletButton,
-  handleNameOfVotingRoundButton,
-  hanldeVerifySSIEmailButton,
-  handleEnterSSIEmailVerificationButton,
-  handleEnterSSIPhoneNumberButton,
-  handleEnterSSIPhoneCodeButton,
-} = require("./handleDiscordActions/handleButtonClicks");
-const {
-  handleConfirmCardanoWalletAddressInputModal,
-  handleRegisterProposalInputModal,
-  handleTokenSelectInputModal,
-  handleConfirmEthereumWalletAddressInputModal,
-  handleNameOfVotingRoundInputModal,
-  handleVerifySSIEmailInputModal,
-  handleEnterSSIPhoneInputModal,
-  handleEnterSSIPhoneCodeInputModal,
-  handleSnapbrilliaEmailAddressModal,
-  handleSnapbrilliaEmailCodeModal,
-} = require("./handleDiscordActions/handleModal");
-const {
-  handleLinkWalletCommand,
-  handleRegisterProposalCommand,
-  handleStartRoundCommand,
-  handleVoteProposalCommand,
-  handleGetVotingRoundResultsCommand,
-  handleHelpCommand,
-  handleViewPersonalInfoCommand,
-} = require("./handleDiscordActions/handleCommands");
 const { deployCommands } = require("./deployCommandScript");
 const {
   createVotingServer,
   createChannelWithAdmins,
   createDiscordUser,
   createDiscordServer,
-} = require("./handleDiscordActions/handleGuildCreate");
-const {
-  handleVotingSystemMenu,
-  handleRoundDurationMenu,
-  handleSelectVerificationMethodMenu,
-  handleSelectIfOnlyTokenHolderCanVoteMenu,
-  handleSelectTokenMenu,
-  handleSelectSnapbrilliaWalletAuthMenu,
-  handleOnChainOrOffChainVotingMenu,
-  handleListOfProposalsMenu,
-  handleLinkWalletMenu,
-  handleViewPersonalInfoMenu,
-  handleLinkSnapbrilliaWalletMenu,
-} = require("./handleDiscordActions/handleSelectMenu");
+} = require("./src/other/handleGuildCreate");
 const { removeExpiredPendingVerification } = require("./utils/databaseUtils");
 const { verifyUsers } = require("./utils/sharedUtils");
 const {
@@ -65,6 +16,70 @@ const {
   checkIfEthSend,
   getEthereumTokensInWallet,
 } = require("./utils/ethereumUtils");
+
+// migration to new folder structure
+const {
+  handleStartRoundCommand,
+} = require("./src/start-voting-round/handleCommand");
+const {
+  handleVotingSystemMenu,
+  handleWhitelistTokenMenu,
+  handleSelectQVFVoteAllocationMenu,
+  handleSelectVotingTokenMenu,
+  handleSelectWhitelistTokenMenu,
+  handleSelectSnapbrilliaWalletAuthMenu,
+  handleRoundDurationMenu,
+  handleSelectVerificationMethodMenu,
+} = require("./src/start-voting-round/handleSelectMenu");
+const {
+  handleConfirmVotingRoundInfoButton,
+  handleNameOfVotingRoundButton,
+} = require("./src/start-voting-round/handleButtonClicks");
+const {
+  handleVoteProposalCommand,
+} = require("./src/vote-proposal/handleCommand");
+const {
+  handleVoteProposalVotingRoundMenu,
+  handleVoteProposalMenu,
+} = require("./src/vote-proposal/handleSelectMenu");
+const {
+  handleVerifyCardanoWalletButton,
+  handleVerifyEthereumWalletButton,
+} = require("./src/link-wallet/handleButtonClicks");
+const {
+  handleVoteProposalButton,
+  handleConfirmVoteProposalButton,
+} = require("./src/vote-proposal/handleButtons");
+const {
+  handleConfirmRegisterProposalButton,
+  handleEnterEmailButton,
+  handleEnterEmailOTPButton,
+  handleRegisterProposalButton,
+} = require("./src/register-proposal/handleButtonClicks");
+const { handleLinkWalletCommand } = require("./src/link-wallet/handleCommand");
+const {
+  handleRegisterProposalCommand,
+} = require("./src/register-proposal/handleCommand");
+const { handleHelpCommand } = require("./src/help/handleCommand");
+const {
+  handleEthereumWalletAddressModal,
+  handleCardanoWalletAddressModal,
+  handleSnapbrilliaEmailModal,
+  handleSnapbrilliaEmailOTPModal,
+} = require("./src/link-wallet/handleModals");
+const {
+  handleVotingTokenModal,
+  handleWhitelistTokenModal,
+  handleNameOfVotingRoundModal,
+} = require("./src/start-voting-round/handleModals");
+const {
+  handleRegisterProposalModal,
+} = require("./src/register-proposal/handleModals");
+const { handleVoteProposalModal } = require("./src/vote-proposal/handleModals");
+const { handleLinkWalletMenu } = require("./src/link-wallet/handleMenus");
+const {
+  handleRegisterProposalVotingRoundMenu,
+} = require("./src/register-proposal/handleSelectMenu");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -115,8 +130,6 @@ client.on("guildCreate", async (guild) => {
   }
 });
 
-// creare private channel with every user, private chaneel with the owner
-// TODO PRIVATE CHANNEL WITH ALL USERS
 // When new members join. Create a private channel with them
 client.on("guildMemberAdd", async (member) => {
   await createDiscordUser(member.guild, member);
@@ -138,12 +151,6 @@ client.on("interactionCreate", async (interaction) => {
     case "vote-proposal":
       await handleVoteProposalCommand(interaction);
       break;
-    case "get-voting-round-results":
-      await handleGetVotingRoundResultsCommand(interaction);
-      break;
-    case "view-personal-info":
-      await handleViewPersonalInfoCommand(interaction);
-      break;
     case "help":
       await handleHelpCommand(interaction);
       break;
@@ -158,17 +165,20 @@ client.on("interactionCreate", async (interaction) => {
     case "selectVotingSystemMenu":
       await handleVotingSystemMenu(interaction);
       break;
-    case "selectOnChainOrOffChainVotingMenu":
-      await handleOnChainOrOffChainVotingMenu(interaction);
+    case "selectQVFVoteAllocationMenu":
+      await handleSelectQVFVoteAllocationMenu(interaction);
       break;
-    case "selectIfOnlyTokenHolderCanVoteMenu":
-      await handleSelectIfOnlyTokenHolderCanVoteMenu(interaction);
+    case "selectWhitelistTokenEnabledMenu":
+      await handleWhitelistTokenMenu(interaction);
       break;
     case "selectVerificationMethodMenu":
       await handleSelectVerificationMethodMenu(interaction);
       break;
-    case "selectTokenMenu":
-      await handleSelectTokenMenu(interaction);
+    case "selectWhitelistTokenMenu":
+      await handleSelectWhitelistTokenMenu(interaction);
+      break;
+    case "selectVotingTokenMenu":
+      await handleSelectVotingTokenMenu(interaction);
       break;
     case "selectSnapbrilliaWalletAuthMenu":
       await handleSelectSnapbrilliaWalletAuthMenu(interaction);
@@ -177,13 +187,16 @@ client.on("interactionCreate", async (interaction) => {
       await handleRoundDurationMenu(interaction);
       break;
     case "selectRegisterProposalVotingRoundMenu":
-      await handleListOfProposalsMenu(interaction);
+      await handleRegisterProposalVotingRoundMenu(interaction);
+      break;
+    case "selectVoteProposalVotingRoundMenu":
+      await handleVoteProposalVotingRoundMenu(interaction);
       break;
     case "selectLinkWalletMenu":
       await handleLinkWalletMenu(interaction);
       break;
-    case "selectSnapbrilliaWalletLoginMenu":
-      await handleLinkSnapbrilliaWalletMenu(interaction);
+    case "selectVoteProposalMenu":
+      await handleVoteProposalMenu(interaction);
       break;
     case "selectViewPersonalInfoMenu":
       await handleViewPersonalInfoMenu(interaction);
@@ -196,46 +209,35 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
   switch (interaction.customId) {
-    case "confirmTokenInputModal":
-      await handleTokenSelectInputModal(interaction);
+    case "votingTokenModal":
+      await handleVotingTokenModal(interaction);
       break;
-    case "confirmNameOfVotingRoundInputModal":
-      await handleNameOfVotingRoundInputModal(interaction);
+    case "whitelistTokenModal":
+      await handleWhitelistTokenModal(interaction);
       break;
-    case "confirmCardanoWalletAddressInputModal":
-      await handleConfirmCardanoWalletAddressInputModal(interaction);
+    case "nameOfVotingRoundModal":
+      await handleNameOfVotingRoundModal(interaction);
       break;
-    case "confirmEthereumWalletAddressInputModal":
-      await handleConfirmEthereumWalletAddressInputModal(interaction);
+    case "cardanoWalletAddressModal":
+      await handleCardanoWalletAddressModal(interaction);
       break;
-    case "registerProposalInputModal":
-      await handleRegisterProposalInputModal(interaction);
+    case "ethereumWalletAddressModal":
+      await handleEthereumWalletAddressModal(interaction);
       break;
-    case "enterSSIEmailInputModal":
-      await handleVerifySSIEmailInputModal(interaction);
+    case "registerProposalModal":
+      await handleRegisterProposalModal(interaction);
       break;
-    case "enterSSIPhoneNumberInputModal":
-      await handleEnterSSIPhoneInputModal(interaction);
-      break;
-    case "enterSSIPhoneCodeInputModal":
-      await handleEnterSSIPhoneCodeInputModal(interaction);
-      break;
-    case "snapbrilliaEmailAddressModal":
-      await handleSnapbrilliaEmailAddressModal(interaction);
+    case "snapbrilliaEmailModal":
+      await handleSnapbrilliaEmailModal(interaction);
       break;
     case "snapbrilliaEmailCodeModal":
-      await handleSnapbrilliaEmailCodeModal(interaction);
+      await handleSnapbrilliaEmailOTPModal(interaction);
+      break;
+    case "voteProposalModal":
+      await handleVoteProposalModal(interaction);
       break;
   }
 });
-
-// const testing = async () => {
-//   const guild = await client.guilds.fetch("1131024409457606726");
-//   let channels = await guild.channels.fetch();
-//   console.log(channels);
-// };
-
-// testing();
 
 // Handle button clicks
 client.on("interactionCreate", async (interaction) => {
@@ -254,26 +256,17 @@ client.on("interactionCreate", async (interaction) => {
     case "verifyEthereumWalletButton":
       await handleVerifyEthereumWalletButton(interaction);
       break;
-    case "verifySSIEmailButton":
-      await hanldeVerifySSIEmailButton(interaction);
+    case "enterEmailButton":
+      await handleEnterEmailButton(interaction);
       break;
-    case "enterSSIEmailVerificationButton":
-      await handleEnterSSIEmailVerificationButton(interaction);
-      break;
-    case "enterSSIPhoneNumberButton":
-      await handleEnterSSIPhoneNumberButton(interaction);
-      break;
-    case "enterSSIPhoneCodeButton":
-      await handleEnterSSIPhoneCodeButton(interaction);
+    case "enterEmailOTPButton":
+      await handleEnterEmailOTPButton(interaction);
       break;
     case "registerProposalButton":
       await handleRegisterProposalButton(interaction);
       break;
     case "voteProposalButton":
       await handleVoteProposalButton(interaction);
-      break;
-    case "downVoteProposal":
-      await handleDownVoteProposalButton(interaction);
       break;
     case "confirmProposalButton":
       await handleConfirmRegisterProposalButton(interaction);

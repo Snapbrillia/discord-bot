@@ -26,7 +26,7 @@ const trinsic = new TrinsicService({
 const issueRegistrationCredential = async (proposal, userId) => {
   const user = await DiscordUser.findOne({ discordId: userId });
 
-  trinsic.options.authToken = user.ssiAuthToken;
+  trinsic.options.authToken = user.snapbrilliaWalletAuthToken;
 
   const nameField = TemplateField.fromPartial({
     description: "Name of proposal",
@@ -61,7 +61,7 @@ const issueRegistrationCredential = async (proposal, userId) => {
     })
   );
 
-  trinsic.options.authToken = user.ssiAuthToken;
+  trinsic.options.authToken = user.snapbrilliaWalletAuthToken;
   const insertResponse = await trinsic.wallet().insertItem(
     InsertItemRequest.fromPartial({
       itemJson: issueResponse.documentJson,
@@ -71,13 +71,9 @@ const issueRegistrationCredential = async (proposal, userId) => {
   return insertResponse.itemId;
 };
 
-const sendSnapbrilliaLoginCode = async (identity, identityProvider) => {
-  let provider = "";
-  if (identityProvider === "email") {
-    provider = IdentityProvider.EMAIL;
-  } else {
-    provider = IdentityProvider.PHONE;
-  }
+const sendSnapbrilliaLoginCode = async (identity) => {
+  const provider = IdentityProvider.EMAIL;
+
   const requestInit = AuthenticateInitRequest.create({
     identity: identity,
     provider: provider,
@@ -94,11 +90,10 @@ const sendSnapbrilliaLoginCode = async (identity, identityProvider) => {
 const verifySnapbrilliaLoginCode = async (challengeId, code) => {
   const requestConfirm = AuthenticateConfirmRequest.create({
     challenge: challengeId,
-    response: code, // OTP code
+    response: code,
   });
 
   const authToken = await trinsic.wallet().authenticateConfirm(requestConfirm);
-
   return authToken;
 };
 
