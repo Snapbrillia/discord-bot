@@ -45,9 +45,21 @@ const getImage = () => {
   return new AttachmentBuilder(`${process.cwd()}/assets/snapicon.png`);
 };
 
+const getDisabledButton = (label) => {
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("disabled")
+      .setLabel(label)
+      .setDisabled(true)
+      .setStyle(ButtonStyle.Primary)
+  );
+  return row;
+};
+
 module.exports = {
   getPrimaryButton,
   createEmbed,
   buildActionRow,
   getImage,
+  getDisabledButton,
 };

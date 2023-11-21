@@ -25,6 +25,7 @@ const handleConfirmVotingRoundInfoButton = async (interaction, client) => {
   });
 
   const userChannels = server.userChannels;
+  const adminChannel = server.adminChannel;
   const notifyNewVotingRoundEmbed = getNotifyNewVotingRoundEmbed(votingRound);
   const image = getImage();
 
@@ -36,7 +37,7 @@ const handleConfirmVotingRoundInfoButton = async (interaction, client) => {
   });
 
   const embed = getConfirmVotingRoundInfoEmbed();
-  return interaction.reply({
+  client.channels.cache.get(adminChannel).send({
     embeds: [embed],
     files: [image],
   });

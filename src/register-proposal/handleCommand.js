@@ -1,6 +1,6 @@
 const { VotingRound } = require("../../models/votingRound.model");
 const { getImage } = require("../../utils/discordUtils");
-const { getListOfVotingRoundMenu } = require("../other/menus");
+const { getVotingRoundMenu } = require("./selectMenus");
 const { getRegisterProposalEmbed } = require("./embeds");
 
 const handleRegisterProposalCommand = async (interaction) => {
@@ -8,14 +8,15 @@ const handleRegisterProposalCommand = async (interaction) => {
     serverId: interaction.guildId,
     status: "active",
   });
-  if (!votingRound) {
+  const image = getImage();
+
+  if (votingRound.length === 0) {
     interaction.reply("No active voting round");
     return false;
   }
-  const embed = getRegisterProposalEmbed();
-  const image = getImage();
 
-  const menu = getListOfVotingRoundMenu(votingRound);
+  const embed = getRegisterProposalEmbed();
+  const menu = getVotingRoundMenu(votingRound);
   await interaction.reply({
     embeds: [embed],
     components: [menu],

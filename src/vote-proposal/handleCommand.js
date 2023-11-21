@@ -1,5 +1,5 @@
 const { VotingRound } = require("../../models/votingRound.model");
-const { getListOfVotingRoundMenu } = require("../other/menus");
+const { getVotingRoundMenu } = require("./selectMenus");
 const { getVoteProposalSelectVotingRoundEmbed } = require("./embeds");
 
 const handleVoteProposalCommand = async (interaction) => {
@@ -14,7 +14,7 @@ const handleVoteProposalCommand = async (interaction) => {
   }
 
   const voteProposalEmbed = getVoteProposalSelectVotingRoundEmbed();
-  const listOfProposalMenu = getListOfVotingRoundMenu(votingRound, "vote");
+  const listOfProposalMenu = getVotingRoundMenu(votingRound);
   await interaction.reply({
     embeds: [voteProposalEmbed],
     components: [listOfProposalMenu],

@@ -39,7 +39,7 @@ const {
   handleVoteProposalCommand,
 } = require("./src/vote-proposal/handleCommand");
 const {
-  handleVoteProposalVotingRoundMenu,
+  handleVoteVotingRoundMenu,
   handleVoteProposalMenu,
 } = require("./src/vote-proposal/handleSelectMenu");
 const {
@@ -190,16 +190,13 @@ client.on("interactionCreate", async (interaction) => {
       await handleRegisterProposalVotingRoundMenu(interaction);
       break;
     case "selectVoteProposalVotingRoundMenu":
-      await handleVoteProposalVotingRoundMenu(interaction);
+      await handleVoteVotingRoundMenu(interaction);
       break;
     case "selectLinkWalletMenu":
       await handleLinkWalletMenu(interaction);
       break;
     case "selectVoteProposalMenu":
       await handleVoteProposalMenu(interaction);
-      break;
-    case "selectViewPersonalInfoMenu":
-      await handleViewPersonalInfoMenu(interaction);
       break;
   }
 });
@@ -269,7 +266,7 @@ client.on("interactionCreate", async (interaction) => {
       await handleVoteProposalButton(interaction);
       break;
     case "confirmProposalButton":
-      await handleConfirmRegisterProposalButton(interaction);
+      await handleConfirmRegisterProposalButton(interaction, client);
       break;
     case "confirmVoteProposalButton":
       await handleConfirmVoteProposalButton(interaction);

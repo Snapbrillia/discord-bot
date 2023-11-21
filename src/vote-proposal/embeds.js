@@ -22,19 +22,18 @@ const getVoteProposalInfoEmbed = (percentageAllocated) => {
 
 const getVoteProposalSelectVotingRoundEmbed = () => {
   const embed = createEmbed(
-    "🗳️ Vote Proposal 🗳️ ",
+    "🗳️ Select Voting Round 🗳️ ",
     `To vote for a proposal please first select the voting round you want to participate in \n 
       `
   );
   return embed;
 };
 
-const getVoteQVFProposalEmbed = () => {
+const getSelectProposalEmbed = () => {
   const embed = createEmbed(
-    "🗳️ Vote Proposal 🗳️ ",
-    `To vote for a proposal please enter the name of the proposal you want to vote for. You will specify a percentage of your voting power(amount of voting asset you have in your wallet) to give to the proposal. \n
-       Please note the maximum percentage of voting power you can allocate across all proposal is 100%. \n
-      `
+    "🗳️ Select Proposal 🗳️ ",
+    `Please select the proposal you want to vote for. \n
+    `
   );
   return embed;
 };
@@ -43,5 +42,5 @@ module.exports = {
   getProposalVotedEmbed,
   getVoteProposalInfoEmbed,
   getVoteProposalSelectVotingRoundEmbed,
-  getVoteQVFProposalEmbed,
+  getSelectProposalEmbed,
 };

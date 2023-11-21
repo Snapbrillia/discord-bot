@@ -190,17 +190,14 @@ const handleWhitelistTokenMenu = async (interaction) => {
     );
   } else {
     votingRound.onlyTokenHolderCanVote = false;
-    embedContent = getCardanoVotingTokenEmbed(votingRound);
-    selectMenu = getSelectTokenMenu(
-      discordUser.cardanoTokensInWallet,
-      "selectVotingTokenMenu"
-    );
+    embedContent = getEnableKYCEmbed(votingRound);
+    selectMenu = getEnableSSIAuthMenu();
   }
 
   await votingRound.save();
 
   const image = getImage();
-  interaction.reply({
+  interaction.update({
     embeds: [embedContent],
     components: [selectMenu],
     files: [image],
@@ -238,7 +235,7 @@ const handleSelectVerificationMethodMenu = async (interaction) => {
   }
   await votingRound.save();
   const image = getImage();
-  interaction.reply({
+  interaction.update({
     embeds: [embedContent],
     files: [image],
     components: [component],
@@ -256,7 +253,7 @@ const handleSelectSnapbrilliaWalletAuthMenu = async (interaction) => {
   const embedContent = getVotingRoundDurationEmbed(votingRound);
   const component = getSelectRoundDurationMenu();
   const image = getImage();
-  interaction.reply({
+  interaction.update({
     embeds: [embedContent],
     files: [image],
     components: [component],
@@ -274,7 +271,7 @@ const handleRoundDurationMenu = async (interaction) => {
   let embedContent = getEnterNameAndDescriptionEmbed(votingRound);
   const nameOfVotingRoundButton = getNameOfVotingRoundButton();
   const image = getImage();
-  interaction.reply({
+  interaction.update({
     embeds: [embedContent],
     components: [nameOfVotingRoundButton],
     files: [image],

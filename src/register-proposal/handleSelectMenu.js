@@ -36,10 +36,10 @@ const handleRegisterProposalVotingRoundMenu = async (interaction) => {
   // const hasParticipatedInRound = await checkIfUserHasParticipatedInRound();
 
   const image = getImage();
-  let embed = getEnterProposalInformationEmbed();
+  let embed = getEnterProposalInformationEmbed(votingRound);
   let button = getRegisterProposalButton();
 
-  interaction.reply({
+  interaction.update({
     embeds: [embed],
     files: [image],
     components: [button],

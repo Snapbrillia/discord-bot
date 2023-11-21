@@ -141,7 +141,7 @@ const getVotingRoundConfigurationText = (config) => {
     votingRoundPurpose,
   } = config;
 
-  let text = `🔧** Voting Round **🔧\n
+  let text = `🔧** Voting Round Info**🔧\n
       ** Voting System **: ${votingSystem}\n \n`;
 
   if (onChainVotes !== undefined) {

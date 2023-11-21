@@ -1,6 +1,6 @@
 const { Proposal } = require("../../models/projectProposal.model");
 const { VotingRound } = require("../../models/votingRound.model");
-const { getImage } = require("../../utils/discordUtils");
+const { getImage, getDisabledButton } = require("../../utils/discordUtils");
 const { getConfirmRegisterProposalButton } = require("./buttons");
 const { getConfirmProposalInfoEmbed } = require("./embeds");
 
@@ -31,13 +31,28 @@ const handleRegisterProposalModal = async (interaction) => {
 
   await proposal.save();
 
+  const embed = getConfirmProposalInfoEmbed(projectInfo, votingRound);
+  const button = getConfirmRegisterProposalButton();
+
+  const filter = (i) =>
+    i.customId === "confirmProposalButton" && i.user.id === interaction.user.id;
+
+  const collector = interaction.channel.createMessageComponentCollector({
+    filter,
+    time: 15000,
+  });
+
+  const disabledButton = getDisabledButton("Confirm Register Proposal");
+
+  collector.on("collect", async (i) => {
+    await i.update({ components: [disabledButton] });
+  });
+
   const image = getImage();
-  const registerProposalButton = getConfirmRegisterProposalButton();
-  interaction.reply({
-    embeds: [
-      getConfirmProposalInfoEmbed(projectInfo, votingRound.votingRoundName),
-    ],
-    components: [registerProposalButton],
+
+  interaction.update({
+    embeds: [embed],
+    components: [button],
     files: [image],
   });
 };

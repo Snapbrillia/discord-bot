@@ -9,20 +9,24 @@ const getRegisterProposalEmbed = () => {
   return embed;
 };
 
-const getEnterProposalInformationEmbed = () => {
+const getEnterProposalInformationEmbed = (votingRound) => {
   const embed = createEmbed(
     "📌📃 Register Proposal 📃📌",
     `Please enter the name and description of your proposal. \n
-        `
+    🔧** Proposal Info**🔧 \n
+     Voting Round: **${votingRound.votingRoundName}** \n
+    `
   );
   return embed;
 };
 
 const getConfirmProposalInfoEmbed = (proposalInfo, votingRound) => {
   const embed = createEmbed(
-    "📝 Proposal Info 📝 ",
+    "📝 Confirm Proposal Info 📝 ",
     `Please confirm the following information about your proposal \n
-        Voting Round: **${votingRound}** \n
+    🔧** Proposal Info**🔧 \n
+        Voting Round: **${votingRound.votingRoundName}** \n
+        Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
         Proposal Name: **${proposalInfo.proposalName}**\n
         Proposal Description: **${proposalInfo.proposalDescription}**\n
         `
@@ -30,11 +34,16 @@ const getConfirmProposalInfoEmbed = (proposalInfo, votingRound) => {
   return embed;
 };
 
-const getProposalRegisteredEmbed = () => {
+const getProposalRegisteredEmbed = (proposalInfo, votingRound) => {
   const embed = createEmbed(
     "📝 Proposal Registered 📝 ",
     `Your proposal has been registered. \n
-        `
+    🔧** Proposal Info**🔧 \n
+    Voting Round: **${votingRound.votingRoundName}** \n
+    Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
+    Proposal Name: **${proposalInfo.proposalName}**\n
+    Proposal Description: **${proposalInfo.proposalDescription}**\n
+    `
   );
   return embed;
 };

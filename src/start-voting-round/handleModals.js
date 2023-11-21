@@ -1,6 +1,6 @@
 const { VotingRound } = require("../../models/votingRound.model");
 const { getTokenFromPolicyId } = require("../../utils/cardanoUtils");
-const { getImage } = require("../../utils/discordUtils");
+const { getImage, getDisabledButton } = require("../../utils/discordUtils");
 const { getTokenFromAddress } = require("../../utils/ethereumUtils");
 const { getConfirmVotingRoundInfoButton } = require("./buttons");
 const {
@@ -87,10 +87,26 @@ const handleNameOfVotingRoundModal = async (interaction) => {
   await votingRound.save();
   const image = getImage();
   const embed = getVotingRoundInfoEmbed(votingRound);
-  const confirmVotingRoundInfoButton = getConfirmVotingRoundInfoButton();
+  const button = getConfirmVotingRoundInfoButton();
+
+  const filter = (i) =>
+    i.customId === "confirmVotingRoundInfoButton" &&
+    i.user.id === interaction.user.id;
+
+  const collector = interaction.channel.createMessageComponentCollector({
+    filter,
+    time: 15000,
+  });
+
+  const disabledButton = getDisabledButton("Confirm Voting Round Info");
+
+  collector.on("collect", async (i) => {
+    await i.update({ components: [disabledButton] });
+  });
+
   interaction.reply({
     embeds: [embed],
-    components: [confirmVotingRoundInfoButton],
+    components: [button],
     files: [image],
   });
 };

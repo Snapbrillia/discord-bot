@@ -1,10 +1,10 @@
 const { Proposal } = require("../../models/projectProposal.model");
 const { getImage } = require("../../utils/discordUtils");
 const { getVoteProposalButton } = require("./buttons");
-const { getVoteQVFProposalEmbed } = require("./embeds");
-const { getVoteQVFProposalDropdownMenu } = require("./selectMenus");
+const { getSelectProposalEmbed } = require("./embeds");
+const { getProposalDropdownMenu } = require("./selectMenus");
 
-const handleVoteProposalVotingRoundMenu = async (interaction) => {
+const handleSelectProposalMenu = async (interaction) => {
   const votingRoundId = interaction.values[0];
 
   const proposals = await Proposal.find({
@@ -12,8 +12,8 @@ const handleVoteProposalVotingRoundMenu = async (interaction) => {
     status: "active",
   });
 
-  const voteProposalEmbed = getVoteQVFProposalEmbed();
-  const voteProposalDropdown = getVoteQVFProposalDropdownMenu(proposals);
+  const voteProposalEmbed = getSelectProposalEmbed();
+  const voteProposalDropdown = getProposalDropdownMenu(proposals);
   const image = getImage();
 
   interaction.reply({
@@ -24,7 +24,10 @@ const handleVoteProposalVotingRoundMenu = async (interaction) => {
 };
 
 const handleVoteProposalMenu = async (interaction) => {
-  const embed = getVoteQVFProposalEmbed();
+  console.log(interaction.values[0]);
+
+  console.log("hiy");
+  const embed = getSelectProposalEmbed();
   const button = getVoteProposalButton();
 
   interaction.reply({
@@ -34,6 +37,6 @@ const handleVoteProposalMenu = async (interaction) => {
 };
 
 module.exports = {
-  handleVoteProposalVotingRoundMenu,
+  handleSelectProposalMenu,
   handleVoteProposalMenu,
 };
