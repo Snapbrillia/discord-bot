@@ -14,7 +14,7 @@ const getVotingSystemsEmbed = () => {
   const embed = createEmbed(
     "Select Voting System",
     `To get started, please choose the voting system you'd like to use for this round.\n
-    **⭐ Quadratic Voting ⭐** \n Voters votes will be calculated using the quadratic voting formula. To learn more about Quadratic Voting https://www.wtfisqf.com/. \n
+    **⭐ Quadratic Voting ⭐** \n Voters votes will be calculated using the quadratic voting formula. To learn more about Quadratic Voting/Funding https://www.wtfisqf.com/. \n
     ** Single Vote ** \n Voters only have one vote. \n 
     ** Yes/No Vote ** \n Voters can choose to vote either For or Against a proposal. \n
     ** Vote With Tokens In Wallet ** \n Voters will be able to vote using the tokens they have in their wallet. Votes are calculated 1:1 to the token they have in their wallet. \n
@@ -92,12 +92,12 @@ const getWhitelistTokenEmbed = (votingRound) => {
   return embed;
 };
 
-const getCardanoVotingTokenEmbed = (votingRound) => {
+const getCardanoVotingTokenEmbed = () => {
   const embed = createEmbed(
     "🌟 Select Voting Token 🌟",
-    `Please select the token that you want to use for voting. \n
+    `You have initiated a new voting round. Users will specify how much of their voting power they want to allocate to a proposal. At the end of the voting round we will take a snapshot of the amount of tokens the users have in their wallet. Then we callculate how much votes each proposal recieved by using the Quadratic Voting/Funding Formula. \n
+    Please select the token that you want to use for voting. \n
     You can also enter the token manually by providing the token's unique identifer on the blockchain (concatenation of the Policy Id and Asset Name in hex ). \n
-    ${getVotingRoundConfigurationText(votingRound)}
     `
   );
   return embed;

@@ -1,7 +1,7 @@
 const { getPrimaryButton } = require("../../utils/discordUtils");
 
-const getVoteProposalButton = () => {
-  const button = getPrimaryButton("voteProposalButton", "Vote Proposal");
+const getVoteProposalQVFButton = () => {
+  const button = getPrimaryButton("voteProposalQVFButton", "Vote Proposal");
   return button;
 };
 
@@ -11,6 +11,6 @@ const getConfirmVoteButton = () => {
 };
 
 module.exports = {
-  getVoteProposalButton,
+  getVoteProposalQVFButton,
   getConfirmVoteButton,
 };

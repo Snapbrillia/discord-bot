@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-const ProposalSchema = new mongoose.Schema(
+const VotesSchema = new mongoose.Schema(
   {
-    discordId: {
+    voterDiscordId: {
       type: String,
     },
     serverId: {
@@ -14,14 +14,15 @@ const ProposalSchema = new mongoose.Schema(
     status: {
       type: String,
     },
-    voterWalletAddress: {
+    proposalId: {
       type: String,
     },
-    voteProposalAddress: {
-      type: String,
+    percentageAllocated: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
 );
 
-module.exports.Proposal = mongoose.model("proposal", ProposalSchema);
+module.exports.Votes = mongoose.model("votes", VotesSchema);

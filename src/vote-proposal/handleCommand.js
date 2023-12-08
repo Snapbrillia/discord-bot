@@ -13,11 +13,11 @@ const handleVoteProposalCommand = async (interaction) => {
     return false;
   }
 
-  const voteProposalEmbed = getVoteProposalSelectVotingRoundEmbed();
-  const listOfProposalMenu = getVotingRoundMenu(votingRound);
+  const embed = getVoteProposalSelectVotingRoundEmbed();
+  const menu = getVotingRoundMenu(votingRound);
   await interaction.reply({
-    embeds: [voteProposalEmbed],
-    components: [listOfProposalMenu],
+    embeds: [embed],
+    components: [menu],
   });
 };
 

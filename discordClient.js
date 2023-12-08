@@ -47,7 +47,7 @@ const {
   handleVerifyEthereumWalletButton,
 } = require("./src/link-wallet/handleButtonClicks");
 const {
-  handleVoteProposalButton,
+  handleVoteProposalQVFButton,
   handleConfirmVoteProposalButton,
 } = require("./src/vote-proposal/handleButtons");
 const {
@@ -75,11 +75,19 @@ const {
 const {
   handleRegisterProposalModal,
 } = require("./src/register-proposal/handleModals");
-const { handleVoteProposalModal } = require("./src/vote-proposal/handleModals");
+const {
+  handleVoteProposalQVFModal,
+} = require("./src/vote-proposal/handleModals");
 const { handleLinkWalletMenu } = require("./src/link-wallet/handleMenus");
 const {
   handleRegisterProposalVotingRoundMenu,
 } = require("./src/register-proposal/handleSelectMenu");
+const {
+  handleViewVotingRoundsCommand,
+} = require("./src/view-voting-round-info/handleCommands");
+const {
+  handleViewVotingRoundsMenu,
+} = require("./src/view-voting-round-info/handleSelectMenus");
 
 require("dotenv").config();
 require("./mongodb.config");
@@ -151,6 +159,9 @@ client.on("interactionCreate", async (interaction) => {
     case "vote-proposal":
       await handleVoteProposalCommand(interaction);
       break;
+    case "view-voting-round-info":
+      await handleViewVotingRoundsCommand(interaction);
+      break;
     case "help":
       await handleHelpCommand(interaction);
       break;
@@ -198,6 +209,9 @@ client.on("interactionCreate", async (interaction) => {
     case "selectVoteProposalMenu":
       await handleVoteProposalMenu(interaction);
       break;
+    case "selectViewInfoVotingRoundMenu":
+      await handleViewVotingRoundsMenu(interaction);
+      break;
   }
 });
 
@@ -230,8 +244,8 @@ client.on("interactionCreate", async (interaction) => {
     case "snapbrilliaEmailCodeModal":
       await handleSnapbrilliaEmailOTPModal(interaction);
       break;
-    case "voteProposalModal":
-      await handleVoteProposalModal(interaction);
+    case "voteProposalQVFModal":
+      await handleVoteProposalQVFModal(interaction);
       break;
   }
 });
@@ -262,8 +276,8 @@ client.on("interactionCreate", async (interaction) => {
     case "registerProposalButton":
       await handleRegisterProposalButton(interaction);
       break;
-    case "voteProposalButton":
-      await handleVoteProposalButton(interaction);
+    case "voteProposalQVFButton":
+      await handleVoteProposalQVFButton(interaction);
       break;
     case "confirmProposalButton":
       await handleConfirmRegisterProposalButton(interaction, client);

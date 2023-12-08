@@ -21,32 +21,27 @@ const handleRegisterProposalModal = async (interaction) => {
     "proposalDescriptionInput"
   );
 
-  const projectInfo = {
-    proposalName,
-    proposalDescription,
-  };
-
   proposal.name = proposalName;
   proposal.description = proposalDescription;
 
   await proposal.save();
 
-  const embed = getConfirmProposalInfoEmbed(projectInfo, votingRound);
+  const embed = getConfirmProposalInfoEmbed(proposal, votingRound);
   const button = getConfirmRegisterProposalButton();
 
-  const filter = (i) =>
-    i.customId === "confirmProposalButton" && i.user.id === interaction.user.id;
+  // const filter = (i) =>
+  //   i.customId === "confirmProposalButton" && i.user.id === interaction.user.id;
 
-  const collector = interaction.channel.createMessageComponentCollector({
-    filter,
-    time: 15000,
-  });
+  // const collector = interaction.channel.createMessageComponentCollector({
+  //   filter,
+  //   time: 15000,
+  // });
 
-  const disabledButton = getDisabledButton("Confirm Register Proposal");
+  // const disabledButton = getDisabledButton("Confirm Register Proposal");
 
-  collector.on("collect", async (i) => {
-    await i.update({ components: [disabledButton] });
-  });
+  // collector.on("collect", async (i) => {
+  //   await i.update({ components: [disabledButton] });
+  // });
 
   const image = getImage();
 

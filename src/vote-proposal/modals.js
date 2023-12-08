@@ -5,9 +5,9 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 
-const getVoteProposalModal = () => {
+const getVoteProposalQVFModal = () => {
   const modal = new ModalBuilder()
-    .setCustomId("voteProposalModal")
+    .setCustomId("voteProposalQVFModal")
     .setTitle("Vote Proposal");
 
   const percentageAllocatedInput = new TextInputBuilder()
@@ -24,5 +24,5 @@ const getVoteProposalModal = () => {
 };
 
 module.exports = {
-  getVoteProposalModal,
+  getVoteProposalQVFModal,
 };

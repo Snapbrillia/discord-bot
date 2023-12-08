@@ -20,6 +20,14 @@ const ProposalSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    uniqueVoters: {
+      type: Number,
+      default: 0,
+    },
+    proposalWeight: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

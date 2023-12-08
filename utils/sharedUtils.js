@@ -142,30 +142,30 @@ const getVotingRoundConfigurationText = (config) => {
   } = config;
 
   let text = `🔧** Voting Round Info**🔧\n
-      ** Voting System **: ${votingSystem}\n \n`;
+      Voting System Used: **${votingSystem}**\n \n`;
 
   if (onChainVotes !== undefined) {
-    text += `** Voting Method **: ${
+    text += `Voting Method : ${
       onChainVotes ? "Store votes on-chain" : "Store votes off-chain"
     }\n \n`;
   }
   if (votingTokenName) {
-    text += `** Voting Token **: ${votingTokenName}\n \n`;
+    text += `Voting Token : **${votingTokenName}**\n \n`;
   }
   if (onlyTokenHolderCanVote !== undefined) {
-    text += `** Participation Permissions **: ${
+    text += `Participation Permissions : **${
       onlyTokenHolderCanVote
         ? "Only people who hold a specific token can participate"
         : "Anybody can vote as long as they are verified"
-    }\n \n`;
+    }**\n \n`;
   }
   if (whitelistTokenName) {
-    text += `** Whitelist Token **: ${whitelistTokenName}\n \n`;
+    text += `Whitelist Token : **${whitelistTokenName}**\n \n`;
   }
   if (snapbrilliaWalletAuth !== undefined) {
-    text += `** Snapbrillia Wallet Auth **: ${
+    text += `Snapbrillia Wallet Auth : **${
       snapbrilliaWalletAuth ? "Enabled" : "Disabled"
-    }\n \n`;
+    }**\n \n`;
   }
   if (roundDurationInDays) {
     const startDate = new Date();
@@ -173,15 +173,15 @@ const getVotingRoundConfigurationText = (config) => {
       startDate.getTime() + roundDurationInDays * 24 * 60 * 60 * 1000
     );
 
-    text += `** Voting Round Start**: ${formatDate(
+    text += `Voting Round Start: **${formatDate(
       startDate
-    )}\n\n ** Voting Round End **: ${formatDate(endDate)}\n\n`;
+    )}**\n\n Voting Round End : **${formatDate(endDate)}**\n\n`;
   }
   if (votingRoundName) {
-    text += `** Voting Round Name **: ${votingRoundName}\n\n`;
+    text += `Voting Round Name : **${votingRoundName}**\n\n`;
   }
   if (votingRoundPurpose) {
-    text += `** Voting Round Purpose **: ${votingRoundPurpose}\n\n`;
+    text += `Voting Round Purpose : **${votingRoundPurpose}**\n\n`;
   }
 
   return text;

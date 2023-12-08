@@ -140,16 +140,16 @@ const handleSelectVotingTokenMenu = async (interaction) => {
   const discordUser = await DiscordUser.findOne({
     discordId: interaction.user.id,
   });
-  let token = {};
-  if (votingRound.blockchain === "Cardano") {
-    token = discordUser.cardanoTokensInWallet.find(
-      (token) => token.tokenIdentifier === tokenIdentifier
-    );
-  } else {
-    token = discordUser.ethereumTokensInWallet.find(
-      (token) => token.tokenIdentifier === tokenIdentifier
-    );
-  }
+  // let token = {};
+  // if (votingRound.blockchain === "Cardano") {
+  const token = discordUser.cardanoTokensInWallet.find(
+    (token) => token.tokenIdentifier === tokenIdentifier
+  );
+  // } else {
+  //   token = discordUser.ethereumTokensInWallet.find(
+  //     (token) => token.tokenIdentifier === tokenIdentifier
+  //   );
+  // }
   if (tokenIdentifier === "Enter Manually") {
     const modal = getSelectVotingTokenModal();
     return interaction.showModal(modal);

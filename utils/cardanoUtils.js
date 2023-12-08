@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { VotingRound } = require("../models/votingRound.model");
 require("dotenv").config();
 
 const blockfrostHeaders = {
@@ -7,16 +8,12 @@ const blockfrostHeaders = {
 };
 
 const checkIfADASend = async (address, amount) => {
-  try {
-    const txHash = await getTxHashOfTransaction(address, amount);
-    if (!txHash) {
-      return false;
-    }
-    const verified = await verifyTxHash(address, txHash);
-    return verified;
-  } catch (err) {
-    throw err;
+  const txHash = await getTxHashOfTransaction(address, amount);
+  if (!txHash) {
+    return false;
   }
+  const verified = await verifyTxHash(address, txHash);
+  return verified;
 };
 
 // Get the transaction hash of the transaction that sent the confirm amount
@@ -111,8 +108,32 @@ const getCardanoTokensInWallet = async (walletAddress) => {
   return tokenWithTokenName;
 };
 
+const concludeRound = async (votingRoundId) => {
+  const votingRound = VotingRound.findById(votingRoundId);
+  const assets = votingRound.assetIdentifierOnChain;
+  // get assets in wallet from each person and put in hash map
+
+  //   let votersHashTable = {};
+  //   let uniqueVoters = await Votes.distinct("voterAddress", {
+  //     votingRoundId: votingRounds[i]._id,
+  //   });
+  //   // Assuming that only Cardano-related logic remains
+  //   votersHashTable = await getCardanoVotes(
+  //     uniqueVoters,
+  //     votingRounds[i].assetIdentiferOnChain
+  //   );
+  //   const proposalsWithPrizeWeight = calculatesVotes(
+  //     votersHashTable,
+  //     votingRounds[i]
+  //   );
+  //   await updateProposalInfo(proposalsWithPrizeWeight);
+  //   votingRounds[i].isActive = false;
+  //   await votingRounds[i].save();
+};
+
 module.exports = {
   checkIfADASend,
   getTokenFromPolicyId,
   getCardanoTokensInWallet,
+  concludeRound,
 };

@@ -22,7 +22,7 @@ const createEmbed = (title, description) => {
     .setTitle(title)
     .setDescription(description)
     .setAuthor({
-      name: "Snapbrillia",
+      name: "Snapbrillia Bot",
       url: "https://snapbrillia.com",
       iconURL: `attachment://snapicon.png`,
     })

@@ -11,6 +11,7 @@ const VotingRoundSchema = new mongoose.Schema(
     // Quadratic Voting (Tokens In Wallet), Quadratic Voting (Same Voting Powe), Basic Voting , Single Choice Voting
     votingSystem: {
       type: String,
+      default: "Quadratic Voting",
     },
     onlyTokenHolderCanVote: {
       type: Boolean,
@@ -52,6 +53,14 @@ const VotingRoundSchema = new mongoose.Schema(
     },
     whitelistTokenBlockchain: {
       type: String,
+    },
+    uniqueVoters: {
+      type: Number,
+      default: 0,
+    },
+    proposalsSubmitted: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

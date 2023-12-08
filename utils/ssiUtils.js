@@ -72,7 +72,7 @@ const issueRegistrationCredential = async (proposal, userId) => {
 };
 
 const sendSnapbrilliaLoginCode = async (identity) => {
-  const provider = IdentityProvider.EMAIL;
+  const provider = IdentityProvider.Email;
 
   const requestInit = AuthenticateInitRequest.create({
     identity: identity,

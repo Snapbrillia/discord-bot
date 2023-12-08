@@ -2,19 +2,23 @@ const { createEmbed } = require("../../utils/discordUtils");
 
 const getProposalVotedEmbed = () => {
   const embed = createEmbed(
-    "🗳️ Proposal Voted 🗳️ ",
-    `Your vote has been registered. \n
+    "🗳️ Vote Registered 🗳️ ",
+    `Your vote has been successfully registered. \n
       `
   );
   return embed;
 };
 
-const getVoteProposalInfoEmbed = (percentageAllocated) => {
+const getVoteProposalInfoEmbed = (votingRound, proposal, votingPower) => {
   const embed = createEmbed(
     "🗳️ Vote Proposal Info 🗳️ ",
     `You have voted for a proposal with the following information. \n
-      Proposal Name: **New Discord Logo**\n
-      Percentage of Voting Power Allocated: **${percentageAllocated}%**\n
+    🔧** Vote Info**🔧 \n
+    Voting Round Selected: **${votingRound.votingRoundName}** \n
+    Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
+    Proposal Selected: **${proposal.name}** \n
+    Proposal Description: **${proposal.description}** \n
+    Percentage Of Voting Power Allocated: **${votingPower}** \n
     `
   );
   return embed;
@@ -23,16 +27,34 @@ const getVoteProposalInfoEmbed = (percentageAllocated) => {
 const getVoteProposalSelectVotingRoundEmbed = () => {
   const embed = createEmbed(
     "🗳️ Select Voting Round 🗳️ ",
-    `To vote for a proposal please first select the voting round you want to participate in \n 
+    `Select the voting round you want to participate in \n 
       `
   );
   return embed;
 };
 
-const getSelectProposalEmbed = () => {
+const getSelectProposalEmbed = (votingRound) => {
   const embed = createEmbed(
     "🗳️ Select Proposal 🗳️ ",
     `Please select the proposal you want to vote for. \n
+
+    🔧** Vote Info**🔧 \n
+    Voting Round Selected: **${votingRound.votingRoundName}** \n
+    Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
+    `
+  );
+  return embed;
+};
+
+const getEnterVoteQVFEmbed = (votingRound, proposal) => {
+  const embed = createEmbed(
+    "🗳️ Enter Voting Power 🗳️ ",
+    `Please enter a percentage of your voting power that you want to allocate to this proposal.\n
+    🔧** Vote Info**🔧 \n
+    Voting Round Selected: **${votingRound.votingRoundName}** \n
+    Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
+    Proposal Selected: **${proposal.name}** \n
+    Proposal Description: **${proposal.description}** \n
     `
   );
   return embed;
@@ -43,4 +65,5 @@ module.exports = {
   getVoteProposalInfoEmbed,
   getVoteProposalSelectVotingRoundEmbed,
   getSelectProposalEmbed,
+  getEnterVoteQVFEmbed,
 };

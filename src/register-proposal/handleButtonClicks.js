@@ -1,16 +1,19 @@
 const { Proposal } = require("../../models/projectProposal.model");
-const { getEmailModal, getEmailOTPModal } = require("./modals");
 const { getProposalRegisteredEmbed } = require("./embeds");
 const { getRegisterProposalModal } = require("./modals");
 const { DiscordServer } = require("../../models/discordServer.model");
 const { getImage } = require("../../utils/discordUtils");
 const { VotingRound } = require("../../models/votingRound.model");
+const { getEmailModal, getEmailOTPModal } = require("../link-wallet/modals");
 
-const handleConfirmRegisterProposalButton = async (interaction, client) => {
+const handleConfirmRegisterProposalButton = async (interaction) => {
   const proposal = await Proposal.findOne({
     discordId: interaction.user.id,
     status: "pending",
   });
+
+  proposal.status = "active";
+  await proposal.save();
 
   // await issueRegistrationCredential(proposal, interaction.user.id);
   const server = await DiscordServer.findOne({
@@ -21,19 +24,15 @@ const handleConfirmRegisterProposalButton = async (interaction, client) => {
     _id: proposal.votingRoundId,
   });
 
-  const userChannels = server.userChannels;
-
-  proposal.status = "active";
-  await proposal.save();
+  votingRound.proposalsSubmitted += 1;
+  await votingRound.save();
 
   const embed = getProposalRegisteredEmbed(proposal, votingRound);
   const image = getImage();
 
-  userChannels.forEach((channel) => {
-    client.channels.cache.get(channel).send({
-      embeds: [embed],
-      files: [image],
-    });
+  interaction.reply({
+    embeds: [embed],
+    files: [image],
   });
 };
 

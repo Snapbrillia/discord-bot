@@ -3,7 +3,7 @@ const { createEmbed } = require("../../utils/discordUtils");
 const getRegisterProposalEmbed = () => {
   const embed = createEmbed(
     "📝 Register Proposal 📝 ",
-    `To register a proposal please first select the voting round you want to participate in. \n
+    `Select the voting round you want to participate in. \n
       `
   );
   return embed;
@@ -14,7 +14,8 @@ const getEnterProposalInformationEmbed = (votingRound) => {
     "📌📃 Register Proposal 📃📌",
     `Please enter the name and description of your proposal. \n
     🔧** Proposal Info**🔧 \n
-     Voting Round: **${votingRound.votingRoundName}** \n
+     Voting Round Selected: **${votingRound.votingRoundName}** \n
+     Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
     `
   );
   return embed;
@@ -25,10 +26,10 @@ const getConfirmProposalInfoEmbed = (proposalInfo, votingRound) => {
     "📝 Confirm Proposal Info 📝 ",
     `Please confirm the following information about your proposal \n
     🔧** Proposal Info**🔧 \n
-        Voting Round: **${votingRound.votingRoundName}** \n
+        Voting Round Selected: **${votingRound.votingRoundName}** \n
         Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
-        Proposal Name: **${proposalInfo.proposalName}**\n
-        Proposal Description: **${proposalInfo.proposalDescription}**\n
+        Proposal Name: **${proposalInfo.name}**\n
+        Proposal Description: **${proposalInfo.description}**\n
         `
   );
   return embed;
@@ -39,10 +40,10 @@ const getProposalRegisteredEmbed = (proposalInfo, votingRound) => {
     "📝 Proposal Registered 📝 ",
     `Your proposal has been registered. \n
     🔧** Proposal Info**🔧 \n
-    Voting Round: **${votingRound.votingRoundName}** \n
+    Voting Round Selected: **${votingRound.votingRoundName}** \n
     Voting Round Purpose: **${votingRound.votingRoundPurpose}** \n
-    Proposal Name: **${proposalInfo.proposalName}**\n
-    Proposal Description: **${proposalInfo.proposalDescription}**\n
+    Proposal Name: **${proposalInfo.name}**\n
+    Proposal Description: **${proposalInfo.description}**\n
     `
   );
   return embed;

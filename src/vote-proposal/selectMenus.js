@@ -36,25 +36,7 @@ const getProposalDropdownMenu = (proposals) => {
   return actionRow;
 };
 
-const getListOfProposalMenu = (proposals) => {
-  const selectMenu = [];
-  for (let i = 0; i < proposals.length; i++) {
-    selectMenu.push({
-      label: proposals[i].name,
-      description: proposals[i].description,
-      value: proposals[i]._id.toString(),
-    });
-  }
-  const actionRow = buildActionRow(
-    selectMenu,
-    "Select Voting Round",
-    "selectRegisterProposalVotingRoundMenu"
-  );
-  return actionRow;
-};
-
 module.exports = {
   getVotingRoundMenu,
   getProposalDropdownMenu,
-  getListOfProposalMenu,
 };
